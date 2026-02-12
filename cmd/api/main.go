@@ -12,6 +12,7 @@ import (
 	"github.com/felipe1496/open-wallet/internal/resources/auth"
 	"github.com/felipe1496/open-wallet/internal/resources/categories"
 	"github.com/felipe1496/open-wallet/internal/resources/transactions"
+	"github.com/felipe1496/open-wallet/internal/utils"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -46,6 +47,7 @@ func main() {
 	r.Use(DelayMiddleware())
 
 	err := godotenv.Load()
+	utils.LoadEnvs()
 	if err != nil {
 		log.Println("Error loading .env file", err)
 	}

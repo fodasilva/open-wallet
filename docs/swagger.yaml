@@ -125,111 +125,13 @@ definitions:
     properties:
       amount:
         maximum: 999999
-        minimum: 0
+        minimum: -999999
         type: number
       reference_date:
         type: string
     required:
     - amount
     - reference_date
-    type: object
-  transactions.CreateIncomeRequest:
-    properties:
-      amount:
-        maximum: 999999
-        minimum: 0
-        type: number
-      category_id:
-        type: string
-      description:
-        maxLength: 400
-        minLength: 0
-        type: string
-      name:
-        type: string
-      reference_date:
-        type: string
-    required:
-    - amount
-    - name
-    - reference_date
-    type: object
-  transactions.CreateIncomeResponse:
-    properties:
-      data:
-        $ref: '#/definitions/transactions.CreateIncomeResponseData'
-    type: object
-  transactions.CreateIncomeResponseData:
-    properties:
-      entry:
-        $ref: '#/definitions/transactions.ViewEntry'
-    type: object
-  transactions.CreateInstallmentRequest:
-    properties:
-      category_id:
-        type: string
-      description:
-        maxLength: 400
-        minLength: 0
-        type: string
-      name:
-        type: string
-      reference_date:
-        type: string
-      total_amount:
-        maximum: 999999
-        type: number
-      total_installments:
-        maximum: 100
-        type: integer
-    required:
-    - name
-    - reference_date
-    - total_amount
-    - total_installments
-    type: object
-  transactions.CreateInstallmentResponse:
-    properties:
-      data:
-        $ref: '#/definitions/transactions.CreateInstallmentResponseData'
-    type: object
-  transactions.CreateInstallmentResponseData:
-    properties:
-      entries:
-        items:
-          $ref: '#/definitions/transactions.ViewEntry'
-        type: array
-    type: object
-  transactions.CreateSimpleExpenseRequest:
-    properties:
-      amount:
-        maximum: 999999
-        minimum: 0
-        type: number
-      category_id:
-        type: string
-      description:
-        maxLength: 400
-        minLength: 0
-        type: string
-      name:
-        type: string
-      reference_date:
-        type: string
-    required:
-    - amount
-    - name
-    - reference_date
-    type: object
-  transactions.CreateSimpleExpenseResponse:
-    properties:
-      data:
-        $ref: '#/definitions/transactions.CreateSimpleExpenseResponseData'
-    type: object
-  transactions.CreateSimpleExpenseResponseData:
-    properties:
-      entry:
-        $ref: '#/definitions/transactions.ViewEntry'
     type: object
   transactions.CreateTransactionRequest:
     properties:
@@ -242,6 +144,8 @@ definitions:
         minItems: 1
         type: array
       name:
+        maxLength: 100
+        minLength: 1
         type: string
       note:
         maxLength: 400
@@ -304,85 +208,13 @@ definitions:
     properties:
       amount:
         maximum: 999999
-        minimum: 0
+        minimum: -999999
         type: number
       reference_date:
         type: string
     required:
     - amount
     - reference_date
-    type: object
-  transactions.UpdateIncomeRequest:
-    properties:
-      amount:
-        type: number
-      category_id:
-        type: string
-      description:
-        type: string
-      name:
-        type: string
-      reference_date:
-        type: string
-    type: object
-  transactions.UpdateIncomeResponse:
-    properties:
-      data:
-        $ref: '#/definitions/transactions.UpdateIncomeResponseData'
-    type: object
-  transactions.UpdateIncomeResponseData:
-    properties:
-      entry:
-        $ref: '#/definitions/transactions.ViewEntry'
-    type: object
-  transactions.UpdateInstallmentRequest:
-    properties:
-      amount:
-        maximum: 999999
-        type: number
-      category_id:
-        type: string
-      description:
-        maxLength: 400
-        minLength: 0
-        type: string
-      name:
-        type: string
-    type: object
-  transactions.UpdateInstallmentResponse:
-    properties:
-      data:
-        $ref: '#/definitions/transactions.UpdateInstallmentResponseData'
-    type: object
-  transactions.UpdateInstallmentResponseData:
-    properties:
-      entries:
-        items:
-          $ref: '#/definitions/transactions.ViewEntry'
-        type: array
-    type: object
-  transactions.UpdateSimpleExpenseRequest:
-    properties:
-      amount:
-        type: number
-      category_id:
-        type: string
-      description:
-        type: string
-      name:
-        type: string
-      reference_date:
-        type: string
-    type: object
-  transactions.UpdateSimpleExpenseResponse:
-    properties:
-      data:
-        $ref: '#/definitions/transactions.UpdateSimpleExpenseResponseData'
-    type: object
-  transactions.UpdateSimpleExpenseResponseData:
-    properties:
-      entry:
-        $ref: '#/definitions/transactions.ViewEntry'
     type: object
   transactions.UpdateTransactionRequest:
     properties:
@@ -400,11 +232,15 @@ definitions:
         type: string
       note:
         maxLength: 400
-        minLength: 2
+        minLength: 0
         type: string
+      update:
+        items:
+          type: string
+        minItems: 1
+        type: array
     required:
-    - entries
-    - name
+    - update
     type: object
   transactions.UpdateTransactionResponse:
     properties:
@@ -879,237 +715,6 @@ paths:
       security:
       - BearerAuth: []
       summary: List entries
-      tags:
-      - transactions
-  /transactions/income:
-    post:
-      consumes:
-      - application/json
-      description: Create an income transactions and entry
-      parameters:
-      - description: Income payload
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/transactions.CreateIncomeRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Income transaction created
-          schema:
-            $ref: '#/definitions/transactions.CreateIncomeResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal server error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      security:
-      - BearerAuth: []
-      summary: Create an income
-      tags:
-      - transactions
-  /transactions/income/{transaction_id}:
-    patch:
-      consumes:
-      - application/json
-      description: Update a cinome
-      parameters:
-      - description: transaction ID
-        in: path
-        name: transaction_id
-        required: true
-        type: string
-      - description: Income payload
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/transactions.UpdateIncomeRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Income updated
-          schema:
-            $ref: '#/definitions/transactions.UpdateIncomeResponse'
-        "400":
-          description: Bad request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal server error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      security:
-      - BearerAuth: []
-      summary: Update a income
-      tags:
-      - transactions
-  /transactions/installment:
-    post:
-      consumes:
-      - application/json
-      description: Create an installment transactions and entries
-      parameters:
-      - description: Installment payload
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/transactions.CreateInstallmentRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Transaction created
-          schema:
-            $ref: '#/definitions/transactions.CreateInstallmentResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal server error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      security:
-      - BearerAuth: []
-      summary: Create an installment
-      tags:
-      - transactions
-  /transactions/installment/{transaction_id}/entry/{entry_id}:
-    patch:
-      consumes:
-      - application/json
-      description: Update a cinome
-      parameters:
-      - description: transaction ID
-        in: path
-        name: transaction_id
-        required: true
-        type: string
-      - description: entry ID
-        in: path
-        name: entry_id
-        required: true
-        type: string
-      - description: Installment payload
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/transactions.UpdateInstallmentRequest'
-      - description: Scope
-        enum:
-        - following
-        - all
-        in: query
-        name: scope
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Installment updated
-          schema:
-            $ref: '#/definitions/transactions.UpdateInstallmentResponse'
-        "400":
-          description: Bad request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal server error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      security:
-      - BearerAuth: []
-      summary: Update a income
-      tags:
-      - transactions
-  /transactions/simple-expense:
-    post:
-      consumes:
-      - application/json
-      description: Create a Simple Expense transaction and entry
-      parameters:
-      - description: Simple Expense payload
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/transactions.CreateSimpleExpenseRequest'
-      produces:
-      - application/json
-      responses:
-        "201":
-          description: Simple Expense created
-          schema:
-            $ref: '#/definitions/transactions.CreateSimpleExpenseResponse'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal server error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      security:
-      - BearerAuth: []
-      summary: Create a Simple Expense
-      tags:
-      - transactions
-  /transactions/simple-expense/{transaction_id}:
-    patch:
-      consumes:
-      - application/json
-      description: Update a simple expense
-      parameters:
-      - description: transaction ID
-        in: path
-        name: transaction_id
-        required: true
-        type: string
-      - description: Simple expense payload
-        in: body
-        name: body
-        required: true
-        schema:
-          $ref: '#/definitions/transactions.UpdateSimpleExpenseRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Simple expense updated
-          schema:
-            $ref: '#/definitions/transactions.UpdateSimpleExpenseResponse'
-        "400":
-          description: Bad request
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-        "500":
-          description: Internal server error
-          schema:
-            $ref: '#/definitions/utils.HTTPError'
-      security:
-      - BearerAuth: []
-      summary: Update a simple expense
       tags:
       - transactions
 securityDefinitions:
