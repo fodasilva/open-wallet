@@ -12,8 +12,8 @@ type CategoriesRepo interface {
 	List(db utils.Executer, filter *utils.QueryOptsBuilder) ([]Category, error)
 	DeleteByID(db utils.Executer, id string) error
 	Count(db utils.Executer, filter *utils.QueryOptsBuilder) (int, error)
-	ListCategoryAmountPerPeriod(db utils.Executer, filter *utils.QueryOptsBuilder) ([]CategoryAmountPerPeriod, error)
-	CountCategoryAmountPerPeriod(db utils.Executer, filter *utils.QueryOptsBuilder) (int, error)
+	ListCategoryAmountPerPeriod(db utils.Executer, period string, filter *utils.QueryOptsBuilder) ([]CategoryAmountPerPeriod, error)
+	CountCategoryAmountPerPeriod(db utils.Executer, period string, filter *utils.QueryOptsBuilder) (int, error)
 	Update(db utils.Executer, id string, payload UpdateCategoryDTO) (Category, error)
 }
 
@@ -122,22 +122,28 @@ func (r *CategoriesRepoImpl) DeleteByID(db utils.Executer, id string) error {
 	return err
 }
 
-func (r *CategoriesRepoImpl) ListCategoryAmountPerPeriod(db utils.Executer, filter *utils.QueryOptsBuilder) ([]CategoryAmountPerPeriod, error) {
-	query := squirrel.Select("id", "user_id", "name", "color", "period", "total_amount").
-		From("v_category_amount_per_period").
+func (r *CategoriesRepoImpl) ListCategoryAmountPerPeriod(db utils.Executer, period string, filter *utils.QueryOptsBuilder) ([]CategoryAmountPerPeriod, error) {
+	query := squirrel.
+		Select("id", "user_id", "name", "color", "period", "total_amount").
+		From("fn_category_amount_per_period(?)").
 		PlaceholderFormat(squirrel.Dollar)
 
 	query = utils.QueryOptsToSquirrel(query, filter)
 
 	sql, args, err := query.ToSql()
+
 	if err != nil {
 		return nil, err
 	}
 
+	args = append([]interface{}{period}, args...)
+
 	rows, err := db.Query(sql, args...)
+
 	if err != nil {
 		return nil, err
 	}
+
 	defer rows.Close()
 
 	result := make([]CategoryAmountPerPeriod, 0)
@@ -162,18 +168,21 @@ func (r *CategoriesRepoImpl) ListCategoryAmountPerPeriod(db utils.Executer, filt
 	return result, nil
 }
 
-func (r *CategoriesRepoImpl) CountCategoryAmountPerPeriod(db utils.Executer, filter *utils.QueryOptsBuilder) (int, error) {
+func (r *CategoriesRepoImpl) CountCategoryAmountPerPeriod(db utils.Executer, period string, filter *utils.QueryOptsBuilder) (int, error) {
 	countQuery := squirrel.
 		Select("COUNT(*)").
-		From("v_category_amount_per_period").
+		From("fn_category_amount_per_period(?)").
 		PlaceholderFormat(squirrel.Dollar)
 
 	countQuery = utils.QueryOptsToSquirrel(countQuery, filter)
 
 	sql, args, err := countQuery.ToSql()
+
 	if err != nil {
 		return 0, err
 	}
+
+	args = append([]interface{}{period}, args...)
 
 	var count int
 	err = db.QueryRow(sql, args...).Scan(&count)

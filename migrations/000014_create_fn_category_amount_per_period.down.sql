@@ -1,0 +1,1 @@
+drop function fn_category_amount_per_period;

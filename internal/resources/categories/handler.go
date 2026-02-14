@@ -168,9 +168,9 @@ func (api *API) ListCategoryAmountPerPeriod(ctx *gin.Context) {
 	userID := ctx.GetString("user_id")
 	period := ctx.Param("period")
 	queryOpts := ctx.MustGet("query_opts").(*utils.QueryOptsBuilder).
-		And("user_id", "eq", userID).And("period", "eq", period)
+		And("user_id", "eq", userID)
 
-	categories, err := api.categoriesUseCase.ListCategoryAmountPerPeriod(queryOpts)
+	categories, err := api.categoriesUseCase.ListCategoryAmountPerPeriod(period, queryOpts)
 
 	if err != nil {
 		apiErr := utils.NewHTTPError(http.StatusInternalServerError, err.Error())
@@ -178,7 +178,7 @@ func (api *API) ListCategoryAmountPerPeriod(ctx *gin.Context) {
 		return
 	}
 
-	count, err := api.categoriesUseCase.CountCategoryAmountPerPeriod(utils.ForCount(queryOpts))
+	count, err := api.categoriesUseCase.CountCategoryAmountPerPeriod(period, utils.ForCount(queryOpts))
 	if err != nil {
 		apiErr := err.(*utils.HTTPError)
 		ctx.JSON(apiErr.StatusCode, apiErr)
