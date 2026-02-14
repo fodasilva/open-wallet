@@ -1,0 +1,1 @@
+drop view v_category_amount_per_period;

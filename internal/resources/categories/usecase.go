@@ -2,6 +2,7 @@ package categories
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
 
 	"github.com/felipe1496/open-wallet/internal/utils"
@@ -12,8 +13,8 @@ type CategoriesUseCase interface {
 	List(filter *utils.QueryOptsBuilder) ([]Category, error)
 	DeleteByID(id string) error
 	Count(filter *utils.QueryOptsBuilder) (int, error)
-	ListCategoryAmountPerPeriod(filter *utils.QueryOptsBuilder) ([]CategoryAmountPerPeriod, error)
-	CountCategoryAmountPerPeriod(filter *utils.QueryOptsBuilder) (int, error)
+	ListCategoryAmountPerPeriod(period string, filter *utils.QueryOptsBuilder) ([]CategoryAmountPerPeriod, error)
+	CountCategoryAmountPerPeriod(period string, filter *utils.QueryOptsBuilder) (int, error)
 	Update(id string, payload UpdateCategoryDTO) (Category, error)
 }
 
@@ -77,16 +78,17 @@ func (uc *CategoriesUseCaseImpl) Count(filter *utils.QueryOptsBuilder) (int, err
 	return count, nil
 }
 
-func (uc *CategoriesUseCaseImpl) ListCategoryAmountPerPeriod(filter *utils.QueryOptsBuilder) ([]CategoryAmountPerPeriod, error) {
-	amounts, err := uc.repo.ListCategoryAmountPerPeriod(uc.db, filter)
+func (uc *CategoriesUseCaseImpl) ListCategoryAmountPerPeriod(period string, filter *utils.QueryOptsBuilder) ([]CategoryAmountPerPeriod, error) {
+	amounts, err := uc.repo.ListCategoryAmountPerPeriod(uc.db, period, filter)
 	if err != nil {
+		fmt.Println("err: ", err)
 		return nil, utils.NewHTTPError(http.StatusInternalServerError, "failed to list category amounts per period")
 	}
 	return amounts, nil
 }
 
-func (uc *CategoriesUseCaseImpl) CountCategoryAmountPerPeriod(filter *utils.QueryOptsBuilder) (int, error) {
-	count, err := uc.repo.CountCategoryAmountPerPeriod(uc.db, filter)
+func (uc *CategoriesUseCaseImpl) CountCategoryAmountPerPeriod(period string, filter *utils.QueryOptsBuilder) (int, error) {
+	count, err := uc.repo.CountCategoryAmountPerPeriod(uc.db, period, filter)
 
 	if err != nil {
 		return 0, utils.NewHTTPError(http.StatusInternalServerError, "failed to count category amounts per period")
