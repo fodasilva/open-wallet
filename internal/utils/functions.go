@@ -6,6 +6,7 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"net/url"
 	"reflect"
 
 	"github.com/gin-gonic/gin"
@@ -84,4 +85,9 @@ func ContainsSome(slice []string, items []string) bool {
 		}
 	}
 	return false
+}
+
+func isValidURL(str string) bool {
+	u, err := url.ParseRequestURI(str)
+	return err == nil && u.Scheme != "" && u.Host != ""
 }
