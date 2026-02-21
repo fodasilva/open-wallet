@@ -6,6 +6,7 @@ import (
 
 	"github.com/felipe1496/open-wallet/internal/resources/categories"
 	"github.com/felipe1496/open-wallet/internal/utils"
+	"go.opentelemetry.io/otel"
 
 	"github.com/gin-gonic/gin"
 )
@@ -36,12 +37,17 @@ func NewHandler(db *sql.DB) *API {
 // @Failure 500 {object} utils.HTTPError "Internal server error"
 // @Router /transactions/entries [get]
 func (api *API) ListEntries(ctx *gin.Context) {
+	tracer := otel.Tracer("open-wallet-api")
+
+	userContext, span := tracer.Start(ctx, "ListEntriesHandler")
+	defer span.End()
+
 	userID := ctx.GetString("user_id")
 	page := ctx.GetInt("page")
 	perPage := ctx.GetInt("per_page")
 	queryOpts := ctx.MustGet("query_opts").(*utils.QueryOptsBuilder).And("user_id", "eq", userID)
 
-	entries, err := api.transactionsUseCase.ListViewEntries(queryOpts)
+	entries, err := api.transactionsUseCase.ListViewEntries(userContext, queryOpts)
 
 	if err != nil {
 		apiErr := err.(*utils.HTTPError)

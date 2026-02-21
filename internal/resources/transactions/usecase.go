@@ -1,6 +1,7 @@
 package transactions
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"net/http"
@@ -9,31 +10,38 @@ import (
 	"github.com/felipe1496/open-wallet/internal/constants"
 	"github.com/felipe1496/open-wallet/internal/resources/categories"
 	"github.com/felipe1496/open-wallet/internal/utils"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type TransactionsUseCase interface {
-	ListViewEntries(filter *utils.QueryOptsBuilder) ([]ViewEntry, error)
+	ListViewEntries(ctx context.Context, filter *utils.QueryOptsBuilder) ([]ViewEntry, error)
 	CountViewEntries(filter *utils.QueryOptsBuilder) (int, error)
 	DeleteTransactionById(id string) error
 	CreateTransaction(payload CreateTransactionDTO) (Transaction, error)
 	UpdateTransaction(transactionID string, userID string, payload UpdateTransactionDTO) (Transaction, error)
 }
 
-type TransactionsUseCaseImpl struct {
+type transactionsUseCaseImpl struct {
 	repo              TransactionsRepo
 	categoriesUseCase categories.CategoriesUseCase
 	db                *sql.DB
+	tracer            trace.Tracer
 }
 
 func NewTransactionsUseCase(repo TransactionsRepo, categoriesUseCase categories.CategoriesUseCase, db *sql.DB) TransactionsUseCase {
-	return &TransactionsUseCaseImpl{
-		repo,
-		categoriesUseCase,
-		db,
+	return &transactionsUseCaseImpl{
+		repo:              repo,
+		categoriesUseCase: categoriesUseCase,
+		db:                db,
+		tracer:            otel.Tracer("TransactionsUseCase"),
 	}
 }
 
-func (uc *TransactionsUseCaseImpl) ListViewEntries(filter *utils.QueryOptsBuilder) ([]ViewEntry, error) {
+func (uc *transactionsUseCaseImpl) ListViewEntries(ctx context.Context, filter *utils.QueryOptsBuilder) ([]ViewEntry, error) {
+	ctx, span := uc.tracer.Start(ctx, "ListViewEntriesUseCase")
+	defer span.End()
+
 	entries, err := uc.repo.ListViewEntries(uc.db, filter)
 
 	if err != nil {
@@ -43,7 +51,7 @@ func (uc *TransactionsUseCaseImpl) ListViewEntries(filter *utils.QueryOptsBuilde
 	return entries, nil
 }
 
-func (uc *TransactionsUseCaseImpl) CountViewEntries(filter *utils.QueryOptsBuilder) (int, error) {
+func (uc *transactionsUseCaseImpl) CountViewEntries(filter *utils.QueryOptsBuilder) (int, error) {
 	count, err := uc.repo.CountViewEntries(uc.db, filter)
 
 	if err != nil {
@@ -53,7 +61,7 @@ func (uc *TransactionsUseCaseImpl) CountViewEntries(filter *utils.QueryOptsBuild
 	return count, nil
 }
 
-func (uc *TransactionsUseCaseImpl) DeleteTransactionById(id string) error {
+func (uc *transactionsUseCaseImpl) DeleteTransactionById(id string) error {
 	transactionExists, err := uc.repo.ListTransactions(uc.db, utils.QueryOpts().And("id", "eq", id))
 
 	if err != nil {
@@ -138,7 +146,7 @@ func validateTransaction(entries []validateTransactionPropsEntry, transactionTyp
 	return nil
 }
 
-func (uc *TransactionsUseCaseImpl) CreateTransaction(payload CreateTransactionDTO) (Transaction, error) {
+func (uc *transactionsUseCaseImpl) CreateTransaction(payload CreateTransactionDTO) (Transaction, error) {
 
 	err := validateTransaction(func() []validateTransactionPropsEntry {
 		entries := make([]validateTransactionPropsEntry, 0)
@@ -202,7 +210,7 @@ func (uc *TransactionsUseCaseImpl) CreateTransaction(payload CreateTransactionDT
 	return transaction, nil
 }
 
-func (uc *TransactionsUseCaseImpl) UpdateTransaction(transactionID string, userID string, payload UpdateTransactionDTO) (t Transaction, err error) {
+func (uc *transactionsUseCaseImpl) UpdateTransaction(transactionID string, userID string, payload UpdateTransactionDTO) (t Transaction, err error) {
 	tx, err := uc.db.Begin()
 	defer func() {
 		if tx == nil {
