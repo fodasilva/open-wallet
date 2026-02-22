@@ -2,18 +2,18 @@ package transactions
 
 import (
 	"log"
-	"os"
 
 	"github.com/felipe1496/open-wallet/db"
 
 	"github.com/felipe1496/open-wallet/internal/middlewares"
 	"github.com/felipe1496/open-wallet/internal/services"
+	"github.com/felipe1496/open-wallet/internal/utils"
 
 	"github.com/gin-gonic/gin"
 )
 
 func Router(router *gin.Engine) {
-	db, err := db.Conn(os.Getenv("DATABASE_URL"))
+	db, err := db.Conn(utils.AppConfig.DatabaseURL)
 	if err != nil {
 		log.Fatal(err)
 	}

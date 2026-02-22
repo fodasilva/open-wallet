@@ -11,17 +11,29 @@ import (
 )
 
 type ConfigRoot struct {
-	Enviroment   string
-	Delay        string
-	Origins      string
-	GcpProjectID string
+	Enviroment         string
+	Delay              string
+	Origins            string
+	GcpProjectID       string
+	Port               string
+	DatabaseURL        string
+	GoogleClientID     string
+	GoogleClientSecret string
+	LoginRedirectURI   string
+	JWTSecret          string
 }
 
 type Config struct {
-	Enviroment   string
-	Delay        int
-	Origins      []string
-	GcpProjectID *string
+	Enviroment       string
+	Delay            int
+	Origins          []string
+	GcpProjectID     *string
+	Port             int
+	DatabaseURL      string
+	GoogleClientID   string
+	GoogleSecret     string
+	LoginRedirectURI string
+	JWTSecret        string
 }
 
 var AppConfig *Config
@@ -39,10 +51,16 @@ func init() {
 
 func loadConfig() *ConfigRoot {
 	return &ConfigRoot{
-		Enviroment:   os.Getenv("ENVIROMENT"),
-		Delay:        os.Getenv("DELAY"),
-		Origins:      os.Getenv("ORIGINS"),
-		GcpProjectID: os.Getenv("GCP_PROJECT_ID"),
+		Enviroment:         os.Getenv("ENVIROMENT"),
+		Delay:              os.Getenv("DELAY"),
+		Origins:            os.Getenv("ORIGINS"),
+		GcpProjectID:       os.Getenv("GCP_PROJECT_ID"),
+		Port:               os.Getenv("PORT"),
+		DatabaseURL:        os.Getenv("DATABASE_URL"),
+		GoogleClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
+		GoogleClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
+		LoginRedirectURI:   os.Getenv("LOGIN_REDIRECT_URI"),
+		JWTSecret:          os.Getenv("JWT_SECRET"),
 	}
 }
 
@@ -87,6 +105,48 @@ func validateConfig(ctg *ConfigRoot) *Config {
 
 	if ctg.GcpProjectID != "" {
 		Config.GcpProjectID = &ctg.GcpProjectID
+	}
+
+	if ctg.Port != "" {
+		intPort, err := strconv.Atoi(ctg.Port)
+
+		if err != nil {
+			errors = append(errors, "PORT must be a number")
+		} else {
+			Config.Port = intPort
+		}
+	} else {
+		Config.Port = 8080
+	}
+
+	if ctg.DatabaseURL != "" {
+		Config.DatabaseURL = ctg.DatabaseURL
+	} else {
+		errors = append(errors, "DATABASE_URL is required")
+	}
+
+	if ctg.GoogleClientID != "" {
+		Config.GoogleClientID = ctg.GoogleClientID
+	} else {
+		errors = append(errors, "GOOGLE_CLIENT_ID is required")
+	}
+
+	if ctg.GoogleClientSecret != "" {
+		Config.GoogleSecret = ctg.GoogleClientSecret
+	} else {
+		errors = append(errors, "GOOGLE_CLIENT_SECRET is required")
+	}
+
+	if ctg.LoginRedirectURI != "" {
+		Config.LoginRedirectURI = ctg.LoginRedirectURI
+	} else {
+		errors = append(errors, "LOGIN_REDIRECT_URI is required")
+	}
+
+	if ctg.JWTSecret != "" {
+		Config.JWTSecret = ctg.JWTSecret
+	} else {
+		errors = append(errors, "JWT_SECRET is required")
 	}
 
 	if len(errors) > 0 {

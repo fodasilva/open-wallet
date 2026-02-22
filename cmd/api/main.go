@@ -3,7 +3,7 @@ package main
 import (
 	"context"
 	"log"
-	"os"
+	"strconv"
 	"time"
 
 	docs "github.com/felipe1496/open-wallet/docs"
@@ -62,10 +62,7 @@ func main() {
 	transactions.Router(r)
 	categories.Router(r)
 
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
+	port := strconv.Itoa(utils.AppConfig.Port)
 
 	r.Run(":" + port)
 }
