@@ -8,7 +8,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-func Tracing(serviceName string) gin.HandlerFunc {
+func TraceMiddleware(serviceName string) gin.HandlerFunc {
 	tracer := otel.Tracer(serviceName)
 
 	return func(c *gin.Context) {
