@@ -1,23 +1,17 @@
 package transactions
 
 import (
-	"log"
+	"database/sql"
 
-	"github.com/felipe1496/open-wallet/db"
 	"github.com/redis/go-redis/v9"
 
 	"github.com/felipe1496/open-wallet/internal/middlewares"
 	"github.com/felipe1496/open-wallet/internal/services"
-	"github.com/felipe1496/open-wallet/internal/utils"
 
 	"github.com/gin-gonic/gin"
 )
 
-func Router(router *gin.Engine, redisClient *redis.Client) {
-	db, err := db.Conn(utils.AppConfig.DatabaseURL)
-	if err != nil {
-		log.Fatal(err)
-	}
+func Router(router *gin.Engine, db *sql.DB, redisClient *redis.Client) {
 	jwtService := services.NewJWTService()
 	handler := NewHandler(db)
 	transactionsGroup := router.Group("/api/v1/transactions")

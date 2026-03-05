@@ -9,6 +9,8 @@ import (
 	docs "github.com/felipe1496/open-wallet/docs"
 	"github.com/felipe1496/open-wallet/trace"
 
+	"github.com/felipe1496/open-wallet/db"
+
 	"github.com/felipe1496/open-wallet/internal/middlewares"
 	"github.com/felipe1496/open-wallet/internal/resources/auth"
 	"github.com/felipe1496/open-wallet/internal/resources/categories"
@@ -45,6 +47,11 @@ func main() {
 		_ = tp.Shutdown(context.Background())
 	}()
 
+	dbConn, err := db.Conn(utils.AppConfig.DatabaseURL)
+	if err != nil {
+		log.Fatalf("failed to connect to postgres: %v", err)
+	}
+
 	opts, err := redis.ParseURL(utils.AppConfig.RateLimitDBURL)
 	if err != nil {
 		log.Fatalf("failed to parse redis url for rate limite: %v", err)
@@ -75,9 +82,9 @@ func main() {
 	r.Use(gin.Recovery())
 	r.Use(middlewares.GlobalRateLimitMiddleware(redisClient))
 
-	auth.Router(r, redisClient)
-	transactions.Router(r, redisClient)
-	categories.Router(r, redisClient)
+	auth.Router(r, dbConn, redisClient)
+	transactions.Router(r, dbConn, redisClient)
+	categories.Router(r, dbConn, redisClient)
 
 	port := strconv.Itoa(utils.AppConfig.Port)
 
