@@ -21,19 +21,25 @@ type ConfigRoot struct {
 	GoogleClientSecret string
 	LoginRedirectURI   string
 	JWTSecret          string
+	RateLimitDBURL     string
+	RateLimitMax       string
+	RateLimitWindow    string
 }
 
 type Config struct {
-	Enviroment       string
-	Delay            int
-	Origins          []string
-	GcpProjectID     *string
-	Port             int
-	DatabaseURL      string
-	GoogleClientID   string
-	GoogleSecret     string
-	LoginRedirectURI string
-	JWTSecret        string
+	Enviroment           string
+	Delay                int
+	Origins              []string
+	GcpProjectID         *string
+	Port                 int
+	DatabaseURL          string
+	GoogleClientID       string
+	GoogleSecret         string
+	LoginRedirectURI     string
+	JWTSecret            string
+	RateLimitDBURL       string
+	RateLimitMaxRequests int
+	RateLimitWindowMs    int
 }
 
 var AppConfig *Config
@@ -61,6 +67,9 @@ func loadConfig() *ConfigRoot {
 		GoogleClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
 		LoginRedirectURI:   os.Getenv("LOGIN_REDIRECT_URI"),
 		JWTSecret:          os.Getenv("JWT_SECRET"),
+		RateLimitDBURL:     os.Getenv("RATE_LIMIT_DB_URL"),
+		RateLimitMax:       os.Getenv("RATE_LIMIT_MAX_REQUESTS"),
+		RateLimitWindow:    os.Getenv("RATE_LIMIT_WINDOW_MS"),
 	}
 }
 
@@ -147,6 +156,34 @@ func validateConfig(ctg *ConfigRoot) *Config {
 		Config.JWTSecret = ctg.JWTSecret
 	} else {
 		errors = append(errors, "JWT_SECRET is required")
+	}
+
+	if ctg.RateLimitDBURL != "" {
+		Config.RateLimitDBURL = ctg.RateLimitDBURL
+	} else {
+		errors = append(errors, "RATE_LIMIT_DB_URL is required")
+	}
+
+	if ctg.RateLimitMax != "" {
+		intRate, err := strconv.Atoi(ctg.RateLimitMax)
+		if err != nil {
+			errors = append(errors, "RATE_LIMIT_MAX_REQUESTS must be a number")
+		} else {
+			Config.RateLimitMaxRequests = intRate
+		}
+	} else {
+		Config.RateLimitMaxRequests = 100
+	}
+
+	if ctg.RateLimitWindow != "" {
+		intTime, err := strconv.Atoi(ctg.RateLimitWindow)
+		if err != nil {
+			errors = append(errors, "RATE_LIMIT_WINDOW_MS must be a number")
+		} else {
+			Config.RateLimitWindowMs = intTime
+		}
+	} else {
+		Config.RateLimitWindowMs = 60000
 	}
 
 	if len(errors) > 0 {

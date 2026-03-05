@@ -77,4 +77,7 @@ jobs:
             --set-env-vars ORIGINS="${{ vars.ORIGINS }}" \
             --set-env-vars LOGIN_REDIRECT_URI="${{ vars.LOGIN_REDIRECT_URI }}" \
             --set-env-vars GCP_PROJECT_ID="${{ secrets.GCP_PROJECT_ID }}" \
-            --set-env-vars ENVIRONMENT="prod"
+            --set-env-vars ENVIRONMENT="prod" \
+            --set-env-vars RATE_LIMIT_DB_URL="${{ secrets.RATE_LIMIT_DB_URL }}" \
+            --set-env-vars RATE_LIMIT_MAX_REQUESTS="${{ vars.RATE_LIMIT_MAX_REQUESTS }}" \
+            --set-env-vars RATE_LIMIT_WINDOW_MS="${{ vars.RATE_LIMIT_WINDOW_MS }}"

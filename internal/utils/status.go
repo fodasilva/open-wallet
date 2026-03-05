@@ -5,5 +5,6 @@ var StatusMessages = map[int]string{
 	401: "unauthorized",
 	403: "forbidden",
 	404: "not found",
+	429: "too many requests",
 	500: "internal server error",
 }

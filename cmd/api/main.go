@@ -15,6 +15,8 @@ import (
 	"github.com/felipe1496/open-wallet/internal/resources/transactions"
 	"github.com/felipe1496/open-wallet/internal/utils"
 
+	"github.com/redis/go-redis/v9"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
@@ -43,6 +45,16 @@ func main() {
 		_ = tp.Shutdown(context.Background())
 	}()
 
+	opts, err := redis.ParseURL(utils.AppConfig.RateLimitDBURL)
+	if err != nil {
+		log.Fatalf("failed to parse redis url for rate limite: %v", err)
+	}
+	redisClient := redis.NewClient(opts)
+
+	if err := redisClient.Ping(context.Background()).Err(); err != nil {
+		log.Fatalf("failed to connect to redis: %v", err)
+	}
+
 	r := gin.Default()
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	// add swagger
@@ -61,10 +73,11 @@ func main() {
 
 	r.Use(middlewares.Tracing("open-wallet-service"))
 	r.Use(gin.Recovery())
+	r.Use(middlewares.GlobalRateLimitMiddleware(redisClient))
 
-	auth.Router(r)
-	transactions.Router(r)
-	categories.Router(r)
+	auth.Router(r, redisClient)
+	transactions.Router(r, redisClient)
+	categories.Router(r, redisClient)
 
 	port := strconv.Itoa(utils.AppConfig.Port)
 
