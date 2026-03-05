@@ -11,12 +11,11 @@ import (
 	"github.com/felipe1496/open-wallet/internal/resources/categories"
 	"github.com/felipe1496/open-wallet/internal/utils"
 	"go.opentelemetry.io/otel"
-	"go.opentelemetry.io/otel/trace"
 )
 
 type TransactionsUseCase interface {
 	ListViewEntries(ctx context.Context, filter *utils.QueryOptsBuilder) ([]ViewEntry, error)
-	CountViewEntries(filter *utils.QueryOptsBuilder) (int, error)
+	CountViewEntries(ctx context.Context, filter *utils.QueryOptsBuilder) (int, error)
 	DeleteTransactionById(id string) error
 	CreateTransaction(payload CreateTransactionDTO) (Transaction, error)
 	UpdateTransaction(transactionID string, userID string, payload UpdateTransactionDTO) (Transaction, error)
@@ -26,7 +25,6 @@ type transactionsUseCaseImpl struct {
 	repo              TransactionsRepo
 	categoriesUseCase categories.CategoriesUseCase
 	db                *sql.DB
-	tracer            trace.Tracer
 }
 
 func NewTransactionsUseCase(repo TransactionsRepo, categoriesUseCase categories.CategoriesUseCase, db *sql.DB) TransactionsUseCase {
@@ -34,27 +32,33 @@ func NewTransactionsUseCase(repo TransactionsRepo, categoriesUseCase categories.
 		repo:              repo,
 		categoriesUseCase: categoriesUseCase,
 		db:                db,
-		tracer:            otel.Tracer("TransactionsUseCase"),
 	}
 }
 
 func (uc *transactionsUseCaseImpl) ListViewEntries(ctx context.Context, filter *utils.QueryOptsBuilder) ([]ViewEntry, error) {
-	ctx, span := uc.tracer.Start(ctx, "ListViewEntriesUseCase")
+	tracer := otel.Tracer("usecase")
+	ctx, span := tracer.Start(ctx, "TransactionsUseCase.ListViewEntries")
 	defer span.End()
 
-	entries, err := uc.repo.ListViewEntries(uc.db, filter)
+	entries, err := uc.repo.ListViewEntries(ctx, uc.db, filter)
 
 	if err != nil {
+		span.RecordError(err)
 		return []ViewEntry{}, ErrFailedToFetchEntries
 	}
 
 	return entries, nil
 }
 
-func (uc *transactionsUseCaseImpl) CountViewEntries(filter *utils.QueryOptsBuilder) (int, error) {
-	count, err := uc.repo.CountViewEntries(uc.db, filter)
+func (uc *transactionsUseCaseImpl) CountViewEntries(ctx context.Context, filter *utils.QueryOptsBuilder) (int, error) {
+	tracer := otel.Tracer("usecase")
+	ctx, span := tracer.Start(ctx, "TransactionsUseCase.CountViewEntries")
+	defer span.End()
+
+	count, err := uc.repo.CountViewEntries(ctx, uc.db, filter)
 
 	if err != nil {
+		span.RecordError(err)
 		return 0, ErrToCountEntries
 	}
 
@@ -226,7 +230,7 @@ func (uc *transactionsUseCaseImpl) UpdateTransaction(transactionID string, userI
 		return Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to start transaction")
 	}
 
-	exists, err := uc.repo.ListViewEntries(tx, utils.QueryOpts().
+	exists, err := uc.repo.ListViewEntries(context.TODO(), tx, utils.QueryOpts().
 		And("transaction_id", "eq", transactionID).
 		And("user_id", "eq", userID))
 	if err != nil {

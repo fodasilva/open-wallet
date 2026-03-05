@@ -9,6 +9,7 @@ import (
 	docs "github.com/felipe1496/open-wallet/docs"
 	"github.com/felipe1496/open-wallet/trace"
 
+	"github.com/felipe1496/open-wallet/internal/middlewares"
 	"github.com/felipe1496/open-wallet/internal/resources/auth"
 	"github.com/felipe1496/open-wallet/internal/resources/categories"
 	"github.com/felipe1496/open-wallet/internal/resources/transactions"
@@ -57,6 +58,9 @@ func main() {
 		AllowCredentials: true,
 		MaxAge:           12 * time.Hour,
 	}))
+
+	r.Use(middlewares.Tracing("open-wallet-service"))
+	r.Use(gin.Recovery())
 
 	auth.Router(r)
 	transactions.Router(r)

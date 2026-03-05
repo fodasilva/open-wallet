@@ -7,6 +7,7 @@ import (
 	"github.com/felipe1496/open-wallet/internal/resources/categories"
 	"github.com/felipe1496/open-wallet/internal/utils"
 	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/attribute"
 
 	"github.com/gin-gonic/gin"
 )
@@ -37,28 +38,30 @@ func NewHandler(db *sql.DB) *API {
 // @Failure 500 {object} utils.HTTPError "Internal server error"
 // @Router /transactions/entries [get]
 func (api *API) ListEntries(ctx *gin.Context) {
-	tracer := otel.Tracer("open-wallet-api")
-
-	userContext, span := tracer.Start(ctx, "ListEntriesHandler")
+	tracer := otel.Tracer("handler")
+	tCtx, span := tracer.Start(ctx.Request.Context(), "TransactionsHandler.ListEntries")
 	defer span.End()
 
 	userID := ctx.GetString("user_id")
+	span.SetAttributes(attribute.String("user.id", userID))
 	page := ctx.GetInt("page")
 	perPage := ctx.GetInt("per_page")
 	queryOpts := ctx.MustGet("query_opts").(*utils.QueryOptsBuilder).And("user_id", "eq", userID)
 
-	entries, err := api.transactionsUseCase.ListViewEntries(userContext, queryOpts)
+	entries, err := api.transactionsUseCase.ListViewEntries(tCtx, queryOpts)
 
 	if err != nil {
+		span.RecordError(err)
 		apiErr := err.(*utils.HTTPError)
 		ctx.JSON(apiErr.StatusCode, apiErr)
 		return
 	}
 
-	count, err := api.transactionsUseCase.CountViewEntries(utils.QueryOpts().
+	count, err := api.transactionsUseCase.CountViewEntries(tCtx, utils.QueryOpts().
 		And("user_id", "eq", userID))
 
 	if err != nil {
+		span.RecordError(err)
 		apiErr := err.(*utils.HTTPError)
 		ctx.JSON(apiErr.StatusCode, apiErr)
 		return
