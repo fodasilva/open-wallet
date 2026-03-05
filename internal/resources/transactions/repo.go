@@ -1,9 +1,11 @@
 package transactions
 
 import (
+	"context"
 	"errors"
 
 	"github.com/felipe1496/open-wallet/internal/utils"
+	"go.opentelemetry.io/otel"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/oklog/ulid/v2"
@@ -12,8 +14,8 @@ import (
 type TransactionsRepo interface {
 	CreateEntry(db utils.Executer, payload PersistEntryDTO) (Entry, error)
 	CreateTransaction(db utils.Executer, payload CreateTransactionDTO) (Transaction, error)
-	ListViewEntries(db utils.Executer, filter *utils.QueryOptsBuilder) ([]ViewEntry, error)
-	CountViewEntries(db utils.Executer, filter *utils.QueryOptsBuilder) (int, error)
+	ListViewEntries(ctx context.Context, db utils.Executer, filter *utils.QueryOptsBuilder) ([]ViewEntry, error)
+	CountViewEntries(ctx context.Context, db utils.Executer, filter *utils.QueryOptsBuilder) (int, error)
 	DeleteTransactionById(db utils.Executer, id string) error
 	ListTransactions(db utils.Executer, filter *utils.QueryOptsBuilder) ([]Transaction, error)
 	UpdateTransaction(db utils.Executer, id string, payload UpdateTransactionDTO) (Transaction, error)
@@ -74,7 +76,10 @@ func (r *TransactionsRepoImpl) CreateTransaction(db utils.Executer, payload Crea
 	return transaction, err
 }
 
-func (r *TransactionsRepoImpl) ListViewEntries(db utils.Executer, filter *utils.QueryOptsBuilder) ([]ViewEntry, error) {
+func (r *TransactionsRepoImpl) ListViewEntries(ctx context.Context, db utils.Executer, filter *utils.QueryOptsBuilder) ([]ViewEntry, error) {
+	tracer := otel.Tracer("repository")
+	ctx, span := tracer.Start(ctx, "TransactionsRepository.ListViewEntries")
+	defer span.End()
 	query := squirrel.Select("id", "transaction_id", "name", "description", "amount", "period", "user_id", "category", "total_amount", "installment", "total_installments", "created_at", "reference_date::text", "category_id", "category_name", "category_color").
 		From("v_entries").
 		PlaceholderFormat(squirrel.Dollar)
@@ -84,12 +89,14 @@ func (r *TransactionsRepoImpl) ListViewEntries(db utils.Executer, filter *utils.
 	sql, args, err := query.ToSql()
 
 	if err != nil {
+		span.RecordError(err)
 		return nil, err
 	}
 
-	rows, err := db.Query(sql, args...)
+	rows, err := db.QueryContext(ctx, sql, args...)
 
 	if err != nil {
+		span.RecordError(err)
 		return nil, err
 	}
 
@@ -116,6 +123,7 @@ func (r *TransactionsRepoImpl) ListViewEntries(db utils.Executer, filter *utils.
 			&entry.CategoryName,
 			&entry.CategoryColor,
 		); err != nil {
+			span.RecordError(err)
 			return nil, err
 		}
 		entries = append(entries, entry)
@@ -124,7 +132,11 @@ func (r *TransactionsRepoImpl) ListViewEntries(db utils.Executer, filter *utils.
 	return entries, nil
 }
 
-func (r *TransactionsRepoImpl) CountViewEntries(db utils.Executer, filter *utils.QueryOptsBuilder) (int, error) {
+func (r *TransactionsRepoImpl) CountViewEntries(ctx context.Context, db utils.Executer, filter *utils.QueryOptsBuilder) (int, error) {
+	tracer := otel.Tracer("repository")
+	ctx, span := tracer.Start(ctx, "TransactionsRepository.CountViewEntries")
+	defer span.End()
+
 	countQuery := squirrel.
 		Select("COUNT(*)").
 		From("v_entries").
@@ -137,13 +149,15 @@ func (r *TransactionsRepoImpl) CountViewEntries(db utils.Executer, filter *utils
 
 	sql, args, err := countQuery.ToSql()
 	if err != nil {
+		span.RecordError(err)
 		return 0, err
 	}
 
 	var count int
-	err = db.QueryRow(sql, args...).Scan(&count)
+	err = db.QueryRowContext(ctx, sql, args...).Scan(&count)
 
 	if err != nil {
+		span.RecordError(err)
 		return 0, err
 	}
 
