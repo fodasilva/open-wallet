@@ -331,7 +331,7 @@ definitions:
     type: object
 info:
   contact: {}
-  title: Money API
+  title: Open Wallet API
 paths:
   /auth/login/google:
     post:
