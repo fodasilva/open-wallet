@@ -1,24 +1,17 @@
 package auth
 
 import (
-	"log"
+	"database/sql"
 
 	"github.com/redis/go-redis/v9"
 
-	"github.com/felipe1496/open-wallet/db"
 	"github.com/felipe1496/open-wallet/internal/middlewares"
 	"github.com/felipe1496/open-wallet/internal/services"
-	"github.com/felipe1496/open-wallet/internal/utils"
 
 	"github.com/gin-gonic/gin"
 )
 
-func Router(router *gin.Engine, redisClient *redis.Client) {
-	db, err := db.Conn(utils.AppConfig.DatabaseURL)
-	if err != nil {
-		log.Fatal(err)
-	}
-
+func Router(router *gin.Engine, db *sql.DB, redisClient *redis.Client) {
 	handler := NewHandler(db, services.NewGoogleService(), services.NewJWTService())
 	authGroup := router.Group("/api/v1/auth")
 	{
