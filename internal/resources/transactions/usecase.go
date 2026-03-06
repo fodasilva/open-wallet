@@ -145,6 +145,12 @@ func validateTransaction(entries []validateTransactionPropsEntry, transactionTyp
 					return utils.NewHTTPError(http.StatusBadRequest, "income entry must have amount greater than zero")
 				}
 			}
+		case constants.Recurrence:
+			{
+				if refEntry.Amount >= 0 {
+					return utils.NewHTTPError(http.StatusBadRequest, "recurrence entries must have amount lower than zero")
+				}
+			}
 		}
 	}
 	return nil
@@ -175,11 +181,12 @@ func (uc *transactionsUseCaseImpl) CreateTransaction(payload CreateTransactionDT
 	}
 
 	transaction, err := uc.repo.CreateTransaction(tx, CreateTransactionDTO{
-		UserID:     payload.UserID,
-		Type:       payload.Type,
-		Name:       payload.Name,
-		Note:       payload.Note,
-		CategoryID: payload.CategoryID,
+		UserID:       payload.UserID,
+		Type:         payload.Type,
+		Name:         payload.Name,
+		Note:         payload.Note,
+		CategoryID:   payload.CategoryID,
+		RecurrenceID: payload.RecurrenceID,
 	})
 
 	if err != nil {
@@ -255,12 +262,13 @@ func (uc *transactionsUseCaseImpl) UpdateTransaction(transactionID string, userI
 		}
 	}
 
-	if utils.ContainsSome(payload.Update, []string{"name", "note", "category_id"}) {
+	if utils.ContainsSome(payload.Update, []string{"name", "note", "category_id", "recurrence_id"}) {
 		_, err = uc.repo.UpdateTransaction(tx, transactionID, UpdateTransactionDTO{
-			Update:     payload.Update,
-			Name:       payload.Name,
-			Note:       payload.Note,
-			CategoryID: payload.CategoryID,
+			Update:       payload.Update,
+			Name:         payload.Name,
+			Note:         payload.Note,
+			CategoryID:   payload.CategoryID,
+			RecurrenceID: payload.RecurrenceID,
 		})
 		if err != nil {
 			return Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to update transaction")
@@ -279,8 +287,7 @@ func (uc *transactionsUseCaseImpl) UpdateTransaction(transactionID string, userI
 				}
 			}
 			return entries
-		}(), exists[0].Type,
-		)
+		}(), exists[0].Type)
 
 		if err != nil {
 			return Transaction{}, err

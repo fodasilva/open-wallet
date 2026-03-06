@@ -69,12 +69,13 @@ type ListEntriesResponseData struct {
 // ==============================================================================
 
 type CreateTransactionDTO struct {
-	UserID     string
-	Name       string
-	CategoryID *string
-	Note       *string
-	Type       constants.TransactionType
-	Entries    []CreateEntryDTO
+	UserID       string
+	Name         string
+	CategoryID   *string
+	Note         *string
+	Type         constants.TransactionType
+	Entries      []CreateEntryDTO
+	RecurrenceID *string
 }
 
 type CreateEntryDTO struct {
@@ -83,11 +84,12 @@ type CreateEntryDTO struct {
 }
 
 type UpdateTransactionDTO struct {
-	Update     []string
-	Name       *string
-	Note       *string
-	CategoryID *string
-	Entries    *[]UpdateEntryDTO
+	Update       []string
+	Name         *string
+	Note         *string
+	CategoryID   *string
+	Entries      *[]UpdateEntryDTO
+	RecurrenceID *string
 }
 
 type UpdateEntryDTO struct {
@@ -124,6 +126,7 @@ type ViewEntry struct {
 	CategoryID        *string                   `json:"category_id,omitempty"`
 	CategoryName      *string                   `json:"category_name,omitempty"`
 	CategoryColor     *string                   `json:"category_color,omitempty"`
+	RecurrenceID      *string                   `json:"recurrence_id,omitempty"`
 }
 
 // Entries table record
@@ -137,11 +140,12 @@ type Entry struct {
 
 // Transactions table record
 type Transaction struct {
-	ID          string                    `json:"id"`
-	UserID      string                    `json:"user_id"`
-	Type        constants.TransactionType `json:"type"`
-	Name        string                    `json:"name"`
-	Description *string                   `json:"description"`
-	CreatedAt   time.Time                 `json:"created_at"`
-	CategoryID  *string                   `json:"category_id"`
+	ID           string                    `json:"id"`
+	UserID       string                    `json:"user_id"`
+	Type         constants.TransactionType `json:"type"`
+	Name         string                    `json:"name"`
+	Description  *string                   `json:"description"`
+	CreatedAt    time.Time                 `json:"created_at"`
+	CategoryID   *string                   `json:"category_id"`
+	RecurrenceID *string                   `json:"recurrence_id"`
 }

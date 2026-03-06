@@ -116,11 +116,132 @@ definitions:
     - simple_expense
     - income
     - installment
+    - recurrence
     type: string
     x-enum-varnames:
     - SimpleExpense
     - Income
     - Installment
+    - Recurrence
+  recurrences.CreateRecurrenceRequest:
+    properties:
+      amount:
+        type: number
+      category_id:
+        type: string
+      day_of_month:
+        maximum: 31
+        minimum: 1
+        type: integer
+      end_period:
+        type: string
+      name:
+        maxLength: 100
+        minLength: 1
+        type: string
+      note:
+        maxLength: 400
+        minLength: 0
+        type: string
+      start_period:
+        type: string
+    required:
+    - amount
+    - day_of_month
+    - name
+    - start_period
+    type: object
+  recurrences.CreateRecurrenceResponse:
+    properties:
+      data:
+        $ref: '#/definitions/recurrences.CreateRecurrenceResponseData'
+    type: object
+  recurrences.CreateRecurrenceResponseData:
+    properties:
+      recurrence:
+        $ref: '#/definitions/recurrences.Recurrence'
+    type: object
+  recurrences.ListRecurrencesResponse:
+    properties:
+      data:
+        $ref: '#/definitions/recurrences.ListRecurrencesResponseData'
+      query:
+        $ref: '#/definitions/utils.QueryMeta'
+    type: object
+  recurrences.ListRecurrencesResponseData:
+    properties:
+      recurrences:
+        items:
+          $ref: '#/definitions/recurrences.Recurrence'
+        type: array
+    type: object
+  recurrences.Recurrence:
+    properties:
+      amount:
+        type: number
+      category_color:
+        type: string
+      category_id:
+        type: string
+      category_name:
+        type: string
+      created_at:
+        type: string
+      day_of_month:
+        type: integer
+      end_period:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      note:
+        type: string
+      start_period:
+        type: string
+      user_id:
+        type: string
+    type: object
+  recurrences.UpdateRecurrenceRequest:
+    properties:
+      amount:
+        type: number
+      category_id:
+        type: string
+      day_of_month:
+        maximum: 31
+        minimum: 1
+        type: integer
+      end_period:
+        type: string
+      name:
+        maxLength: 100
+        minLength: 1
+        type: string
+      note:
+        maxLength: 400
+        minLength: 0
+        type: string
+      start_period:
+        type: string
+      update:
+        items:
+          type: string
+        minItems: 1
+        type: array
+    required:
+    - update
+    type: object
+  recurrences.UpdateRecurrenceResponse:
+    properties:
+      data:
+        $ref: '#/definitions/recurrences.UpdateRecurrenceResponseData'
+    type: object
+  recurrences.UpdateRecurrenceResponseData:
+    properties:
+      recurrence:
+        $ref: '#/definitions/recurrences.Recurrence'
+    type: object
   transactions.CreateEntryRequest:
     properties:
       amount:
@@ -199,6 +320,8 @@ definitions:
         type: string
       name:
         type: string
+      recurrence_id:
+        type: string
       type:
         $ref: '#/definitions/constants.TransactionType'
       user_id:
@@ -273,6 +396,8 @@ definitions:
       name:
         type: string
       period:
+        type: string
+      recurrence_id:
         type: string
       reference_date:
         type: string
@@ -566,6 +691,184 @@ paths:
       summary: List categories with amount per period
       tags:
       - categories
+  /recurrences:
+    get:
+      consumes:
+      - application/json
+      description: List user recurrences
+      parameters:
+      - default: 1
+        description: Page number
+        in: query
+        name: page
+        type: integer
+      - default: 10
+        description: Items per page
+        in: query
+        name: per_page
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of recurrences
+          schema:
+            $ref: '#/definitions/recurrences.ListRecurrencesResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      security:
+      - BearerAuth: []
+      summary: List recurrences
+      tags:
+      - recurrences
+    post:
+      consumes:
+      - application/json
+      description: Create a new recurrence template
+      parameters:
+      - description: Recurrence payload
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/recurrences.CreateRecurrenceRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Recurrence created
+          schema:
+            $ref: '#/definitions/recurrences.CreateRecurrenceResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      security:
+      - BearerAuth: []
+      summary: Create a recurrence
+      tags:
+      - recurrences
+  /recurrences/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete a recurrence template
+      parameters:
+      - description: recurrence ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: Recurrence deleted
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "404":
+          description: Not found
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      security:
+      - BearerAuth: []
+      summary: Delete Recurrence By ID
+      tags:
+      - recurrences
+    patch:
+      consumes:
+      - application/json
+      description: Update a recurrence template
+      parameters:
+      - description: recurrence ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Recurrence payload
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/recurrences.UpdateRecurrenceRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Recurrence updated
+          schema:
+            $ref: '#/definitions/recurrences.UpdateRecurrenceResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      security:
+      - BearerAuth: []
+      summary: Update a recurrence
+      tags:
+      - recurrences
+  /recurrences/{period}:
+    post:
+      consumes:
+      - application/json
+      description: Generates entry records for all recurrence templates that don't
+        already have one in the given period.
+      parameters:
+      - description: Period in YYYYMM format (e.g. 202603)
+        in: path
+        name: period
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Recurrences prepared
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/utils.HTTPError'
+      security:
+      - BearerAuth: []
+      summary: Prepare recurrences for a period
+      tags:
+      - recurrences
   /transactions:
     post:
       consumes:

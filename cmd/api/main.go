@@ -12,6 +12,7 @@ import (
 	"github.com/felipe1496/open-wallet/internal/middlewares"
 	"github.com/felipe1496/open-wallet/internal/resources/auth"
 	"github.com/felipe1496/open-wallet/internal/resources/categories"
+	"github.com/felipe1496/open-wallet/internal/resources/recurrences"
 	"github.com/felipe1496/open-wallet/internal/resources/transactions"
 
 	"github.com/redis/go-redis/v9"
@@ -45,6 +46,7 @@ func main() {
 	auth.Router(r, dbConn, redisClient)
 	transactions.Router(r, dbConn, redisClient)
 	categories.Router(r, dbConn, redisClient)
+	recurrences.Router(r, dbConn, redisClient)
 
 	r.Run(fmt.Sprintf(":%d", infra.AppConfig.Port))
 }
