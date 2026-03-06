@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"reflect"
 	"slices"
 	"strconv"
 	"strings"
@@ -57,7 +58,34 @@ func init() {
 
 	ConfigRoot := loadConfig()
 	AppConfig = validateConfig(ConfigRoot)
-	log.Printf("Enviroment variables loaded: %+v\n", AppConfig)
+
+	v := reflect.ValueOf(AppConfig).Elem()
+	t := v.Type()
+
+	var builder strings.Builder
+
+	builder.WriteString("-----Environment variables-----\n")
+
+	for i := 0; i < v.NumField(); i++ {
+		field := t.Field(i)
+		valueField := v.Field(i)
+
+		var value any
+
+		if valueField.Kind() == reflect.Ptr {
+			if valueField.IsNil() {
+				value = nil
+			} else {
+				value = valueField.Elem().Interface()
+			}
+		} else {
+			value = valueField.Interface()
+		}
+
+		builder.WriteString(fmt.Sprintf("%s: %v\n", field.Name, value))
+	}
+
+	log.Printf("\n%s", builder.String())
 }
 
 func loadConfig() *ConfigRoot {
