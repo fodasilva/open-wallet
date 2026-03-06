@@ -7,15 +7,12 @@ import (
 	"log"
 
 	docs "github.com/felipe1496/open-wallet/docs"
-	"github.com/felipe1496/open-wallet/trace"
-
-	"github.com/felipe1496/open-wallet/db"
+	"github.com/felipe1496/open-wallet/infra"
 
 	"github.com/felipe1496/open-wallet/internal/middlewares"
 	"github.com/felipe1496/open-wallet/internal/resources/auth"
 	"github.com/felipe1496/open-wallet/internal/resources/categories"
 	"github.com/felipe1496/open-wallet/internal/resources/transactions"
-	"github.com/felipe1496/open-wallet/internal/utils"
 
 	"github.com/redis/go-redis/v9"
 
@@ -49,11 +46,11 @@ func main() {
 	transactions.Router(r, dbConn, redisClient)
 	categories.Router(r, dbConn, redisClient)
 
-	r.Run(fmt.Sprintf(":%d", utils.AppConfig.Port))
+	r.Run(fmt.Sprintf(":%d", infra.AppConfig.Port))
 }
 
 func setupTracer() func() {
-	tp, err := trace.InitTracer()
+	tp, err := infra.InitTracer()
 	if err != nil {
 		log.Fatalf("failed to initialize tracer: %v", err)
 	}
@@ -63,12 +60,12 @@ func setupTracer() func() {
 }
 
 func setupPersistence() (*sql.DB, *redis.Client) {
-	dbConn, err := db.Conn(utils.AppConfig.DatabaseURL)
+	dbConn, err := infra.DBConn(infra.AppConfig.DatabaseURL)
 	if err != nil {
 		log.Fatalf("failed to connect to postgres: %v", err)
 	}
 
-	opts, err := redis.ParseURL(utils.AppConfig.RateLimitDBURL)
+	opts, err := redis.ParseURL(infra.AppConfig.RateLimitDBURL)
 	if err != nil {
 		log.Fatalf("failed to parse redis url for rate limit: %v", err)
 	}

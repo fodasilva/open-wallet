@@ -1,4 +1,4 @@
-package db
+package infra
 
 import (
 	"database/sql"
@@ -10,7 +10,7 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.20.0"
 )
 
-func Conn(connString string) (*sql.DB, error) {
+func DBConn(connString string) (*sql.DB, error) {
 	dsn := connString
 
 	db, err := otelsql.Open("postgres", dsn,
