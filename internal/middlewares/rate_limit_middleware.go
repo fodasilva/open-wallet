@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/felipe1496/open-wallet/infra"
 	"github.com/felipe1496/open-wallet/internal/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
@@ -38,7 +39,7 @@ func rateLimit(redisClient *redis.Client, maxRequests int, windowMilliseconds in
 }
 
 func GlobalRateLimitMiddleware(redisClient *redis.Client) gin.HandlerFunc {
-	return rateLimit(redisClient, utils.AppConfig.RateLimitMaxRequests, utils.AppConfig.RateLimitWindowMs, "global")
+	return rateLimit(redisClient, infra.AppConfig.RateLimitMaxRequests, infra.AppConfig.RateLimitWindowMs, "global")
 }
 
 func RouteRateLimitMiddleware(redisClient *redis.Client, maxRequests int, windowMilliseconds int, prefix string) gin.HandlerFunc {

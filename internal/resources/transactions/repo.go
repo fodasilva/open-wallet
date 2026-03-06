@@ -54,9 +54,9 @@ func (r *TransactionsRepoImpl) CreateEntry(db utils.Executer, payload PersistEnt
 
 func (r *TransactionsRepoImpl) CreateTransaction(db utils.Executer, payload CreateTransactionDTO) (Transaction, error) {
 	query, args, err := squirrel.Insert("transactions").
-		Columns("id", "user_id", "category", "name", "description", "category_id").
-		Values(ulid.Make().String(), payload.UserID, payload.Type, payload.Name, &payload.Note, &payload.CategoryID).
-		Suffix("RETURNING id, user_id, category, name, description, created_at, category_id").
+		Columns("id", "user_id", "category", "name", "description", "category_id", "recurrence_id").
+		Values(ulid.Make().String(), payload.UserID, payload.Type, payload.Name, &payload.Note, &payload.CategoryID, payload.RecurrenceID).
+		Suffix("RETURNING id, user_id, category, name, description, created_at, category_id, recurrence_id").
 		PlaceholderFormat(squirrel.Dollar).
 		ToSql()
 	if err != nil {
@@ -72,6 +72,7 @@ func (r *TransactionsRepoImpl) CreateTransaction(db utils.Executer, payload Crea
 		&transaction.Description,
 		&transaction.CreatedAt,
 		&transaction.CategoryID,
+		&transaction.RecurrenceID,
 	)
 	return transaction, err
 }
@@ -80,7 +81,7 @@ func (r *TransactionsRepoImpl) ListViewEntries(ctx context.Context, db utils.Exe
 	tracer := otel.Tracer("repository")
 	ctx, span := tracer.Start(ctx, "TransactionsRepository.ListViewEntries")
 	defer span.End()
-	query := squirrel.Select("id", "transaction_id", "name", "description", "amount", "period", "user_id", "category", "total_amount", "installment", "total_installments", "created_at", "reference_date::text", "category_id", "category_name", "category_color").
+	query := squirrel.Select("id", "transaction_id", "name", "description", "amount", "period", "user_id", "category", "total_amount", "installment", "total_installments", "created_at", "reference_date::text", "category_id", "category_name", "category_color", "recurrence_id").
 		From("v_entries").
 		PlaceholderFormat(squirrel.Dollar)
 
@@ -122,6 +123,7 @@ func (r *TransactionsRepoImpl) ListViewEntries(ctx context.Context, db utils.Exe
 			&entry.CategoryID,
 			&entry.CategoryName,
 			&entry.CategoryColor,
+			&entry.RecurrenceID,
 		); err != nil {
 			span.RecordError(err)
 			return nil, err
@@ -179,7 +181,7 @@ func (r *TransactionsRepoImpl) DeleteTransactionById(db utils.Executer, id strin
 	return err
 }
 func (r *TransactionsRepoImpl) ListTransactions(db utils.Executer, filter *utils.QueryOptsBuilder) ([]Transaction, error) {
-	query := squirrel.Select("id", "user_id", "category", "name", "description", "created_at").
+	query := squirrel.Select("id", "user_id", "category", "name", "description", "created_at", "category_id", "recurrence_id").
 		From("transactions").
 		PlaceholderFormat(squirrel.Dollar)
 
@@ -208,6 +210,8 @@ func (r *TransactionsRepoImpl) ListTransactions(db utils.Executer, filter *utils
 			&transaction.Name,
 			&transaction.Description,
 			&transaction.CreatedAt,
+			&transaction.CategoryID,
+			&transaction.RecurrenceID,
 		); err != nil {
 			return nil, err
 		}
@@ -223,7 +227,7 @@ func (r *TransactionsRepoImpl) UpdateTransaction(db utils.Executer, id string, p
 	}
 
 	query := squirrel.Update("transactions").Where(squirrel.Eq{"id": id}).
-		Suffix("RETURNING id, user_id, category, name, description, created_at, category_id").
+		Suffix("RETURNING id, user_id, category, name, description, created_at, category_id, recurrence_id").
 		PlaceholderFormat(squirrel.Dollar)
 
 	for _, field := range payload.Update {
@@ -234,6 +238,8 @@ func (r *TransactionsRepoImpl) UpdateTransaction(db utils.Executer, id string, p
 			query = query.Set("description", payload.Note)
 		case "category_id":
 			query = query.Set("category_id", payload.CategoryID)
+		case "recurrence_id":
+			query = query.Set("recurrence_id", payload.RecurrenceID)
 		}
 	}
 
@@ -251,6 +257,7 @@ func (r *TransactionsRepoImpl) UpdateTransaction(db utils.Executer, id string, p
 		&transaction.Description,
 		&transaction.CreatedAt,
 		&transaction.CategoryID,
+		&transaction.RecurrenceID,
 	)
 
 	if err != nil {
