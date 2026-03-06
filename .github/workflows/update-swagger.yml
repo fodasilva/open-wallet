@@ -1,0 +1,37 @@
+name: Check Swagger Docs
+
+on:
+  pull_request:
+    paths:
+      - '**/*.go'
+
+jobs:
+  check-swagger:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24'
+
+      - name: Install swag
+        run: go install github.com/swaggo/swag/cmd/swag@latest
+
+      - name: Generate Swagger Docs
+        run: swag init -g cmd/api/main.go
+
+      - name: Check for uncommitted changes
+        run: |
+          git status -s docs/ > /tmp/status.txt
+          cat /tmp/status.txt
+          if [[ -n $(cat /tmp/status.txt) ]]; then
+            echo "Swagger documentation is out of sync!"
+            echo "Please run 'swag init -g cmd/api/main.go' locally and commit the updated docs/ folder."
+            git diff docs/
+            exit 1
+          fi
+          echo "Swagger documentation is up to date."
