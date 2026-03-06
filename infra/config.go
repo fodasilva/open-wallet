@@ -1,12 +1,14 @@
-package utils
+package infra
 
 import (
 	"fmt"
 	"log"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 
+	"github.com/felipe1496/open-wallet/internal/utils"
 	"github.com/joho/godotenv"
 )
 
@@ -47,6 +49,9 @@ var AppConfig *Config
 func init() {
 	err := godotenv.Load()
 	if err != nil {
+		err = godotenv.Load("../../.env")
+	}
+	if err != nil {
 		log.Println("Error loading .env file", err)
 	}
 
@@ -78,7 +83,7 @@ func validateConfig(ctg *ConfigRoot) *Config {
 	Config := &Config{}
 
 	if ctg.Enviroment != "" {
-		if !Contains([]string{"dev", "prod"}, ctg.Enviroment) {
+		if !slices.Contains([]string{"dev", "prod"}, ctg.Enviroment) {
 			errors = append(errors, "ENVIROMENT must be 'dev' or 'prod'")
 		} else {
 			Config.Enviroment = ctg.Enviroment
@@ -102,7 +107,7 @@ func validateConfig(ctg *ConfigRoot) *Config {
 		errs := make([]string, 0)
 
 		for _, origin := range splittedOrigins {
-			if !isValidURL(origin) {
+			if !utils.IsValidURL(origin) {
 				errors = append(errs, fmt.Sprintf("ORIGIN %s must be a valid url", origin))
 			}
 		}

@@ -1,10 +1,9 @@
-package trace
+package infra
 
 import (
 	"context"
 
 	texporter "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace"
-	"github.com/felipe1496/open-wallet/internal/utils"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
@@ -20,14 +19,14 @@ func InitTracer() (*trace.TracerProvider, error) {
 	var exporter sdktrace.SpanExporter
 	var err error
 
-	switch utils.AppConfig.Enviroment {
+	switch AppConfig.Enviroment {
 	case "dev":
 
 		exporter, err = otlptracehttp.New(ctx,
 			otlptracehttp.WithEndpoint("localhost:4318"),
 			otlptracehttp.WithInsecure())
 	case "prod":
-		exporter, err = texporter.New(texporter.WithProjectID(*utils.AppConfig.GcpProjectID))
+		exporter, err = texporter.New(texporter.WithProjectID(*AppConfig.GcpProjectID))
 	}
 
 	if err != nil {
@@ -37,7 +36,7 @@ func InitTracer() (*trace.TracerProvider, error) {
 	res, err := resource.New(ctx,
 		resource.WithAttributes(
 			semconv.ServiceName("open-wallet"),
-			attribute.String("environment", utils.AppConfig.Enviroment),
+			attribute.String("environment", AppConfig.Enviroment),
 		),
 	)
 	if err != nil {

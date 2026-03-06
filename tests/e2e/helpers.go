@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/felipe1496/open-wallet/db"
+	"github.com/felipe1496/open-wallet/infra"
 
 	"github.com/docker/go-connections/nat"
 	"github.com/golang-migrate/migrate/v4"
@@ -62,9 +62,9 @@ func SetupTestDB(t *testing.T) *PostgresTestDB {
 		port.Port(),
 	)
 
-	dbConn, err := db.Conn(connStr)
+	dbConn, err := infra.DBConn(connStr)
 	if err != nil {
-		t.Fatalf("cannot init DB using db.Conn: %v", err)
+		t.Fatalf("cannot init DB using infra.DBConn: %v", err)
 	}
 
 	if err := runMigrations(t, dbConn); err != nil {

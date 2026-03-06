@@ -8,7 +8,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/infra"
 )
 
 type GoogleService interface {
@@ -64,9 +64,9 @@ func (s *googleServiceImpl) GetUserInfo(accessToken string) (*GoogleUserInfo, er
 func (s *googleServiceImpl) GetUserAccessToken(code string) (*string, error) {
 	data := url.Values{}
 	data.Set("code", code)
-	data.Set("client_id", utils.AppConfig.GoogleClientID)
-	data.Set("client_secret", utils.AppConfig.GoogleSecret)
-	data.Set("redirect_uri", utils.AppConfig.LoginRedirectURI)
+	data.Set("client_id", infra.AppConfig.GoogleClientID)
+	data.Set("client_secret", infra.AppConfig.GoogleSecret)
+	data.Set("redirect_uri", infra.AppConfig.LoginRedirectURI)
 	data.Set("grant_type", "authorization_code")
 
 	req, err := http.NewRequest(
