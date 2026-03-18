@@ -14,7 +14,7 @@ import (
 )
 
 type ConfigRoot struct {
-	Enviroment         string
+	Environment        string
 	Delay              string
 	Origins            string
 	GcpProjectID       string
@@ -30,7 +30,7 @@ type ConfigRoot struct {
 }
 
 type Config struct {
-	Enviroment           string
+	Environment          string
 	Delay                int
 	Origins              []string
 	GcpProjectID         *string
@@ -90,7 +90,7 @@ func init() {
 
 func loadConfig() *ConfigRoot {
 	return &ConfigRoot{
-		Enviroment:         os.Getenv("ENVIROMENT"),
+		Environment:        os.Getenv("ENVIRONMENT"),
 		Delay:              os.Getenv("DELAY"),
 		Origins:            os.Getenv("ORIGINS"),
 		GcpProjectID:       os.Getenv("GCP_PROJECT_ID"),
@@ -110,14 +110,14 @@ func validateConfig(ctg *ConfigRoot) *Config {
 	errors := make([]string, 0)
 	Config := &Config{}
 
-	if ctg.Enviroment != "" {
-		if !slices.Contains([]string{"dev", "prod"}, ctg.Enviroment) {
-			errors = append(errors, "ENVIROMENT must be 'dev' or 'prod'")
+	if ctg.Environment != "" {
+		if !slices.Contains([]string{"dev", "prod"}, ctg.Environment) {
+			errors = append(errors, "ENVIRONMENT must be 'dev' or 'prod'")
 		} else {
-			Config.Enviroment = ctg.Enviroment
+			Config.Environment = ctg.Environment
 		}
 	} else {
-		Config.Enviroment = "dev"
+		Config.Environment = "dev"
 	}
 
 	if ctg.Delay != "" {
