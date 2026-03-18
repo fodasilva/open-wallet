@@ -32,6 +32,10 @@ func main() {
 
 	dbConn, redisClient := setupPersistence()
 
+	if infra.AppConfig.Environment == "prod" {
+		gin.SetMode(gin.ReleaseMode)
+	}
+
 	r := gin.Default()
 
 	docs.SwaggerInfo.BasePath = "/api/v1"
