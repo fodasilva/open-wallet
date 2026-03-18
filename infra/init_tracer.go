@@ -3,7 +3,6 @@ package infra
 import (
 	"context"
 
-	texporter "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
@@ -19,7 +18,7 @@ func InitTracer() (*trace.TracerProvider, error) {
 	var exporter sdktrace.SpanExporter
 	var err error
 
-	switch AppConfig.Enviroment {
+	switch AppConfig.Environment {
 	case "dev":
 
 		exporter, err = otlptracehttp.New(ctx,
@@ -36,7 +35,7 @@ func InitTracer() (*trace.TracerProvider, error) {
 	res, err := resource.New(ctx,
 		resource.WithAttributes(
 			semconv.ServiceName("open-wallet"),
-			attribute.String("environment", AppConfig.Enviroment),
+			attribute.String("environment", AppConfig.Environment),
 		),
 	)
 	if err != nil {
