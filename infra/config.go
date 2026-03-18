@@ -48,12 +48,13 @@ type Config struct {
 var AppConfig *Config
 
 func init() {
-	err := godotenv.Load()
-	if err != nil {
-		err = godotenv.Load("../../.env")
-	}
-	if err != nil {
-		log.Println("Error loading .env file", err)
+	envFiles := []string{".env", ".env.dev", "../../.env", "../../.env.dev"}
+
+	for _, file := range envFiles {
+		if err := godotenv.Load(file); err == nil {
+			log.Printf("Loaded configuration from %s\n", file)
+			break
+		}
 	}
 
 	ConfigRoot := loadConfig()
