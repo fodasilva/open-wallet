@@ -10,7 +10,6 @@ app
 .env
 .env.*
 *.env
-!.env.dev
 !.env.example
 
 # Coverage
