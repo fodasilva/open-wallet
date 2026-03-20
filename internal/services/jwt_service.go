@@ -3,9 +3,9 @@ package services
 import (
 	"fmt"
 	"net/http"
-	"os"
 	"time"
 
+	"github.com/felipe1496/open-wallet/infra"
 	"github.com/felipe1496/open-wallet/internal/utils"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -17,12 +17,12 @@ type JWTService interface {
 }
 
 type JWTServiceImpl struct {
-	jwtSecret string
+	cfg *infra.Config
 }
 
-func NewJWTService() JWTService {
+func NewJWTService(cfg *infra.Config) JWTService {
 	return &JWTServiceImpl{
-		jwtSecret: os.Getenv("JWT_SECRET"),
+		cfg: cfg,
 	}
 }
 
@@ -35,7 +35,7 @@ func (s *JWTServiceImpl) GenerateToken(userID string) (string, error) {
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
-	signedToken, err := token.SignedString([]byte(s.jwtSecret))
+	signedToken, err := token.SignedString([]byte(s.cfg.JWTSecret))
 
 	if err != nil {
 		return "", utils.NewHTTPError(http.StatusInternalServerError, "failed to generate JWT token")
@@ -46,15 +46,13 @@ func (s *JWTServiceImpl) GenerateToken(userID string) (string, error) {
 
 func (s *JWTServiceImpl) ValidateToken(tokenString string) (string, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("método de assinatura inválido: %v", token.Header["alg"])
 		}
-		return []byte(s.jwtSecret), nil
+		return []byte(s.cfg.JWTSecret), nil
 	})
 
 	if err != nil {
-
 		return "", utils.NewHTTPError(http.StatusInternalServerError, "failed to parse JWT token")
 	}
 
@@ -73,7 +71,6 @@ func (s *JWTServiceImpl) ValidateToken(tokenString string) (string, error) {
 
 	userID, ok := claims["sub"].(string)
 	if !ok {
-
 		return "", utils.NewHTTPError(http.StatusInternalServerError, "failed to extract sub claim from token")
 	}
 

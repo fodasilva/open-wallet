@@ -8,9 +8,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func CorsMiddleware() gin.HandlerFunc {
+func CorsMiddleware(cfg *infra.Config) gin.HandlerFunc {
 	return cors.New(cors.Config{
-		AllowOrigins:     infra.AppConfig.Origins,
+		AllowOrigins:     cfg.Origins,
 		AllowMethods:     []string{"POST", "GET", "OPTIONS", "PUT", "DELETE", "PATCH"},
 		AllowHeaders:     []string{"Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},

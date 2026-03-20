@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"reflect"
 	"slices"
 	"strconv"
 	"strings"
@@ -12,22 +11,6 @@ import (
 	"github.com/felipe1496/open-wallet/internal/utils"
 	"github.com/joho/godotenv"
 )
-
-type ConfigRoot struct {
-	Environment        string
-	Delay              string
-	Origins            string
-	GcpProjectID       string
-	Port               string
-	DatabaseURL        string
-	GoogleClientID     string
-	GoogleClientSecret string
-	LoginRedirectURI   string
-	JWTSecret          string
-	RateLimitDBURL     string
-	RateLimitMax       string
-	RateLimitWindow    string
-}
 
 type Config struct {
 	Environment          string
@@ -45,179 +28,152 @@ type Config struct {
 	RateLimitWindowMs    int
 }
 
-var AppConfig *Config
-
-func init() {
+func Load() (*Config, error) {
 	if err := godotenv.Load(".env"); err != nil {
 		log.Println("Error loading .env file", err)
 	}
 
-	ConfigRoot := loadConfig()
-	AppConfig = validateConfig(ConfigRoot)
+	cfg := &Config{}
+	var errs []string
 
-	v := reflect.ValueOf(AppConfig).Elem()
-	t := v.Type()
-
-	var builder strings.Builder
-
-	builder.WriteString("-----Environment variables-----\n")
-
-	for i := 0; i < v.NumField(); i++ {
-		field := t.Field(i)
-		valueField := v.Field(i)
-
-		var value any
-
-		if valueField.Kind() == reflect.Ptr {
-			if valueField.IsNil() {
-				value = nil
-			} else {
-				value = valueField.Elem().Interface()
+	steps := []func(){
+		func() {
+			env := os.Getenv("ENVIRONMENT")
+			if env == "" {
+				cfg.Environment = "dev"
+				return
 			}
-		} else {
-			value = valueField.Interface()
-		}
-
-		builder.WriteString(fmt.Sprintf("%s: %v\n", field.Name, value))
-	}
-
-	log.Printf("\n%s", builder.String())
-}
-
-func loadConfig() *ConfigRoot {
-	return &ConfigRoot{
-		Environment:        os.Getenv("ENVIRONMENT"),
-		Delay:              os.Getenv("DELAY"),
-		Origins:            os.Getenv("ORIGINS"),
-		GcpProjectID:       os.Getenv("GCP_PROJECT_ID"),
-		Port:               os.Getenv("PORT"),
-		DatabaseURL:        os.Getenv("DATABASE_URL"),
-		GoogleClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
-		GoogleClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
-		LoginRedirectURI:   os.Getenv("LOGIN_REDIRECT_URI"),
-		JWTSecret:          os.Getenv("JWT_SECRET"),
-		RateLimitDBURL:     os.Getenv("RATE_LIMIT_DB_URL"),
-		RateLimitMax:       os.Getenv("RATE_LIMIT_MAX_REQUESTS"),
-		RateLimitWindow:    os.Getenv("RATE_LIMIT_WINDOW_MS"),
-	}
-}
-
-func validateConfig(ctg *ConfigRoot) *Config {
-	errors := make([]string, 0)
-	Config := &Config{}
-
-	if ctg.Environment != "" {
-		if !slices.Contains([]string{"dev", "prod"}, ctg.Environment) {
-			errors = append(errors, "ENVIRONMENT must be 'dev' or 'prod'")
-		} else {
-			Config.Environment = ctg.Environment
-		}
-	} else {
-		Config.Environment = "dev"
-	}
-
-	if ctg.Delay != "" {
-		intDelay, err := strconv.Atoi(ctg.Delay)
-
-		if err != nil {
-			errors = append(errors, "DELAY must be a number")
-		} else {
-			Config.Delay = intDelay
-		}
-	}
-
-	if ctg.Origins != "" {
-		splittedOrigins := strings.Split(ctg.Origins, ",")
-		errs := make([]string, 0)
-
-		for _, origin := range splittedOrigins {
-			if !utils.IsValidURL(origin) {
-				errors = append(errs, fmt.Sprintf("ORIGIN %s must be a valid url", origin))
+			allowed := []string{"dev", "prod", "test"}
+			if !slices.Contains(allowed, env) {
+				errs = append(errs, "ENVIRONMENT must be one of: dev, prod, test")
 			}
-		}
-
-		if len(errs) == 0 {
-			Config.Origins = splittedOrigins
-		}
+			cfg.Environment = env
+		},
+		func() {
+			val := os.Getenv("DELAY")
+			if val == "" {
+				cfg.Delay = 0
+				return
+			}
+			intVal, err := strconv.Atoi(val)
+			if err != nil {
+				errs = append(errs, "DELAY must be a number")
+				cfg.Delay = 0
+				return
+			}
+			cfg.Delay = intVal
+		},
+		func() {
+			val := os.Getenv("ORIGINS")
+			if val != "" {
+				parts := strings.Split(val, ",")
+				for _, part := range parts {
+					if !utils.IsValidURL(part) {
+						errs = append(errs, fmt.Sprintf("ORIGINS item %s must be a valid url", part))
+					}
+				}
+				cfg.Origins = parts
+			}
+		},
+		func() {
+			val := os.Getenv("GCP_PROJECT_ID")
+			if val != "" {
+				cfg.GcpProjectID = &val
+			}
+		},
+		func() {
+			val := os.Getenv("PORT")
+			if val == "" {
+				cfg.Port = 8080
+				return
+			}
+			intVal, err := strconv.Atoi(val)
+			if err != nil {
+				errs = append(errs, "PORT must be a number")
+				cfg.Port = 8080
+				return
+			}
+			cfg.Port = intVal
+		},
+		func() {
+			val := os.Getenv("DATABASE_URL")
+			if val == "" {
+				errs = append(errs, "DATABASE_URL is required")
+			}
+			cfg.DatabaseURL = val
+		},
+		func() {
+			val := os.Getenv("GOOGLE_CLIENT_ID")
+			if val == "" {
+				errs = append(errs, "GOOGLE_CLIENT_ID is required")
+			}
+			cfg.GoogleClientID = val
+		},
+		func() {
+			val := os.Getenv("GOOGLE_CLIENT_SECRET")
+			if val == "" {
+				errs = append(errs, "GOOGLE_CLIENT_SECRET is required")
+			}
+			cfg.GoogleSecret = val
+		},
+		func() {
+			val := os.Getenv("LOGIN_REDIRECT_URI")
+			if val == "" {
+				errs = append(errs, "LOGIN_REDIRECT_URI is required")
+			}
+			cfg.LoginRedirectURI = val
+		},
+		func() {
+			val := os.Getenv("JWT_SECRET")
+			if val == "" {
+				errs = append(errs, "JWT_SECRET is required")
+			}
+			cfg.JWTSecret = val
+		},
+		func() {
+			val := os.Getenv("RATE_LIMIT_DB_URL")
+			if val == "" {
+				errs = append(errs, "RATE_LIMIT_DB_URL is required")
+			}
+			cfg.RateLimitDBURL = val
+		},
+		func() {
+			val := os.Getenv("RATE_LIMIT_MAX_REQUESTS")
+			if val == "" {
+				cfg.RateLimitMaxRequests = 100
+				return
+			}
+			intVal, err := strconv.Atoi(val)
+			if err != nil {
+				errs = append(errs, "RATE_LIMIT_MAX_REQUESTS must be a number")
+				cfg.RateLimitMaxRequests = 100
+				return
+			}
+			cfg.RateLimitMaxRequests = intVal
+		},
+		func() {
+			val := os.Getenv("RATE_LIMIT_WINDOW_MS")
+			if val == "" {
+				cfg.RateLimitWindowMs = 60000
+				return
+			}
+			intVal, err := strconv.Atoi(val)
+			if err != nil {
+				errs = append(errs, "RATE_LIMIT_WINDOW_MS must be a number")
+				cfg.RateLimitWindowMs = 60000
+				return
+			}
+			cfg.RateLimitWindowMs = intVal
+		},
 	}
 
-	if ctg.GcpProjectID != "" {
-		Config.GcpProjectID = &ctg.GcpProjectID
+	for _, step := range steps {
+		step()
 	}
 
-	if ctg.Port != "" {
-		intPort, err := strconv.Atoi(ctg.Port)
-
-		if err != nil {
-			errors = append(errors, "PORT must be a number")
-		} else {
-			Config.Port = intPort
-		}
-	} else {
-		Config.Port = 8080
+	if len(errs) > 0 {
+		return nil, fmt.Errorf("invalid configuration: %s", strings.Join(errs, "; "))
 	}
 
-	if ctg.DatabaseURL != "" {
-		Config.DatabaseURL = ctg.DatabaseURL
-	} else {
-		errors = append(errors, "DATABASE_URL is required")
-	}
-
-	if ctg.GoogleClientID != "" {
-		Config.GoogleClientID = ctg.GoogleClientID
-	} else {
-		errors = append(errors, "GOOGLE_CLIENT_ID is required")
-	}
-
-	if ctg.GoogleClientSecret != "" {
-		Config.GoogleSecret = ctg.GoogleClientSecret
-	} else {
-		errors = append(errors, "GOOGLE_CLIENT_SECRET is required")
-	}
-
-	if ctg.LoginRedirectURI != "" {
-		Config.LoginRedirectURI = ctg.LoginRedirectURI
-	} else {
-		errors = append(errors, "LOGIN_REDIRECT_URI is required")
-	}
-
-	if ctg.JWTSecret != "" {
-		Config.JWTSecret = ctg.JWTSecret
-	} else {
-		errors = append(errors, "JWT_SECRET is required")
-	}
-
-	if ctg.RateLimitDBURL != "" {
-		Config.RateLimitDBURL = ctg.RateLimitDBURL
-	} else {
-		errors = append(errors, "RATE_LIMIT_DB_URL is required")
-	}
-
-	if ctg.RateLimitMax != "" {
-		intRate, err := strconv.Atoi(ctg.RateLimitMax)
-		if err != nil {
-			errors = append(errors, "RATE_LIMIT_MAX_REQUESTS must be a number")
-		} else {
-			Config.RateLimitMaxRequests = intRate
-		}
-	} else {
-		Config.RateLimitMaxRequests = 100
-	}
-
-	if ctg.RateLimitWindow != "" {
-		intTime, err := strconv.Atoi(ctg.RateLimitWindow)
-		if err != nil {
-			errors = append(errors, "RATE_LIMIT_WINDOW_MS must be a number")
-		} else {
-			Config.RateLimitWindowMs = intTime
-		}
-	} else {
-		Config.RateLimitWindowMs = 60000
-	}
-
-	if len(errors) > 0 {
-		panic("Invalid configuration -> " + strings.Join(errors, ", "))
-	}
-
-	return Config
+	return cfg, nil
 }
