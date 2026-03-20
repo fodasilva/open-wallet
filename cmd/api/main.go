@@ -8,14 +8,13 @@ import (
 
 	docs "github.com/felipe1496/open-wallet/docs"
 	"github.com/felipe1496/open-wallet/infra"
+	"github.com/redis/go-redis/v9"
 
 	"github.com/felipe1496/open-wallet/internal/middlewares"
 	"github.com/felipe1496/open-wallet/internal/resources/auth"
 	"github.com/felipe1496/open-wallet/internal/resources/categories"
 	"github.com/felipe1496/open-wallet/internal/resources/recurrences"
 	"github.com/felipe1496/open-wallet/internal/resources/transactions"
-
-	"github.com/redis/go-redis/v9"
 
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
@@ -27,59 +26,64 @@ import (
 // @in header
 // @name Authorization
 func main() {
-	cleanupTracer := setupTracer()
+	cfg, err := infra.Load()
+	if err != nil {
+		log.Fatalf("failed to load configuration: %v", err)
+	}
+
+	cleanupTracer := setupTracer(cfg)
 	defer cleanupTracer()
 
-	dbConn, redisClient := setupPersistence()
-
-	if infra.AppConfig.Environment == "prod" {
+	if cfg.Environment == "prod" {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
-	r := gin.Default()
+	dbConn, redisClient, cleanupPersistence := setupPersistence(cfg)
+	defer cleanupPersistence()
+
+	r := gin.New()
+	r.Use(middlewares.DelayMiddleware(cfg))
+	r.Use(middlewares.CorsMiddleware(cfg))
+	r.Use(middlewares.GlobalRateLimitMiddleware(redisClient, cfg))
+	r.Use(gin.Logger())
+	r.Use(gin.Recovery())
 
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	r.GET("/api-docs/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
-	r.Use(middlewares.DelayMiddleware())
-	r.Use(middlewares.CorsMiddleware())
-	r.Use(middlewares.TraceMiddleware("open-wallet-service"))
-	r.Use(gin.Recovery())
-	r.Use(middlewares.GlobalRateLimitMiddleware(redisClient))
+	auth.Router(r, dbConn, redisClient, cfg)
+	categories.Router(r, dbConn, redisClient, cfg)
+	transactions.Router(r, dbConn, redisClient, cfg)
+	recurrences.Router(r, dbConn, redisClient, cfg)
 
-	auth.Router(r, dbConn, redisClient)
-	transactions.Router(r, dbConn, redisClient)
-	categories.Router(r, dbConn, redisClient)
-	recurrences.Router(r, dbConn, redisClient)
-
-	r.Run(fmt.Sprintf(":%d", infra.AppConfig.Port))
+	if err := r.Run(fmt.Sprintf(":%d", cfg.Port)); err != nil {
+		log.Fatalf("failed to start server: %v", err)
+	}
 }
 
-func setupTracer() func() {
-	tp, err := infra.InitTracer()
+func setupPersistence(cfg *infra.Config) (*sql.DB, *redis.Client, func()) {
+	dbConn, err := infra.DBConn(cfg.DatabaseURL)
+	if err != nil {
+		log.Fatalf("failed to connect to database: %v", err)
+	}
+
+	redisClient, err := infra.RedisConn(cfg.RateLimitDBURL)
+	if err != nil {
+		log.Fatalf("failed to connect to redis: %v", err)
+	}
+
+	return dbConn, redisClient, func() {
+		_ = dbConn.Close()
+		_ = redisClient.Close()
+	}
+}
+
+func setupTracer(cfg *infra.Config) func() {
+	tp, err := infra.InitTracer(cfg)
 	if err != nil {
 		log.Fatalf("failed to initialize tracer: %v", err)
 	}
 	return func() {
 		_ = tp.Shutdown(context.Background())
 	}
-}
-
-func setupPersistence() (*sql.DB, *redis.Client) {
-	dbConn, err := infra.DBConn(infra.AppConfig.DatabaseURL)
-	if err != nil {
-		log.Fatalf("failed to connect to postgres: %v", err)
-	}
-
-	opts, err := redis.ParseURL(infra.AppConfig.RateLimitDBURL)
-	if err != nil {
-		log.Fatalf("failed to parse redis url for rate limit: %v", err)
-	}
-	redisClient := redis.NewClient(opts)
-
-	if err := redisClient.Ping(context.Background()).Err(); err != nil {
-		log.Fatalf("failed to connect to redis: %v", err)
-	}
-
-	return dbConn, redisClient
 }

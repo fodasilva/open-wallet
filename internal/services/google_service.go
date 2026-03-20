@@ -16,11 +16,14 @@ type GoogleService interface {
 	GetUserAccessToken(code string) (*string, error)
 }
 
-func NewGoogleService() GoogleService {
-	return &googleServiceImpl{}
+func NewGoogleService(cfg *infra.Config) GoogleService {
+	return &googleServiceImpl{
+		cfg: cfg,
+	}
 }
 
 type googleServiceImpl struct {
+	cfg *infra.Config
 }
 
 type GoogleUserInfo struct {
@@ -64,9 +67,9 @@ func (s *googleServiceImpl) GetUserInfo(accessToken string) (*GoogleUserInfo, er
 func (s *googleServiceImpl) GetUserAccessToken(code string) (*string, error) {
 	data := url.Values{}
 	data.Set("code", code)
-	data.Set("client_id", infra.AppConfig.GoogleClientID)
-	data.Set("client_secret", infra.AppConfig.GoogleSecret)
-	data.Set("redirect_uri", infra.AppConfig.LoginRedirectURI)
+	data.Set("client_id", s.cfg.GoogleClientID)
+	data.Set("client_secret", s.cfg.GoogleSecret)
+	data.Set("redirect_uri", s.cfg.LoginRedirectURI)
 	data.Set("grant_type", "authorization_code")
 
 	req, err := http.NewRequest(

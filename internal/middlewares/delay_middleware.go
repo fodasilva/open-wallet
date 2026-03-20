@@ -7,10 +7,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func DelayMiddleware() gin.HandlerFunc {
+func DelayMiddleware(cfg *infra.Config) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		if infra.AppConfig.Delay != 0 {
-			time.Sleep(time.Duration(infra.AppConfig.Delay) * time.Millisecond)
+		if cfg.Delay > 0 {
+			time.Sleep(time.Duration(cfg.Delay) * time.Millisecond)
 		}
 		c.Next()
 	}

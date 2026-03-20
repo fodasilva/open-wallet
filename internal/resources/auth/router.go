@@ -3,6 +3,7 @@ package auth
 import (
 	"database/sql"
 
+	"github.com/felipe1496/open-wallet/infra"
 	"github.com/redis/go-redis/v9"
 
 	"github.com/felipe1496/open-wallet/internal/middlewares"
@@ -11,8 +12,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Router(router *gin.Engine, db *sql.DB, redisClient *redis.Client) {
-	handler := NewHandler(db, services.NewGoogleService(), services.NewJWTService())
+func Router(router *gin.Engine, db *sql.DB, redisClient *redis.Client, cfg *infra.Config) {
+	googleService := services.NewGoogleService(cfg)
+	jwtService := services.NewJWTService(cfg)
+	handler := NewHandler(db, googleService, jwtService)
 	authGroup := router.Group("/api/v1/auth")
 	{
 		authGroup.POST("/login/google",

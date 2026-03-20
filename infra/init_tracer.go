@@ -14,19 +14,20 @@ import (
 	semconv "go.opentelemetry.io/otel/semconv/v1.37.0"
 )
 
-func InitTracer() (*trace.TracerProvider, error) {
+func InitTracer(cfg *Config) (*trace.TracerProvider, error) {
 	ctx := context.Background()
 	var exporter sdktrace.SpanExporter
 	var err error
 
-	switch AppConfig.Environment {
+	switch cfg.Environment {
 	case "dev":
 
 		exporter, err = otlptracehttp.New(ctx,
 			otlptracehttp.WithEndpoint("localhost:4318"),
 			otlptracehttp.WithInsecure())
 	case "prod":
-		exporter, err = texporter.New(texporter.WithProjectID(*AppConfig.GcpProjectID))
+		exporter, err = texporter.New(texporter.WithProjectID(*cfg.GcpProjectID))
+
 	}
 
 	if err != nil {
@@ -36,7 +37,7 @@ func InitTracer() (*trace.TracerProvider, error) {
 	res, err := resource.New(ctx,
 		resource.WithAttributes(
 			semconv.ServiceName("open-wallet"),
-			attribute.String("environment", AppConfig.Environment),
+			attribute.String("environment", cfg.Environment),
 		),
 	)
 	if err != nil {

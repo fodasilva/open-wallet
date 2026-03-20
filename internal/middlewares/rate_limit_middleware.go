@@ -38,8 +38,10 @@ func rateLimit(redisClient *redis.Client, maxRequests int, windowMilliseconds in
 	}
 }
 
-func GlobalRateLimitMiddleware(redisClient *redis.Client) gin.HandlerFunc {
-	return rateLimit(redisClient, infra.AppConfig.RateLimitMaxRequests, infra.AppConfig.RateLimitWindowMs, "global")
+func GlobalRateLimitMiddleware(redisClient *redis.Client, cfg *infra.Config) gin.HandlerFunc {
+	limit := cfg.RateLimitMaxRequests
+	window := time.Duration(cfg.RateLimitWindowMs) * time.Millisecond
+	return rateLimit(redisClient, limit, int(window.Milliseconds()), "global")
 }
 
 func RouteRateLimitMiddleware(redisClient *redis.Client, maxRequests int, windowMilliseconds int, prefix string) gin.HandlerFunc {
