@@ -8,3 +8,13 @@ db-migrate:
 	migrate -path ./migrations -database "postgres://docker:docker@localhost:5432/docker?sslmode=disable" up
 db-migrate-create:
 	migrate create -ext sql -dir migrations -seq $(name)
+
+check-docs:
+	@swag init -g cmd/api/main.go
+	@if [ -n "$$(git status -s docs/)" ]; then \
+		echo "Documentation is out of sync!"; \
+		echo "Please run 'swag init -g cmd/api/main.go' locally and commit the updated docs/ folder."; \
+		git diff docs/; \
+		exit 1; \
+	fi
+	@echo "Documentation is up to date."
