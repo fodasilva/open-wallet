@@ -1,8 +1,7 @@
 package categories
 
 import (
-	"time"
-
+	"github.com/felipe1496/open-wallet/internal/resources/categories/repository"
 	"github.com/felipe1496/open-wallet/internal/utils"
 )
 
@@ -21,7 +20,7 @@ type CreateCategoryResponse struct {
 }
 
 type CreateCategoryResponseData struct {
-	Category Category `json:"category"`
+	Category repository.Category `json:"category"`
 }
 
 type ListCategoriesResponse struct {
@@ -30,7 +29,7 @@ type ListCategoriesResponse struct {
 }
 
 type ListCategoriesResponseData struct {
-	Categories []Category `json:"categories"`
+	Categories []repository.Category `json:"categories"`
 }
 
 type ListCategoryAmountPerPeriodResponse struct {
@@ -39,7 +38,7 @@ type ListCategoryAmountPerPeriodResponse struct {
 }
 
 type ListCategoryAmountPerPeriodResponseData struct {
-	Categories []CategoryAmountPerPeriod `json:"categories"`
+	Categories []repository.CategoryAmountPerPeriod `json:"categories"`
 }
 
 type UpdateCategoryRequest struct {
@@ -52,7 +51,7 @@ type UpdateCategoryResponse struct {
 }
 
 type UpdateCategoryResponseData struct {
-	Category Category `json:"category"`
+	Category repository.Category `json:"category"`
 }
 
 // ==============================================================================
@@ -67,28 +66,6 @@ type CreateCategoryDTO struct {
 }
 
 type UpdateCategoryDTO struct {
-	Name  *string `json:"name"`
-	Color *string `json:"color"`
-}
-
-// ==============================================================================
-// 3. DATABASE
-//    Models that represents database objects
-// ==============================================================================
-
-type Category struct {
-	ID        string    `json:"id"`
-	UserID    string    `json:"user_id"`
-	Name      string    `json:"name"`
-	Color     string    `json:"color"`
-	CreatedAt time.Time `json:"created_at"`
-}
-
-type CategoryAmountPerPeriod struct {
-	ID          string  `json:"id"`
-	UserID      string  `json:"user_id"`
-	Name        string  `json:"name"`
-	Color       string  `json:"color"`
-	Period      string  `json:"period"`
-	TotalAmount float64 `json:"total_amount"`
+	Name  utils.OptionalNullable[string]
+	Color utils.OptionalNullable[string]
 }
