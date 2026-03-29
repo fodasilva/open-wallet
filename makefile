@@ -9,6 +9,9 @@ db-migrate:
 db-migrate-create:
 	migrate create -ext sql -dir migrations -seq $(name)
 
+gen-repos:
+	bash scripts/repository/gen-repos.sh
+
 check-docs:
 	@swag init -g cmd/api/main.go
 	@if [ -n "$$(git status -s docs/)" ]; then \

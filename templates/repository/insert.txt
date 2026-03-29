@@ -1,0 +1,24 @@
+func (r *{{RepoName}}) Insert(db utils.Executer, data {{PayloadType}}) ({{ReturnType}}, error) {
+	query := squirrel.Insert("{{TableName}}").
+		PlaceholderFormat(squirrel.Dollar)
+
+{{InColsVals}}
+
+	query = query.Suffix("RETURNING {{RawOutCols}}")
+
+	sql, args, err := query.ToSql()
+	if err != nil {
+		return {{ZeroValType}}{}, err
+	}
+
+	var result {{ReturnType}}
+	err = db.QueryRow(sql, args...).Scan(
+{{OutScan}}
+	)
+
+	if err != nil {
+		return {{ZeroValType}}{}, err
+	}
+
+	return result, nil
+}

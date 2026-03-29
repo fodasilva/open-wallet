@@ -1,0 +1,16 @@
+func (r *{{RepoName}}) Delete(db utils.Executer, filter *utils.QueryOptsBuilder) error {
+	query := squirrel.Delete("{{TableName}}").
+		PlaceholderFormat(squirrel.Dollar)
+
+	query = utils.DeleteOptsToSquirrel(query, filter)
+
+	sql, args, err := query.ToSql()
+
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec(sql, args...)
+
+	return err
+}
