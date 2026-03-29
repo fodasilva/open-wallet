@@ -24,3 +24,8 @@ type QueryMeta struct {
 	TotalItems int  `json:"total_items"`
 	TotalPages int  `json:"total_pages"`
 }
+
+type OptionalNullable[T any] struct {
+	Set   bool
+	Value *T
+}

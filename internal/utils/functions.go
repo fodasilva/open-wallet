@@ -91,3 +91,15 @@ func IsValidURL(str string) bool {
 	u, err := url.ParseRequestURI(str)
 	return err == nil && u.Scheme != "" && u.Host != ""
 }
+
+func NewValue[T any](v T) OptionalNullable[T] {
+	return OptionalNullable[T]{Set: true, Value: &v}
+}
+
+func NewNull[T any]() OptionalNullable[T] {
+	return OptionalNullable[T]{Set: true, Value: nil}
+}
+
+func Unset[T any]() OptionalNullable[T] {
+	return OptionalNullable[T]{Set: false}
+}
