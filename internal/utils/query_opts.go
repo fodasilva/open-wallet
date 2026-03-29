@@ -148,6 +148,34 @@ func DeleteOptsToSquirrel(query squirrel.DeleteBuilder, qo *QueryOptsBuilder) sq
 	return query
 }
 
+func UpdateOptsToSquirrel(query squirrel.UpdateBuilder, qo *QueryOptsBuilder) squirrel.UpdateBuilder {
+	for _, andCondition := range qo.AndConditions {
+		query = query.Where(conditionToSquirrel(andCondition))
+	}
+
+	for _, orGroup := range qo.OrGroups {
+		orSqlizers := squirrel.Or{}
+		for _, condition := range orGroup {
+			orSqlizers = append(orSqlizers, conditionToSquirrel(condition))
+		}
+		query = query.Where(orSqlizers)
+	}
+
+	if qo.LimitValue != nil {
+		query = query.Limit(uint64(*qo.LimitValue))
+	}
+
+	for _, order := range qo.Orders {
+		if order.dir == "asc" {
+			query = query.OrderBy(order.field + " ASC")
+		} else {
+			query = query.OrderBy(order.field + " DESC")
+		}
+	}
+
+	return query
+}
+
 func conditionToSquirrel(condition Condition) squirrel.Sqlizer {
 	switch condition.Operator {
 	case "eq":
