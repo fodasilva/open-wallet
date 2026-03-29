@@ -3,7 +3,9 @@ package categories
 import (
 	"database/sql"
 	"net/http"
+	"slices"
 
+	"github.com/felipe1496/open-wallet/internal/resources/categories/repository"
 	"github.com/felipe1496/open-wallet/internal/utils"
 
 	"github.com/gin-gonic/gin"
@@ -15,7 +17,7 @@ type API struct {
 
 func NewHandler(db *sql.DB) *API {
 	return &API{
-		categoriesUseCase: NewCategoriesUseCase(NewCategoriesRepo(db), db),
+		categoriesUseCase: NewCategoriesUseCase(repository.NewCategoriesRepo(), db),
 	}
 }
 
@@ -42,7 +44,7 @@ func (api *API) Create(ctx *gin.Context) {
 		return
 	}
 
-	category, err := api.categoriesUseCase.Create(CreateCategoryDTO{
+	category, err := api.categoriesUseCase.Create(repository.CreateCategoryDTO{
 		UserID: userID,
 		Name:   body.Name,
 		Color:  body.Color,
@@ -223,9 +225,7 @@ func (api *API) ListCategoryAmountPerPeriod(ctx *gin.Context) {
 // @Router /categories/{category_id} [patch]
 func (api *API) Update(ctx *gin.Context) {
 	id := ctx.Param("category_id")
-	var body UpdateCategoryRequest
-
-	err := ctx.ShouldBindJSON(&body)
+	passedKeys, err := utils.GetJSONKeys(ctx)
 
 	if err != nil {
 		apiErr := utils.NewHTTPError(http.StatusBadRequest, err.Error())
@@ -233,7 +233,7 @@ func (api *API) Update(ctx *gin.Context) {
 		return
 	}
 
-	if !utils.HasAtLeastOneField(body) {
+	if len(passedKeys) == 0 {
 		apiErr := utils.NewHTTPError(
 			http.StatusBadRequest,
 			"At least one field must be provided for update",
@@ -242,10 +242,34 @@ func (api *API) Update(ctx *gin.Context) {
 		return
 	}
 
-	category, err := api.categoriesUseCase.Update(id, UpdateCategoryDTO{
-		Name:  body.Name,
-		Color: body.Color,
-	})
+	var body UpdateCategoryRequest
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		apiErr := utils.NewHTTPError(http.StatusBadRequest, err.Error())
+		ctx.JSON(apiErr.StatusCode, apiErr)
+		return
+	}
+
+	var payload repository.UpdateCategoryDTO
+
+	if slices.Contains(passedKeys, "name") {
+		if body.Name == nil {
+			apiErr := utils.NewHTTPError(http.StatusBadRequest, "name cannot be null")
+			ctx.AbortWithStatusJSON(apiErr.StatusCode, apiErr)
+			return
+		}
+		payload.Name = utils.NewValue(*body.Name)
+	}
+
+	if slices.Contains(passedKeys, "color") {
+		if body.Color == nil {
+			apiErr := utils.NewHTTPError(http.StatusBadRequest, "color cannot be null")
+			ctx.AbortWithStatusJSON(apiErr.StatusCode, apiErr)
+			return
+		}
+		payload.Color = utils.NewValue(*body.Color)
+	}
+
+	category, err := api.categoriesUseCase.Update(id, payload)
 
 	if err != nil {
 		apiErr := err.(*utils.HTTPError)

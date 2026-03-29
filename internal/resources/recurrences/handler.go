@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/felipe1496/open-wallet/internal/resources/categories"
+	"github.com/felipe1496/open-wallet/internal/resources/categories/repository"
 	"github.com/felipe1496/open-wallet/internal/resources/transactions"
 	"github.com/felipe1496/open-wallet/internal/utils"
 	"go.opentelemetry.io/otel"
@@ -18,7 +19,7 @@ type API struct {
 }
 
 func NewHandler(db *sql.DB) *API {
-	catsRepo := categories.NewCategoriesRepo(db)
+	catsRepo := repository.NewCategoriesRepo()
 	catsUseCase := categories.NewCategoriesUseCase(catsRepo, db)
 	txsRepo := transactions.NewTransactionsRepo(db)
 	txsUseCase := transactions.NewTransactionsUseCase(txsRepo, catsUseCase, db)

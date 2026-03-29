@@ -16,34 +16,6 @@ definitions:
       user:
         $ref: '#/definitions/users.User'
     type: object
-  categories.Category:
-    properties:
-      color:
-        type: string
-      created_at:
-        type: string
-      id:
-        type: string
-      name:
-        type: string
-      user_id:
-        type: string
-    type: object
-  categories.CategoryAmountPerPeriod:
-    properties:
-      color:
-        type: string
-      id:
-        type: string
-      name:
-        type: string
-      period:
-        type: string
-      total_amount:
-        type: number
-      user_id:
-        type: string
-    type: object
   categories.CreateCategoryRequest:
     properties:
       color:
@@ -62,7 +34,7 @@ definitions:
   categories.CreateCategoryResponseData:
     properties:
       category:
-        $ref: '#/definitions/categories.Category'
+        $ref: '#/definitions/repository.Category'
     type: object
   categories.ListCategoriesResponse:
     properties:
@@ -75,7 +47,7 @@ definitions:
     properties:
       categories:
         items:
-          $ref: '#/definitions/categories.Category'
+          $ref: '#/definitions/repository.Category'
         type: array
     type: object
   categories.ListCategoryAmountPerPeriodResponse:
@@ -89,7 +61,7 @@ definitions:
     properties:
       categories:
         items:
-          $ref: '#/definitions/categories.CategoryAmountPerPeriod'
+          $ref: '#/definitions/repository.CategoryAmountPerPeriod'
         type: array
     type: object
   categories.UpdateCategoryRequest:
@@ -109,7 +81,7 @@ definitions:
   categories.UpdateCategoryResponseData:
     properties:
       category:
-        $ref: '#/definitions/categories.Category'
+        $ref: '#/definitions/repository.Category'
     type: object
   constants.TransactionType:
     enum:
@@ -241,6 +213,34 @@ definitions:
     properties:
       recurrence:
         $ref: '#/definitions/recurrences.Recurrence'
+    type: object
+  repository.Category:
+    properties:
+      color:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      user_id:
+        type: string
+    type: object
+  repository.CategoryAmountPerPeriod:
+    properties:
+      color:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      period:
+        type: string
+      total_amount:
+        type: number
+      user_id:
+        type: string
     type: object
   transactions.CreateEntryRequest:
     properties:

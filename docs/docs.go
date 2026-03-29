@@ -915,49 +915,6 @@ const docTemplate = `{
                 }
             }
         },
-        "categories.Category": {
-            "type": "object",
-            "properties": {
-                "color": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "user_id": {
-                    "type": "string"
-                }
-            }
-        },
-        "categories.CategoryAmountPerPeriod": {
-            "type": "object",
-            "properties": {
-                "color": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "period": {
-                    "type": "string"
-                },
-                "total_amount": {
-                    "type": "number"
-                },
-                "user_id": {
-                    "type": "string"
-                }
-            }
-        },
         "categories.CreateCategoryRequest": {
             "type": "object",
             "required": [
@@ -985,7 +942,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "category": {
-                    "$ref": "#/definitions/categories.Category"
+                    "$ref": "#/definitions/repository.Category"
                 }
             }
         },
@@ -1006,7 +963,7 @@ const docTemplate = `{
                 "categories": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/categories.Category"
+                        "$ref": "#/definitions/repository.Category"
                     }
                 }
             }
@@ -1028,7 +985,7 @@ const docTemplate = `{
                 "categories": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/categories.CategoryAmountPerPeriod"
+                        "$ref": "#/definitions/repository.CategoryAmountPerPeriod"
                     }
                 }
             }
@@ -1058,7 +1015,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "category": {
-                    "$ref": "#/definitions/categories.Category"
+                    "$ref": "#/definitions/repository.Category"
                 }
             }
         },
@@ -1249,6 +1206,49 @@ const docTemplate = `{
             "properties": {
                 "recurrence": {
                     "$ref": "#/definitions/recurrences.Recurrence"
+                }
+            }
+        },
+        "repository.Category": {
+            "type": "object",
+            "properties": {
+                "color": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "repository.CategoryAmountPerPeriod": {
+            "type": "object",
+            "properties": {
+                "color": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "period": {
+                    "type": "string"
+                },
+                "total_amount": {
+                    "type": "number"
+                },
+                "user_id": {
+                    "type": "string"
                 }
             }
         },
