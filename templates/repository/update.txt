@@ -1,0 +1,18 @@
+func (r *{{RepoName}}) Update(db utils.Executer, data {{PayloadType}}, filter *utils.QueryOptsBuilder) error {
+	query := squirrel.Update("{{TableName}}").
+		PlaceholderFormat(squirrel.Dollar)
+
+{{UpdateSets}}
+
+	query = utils.UpdateOptsToSquirrel(query, filter)
+
+	sql, args, err := query.ToSql()
+
+	if err != nil {
+		return err
+	}
+
+	_, err = db.Exec(sql, args...)
+
+	return err
+}

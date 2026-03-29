@@ -1,0 +1,22 @@
+func (r *{{RepoName}}) Count(db utils.Executer, filter *utils.QueryOptsBuilder) ({{ReturnType}}, error) {
+	query := squirrel.Select("COUNT(*)").
+		From("{{TableName}}").
+		PlaceholderFormat(squirrel.Dollar)
+
+	query = utils.QueryOptsToSquirrel(query, filter)
+
+	sql, args, err := query.ToSql()
+
+	if err != nil {
+		return 0, err
+	}
+
+	var count int
+	err = db.QueryRow(sql, args...).Scan(&count)
+
+	if err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}

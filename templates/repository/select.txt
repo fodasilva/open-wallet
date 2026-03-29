@@ -1,0 +1,32 @@
+func (r *{{RepoName}}) Select(db utils.Executer, filter *utils.QueryOptsBuilder) ({{ReturnType}}, error) {
+	query := squirrel.Select({{Columns}}).
+		From("{{TableName}}").
+		PlaceholderFormat(squirrel.Dollar)
+
+	query = utils.QueryOptsToSquirrel(query, filter)
+
+	sql, args, err := query.ToSql()
+
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := db.Query(sql, args...)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var results []{{StructName}} = []{{StructName}}{}
+	for rows.Next() {
+		var item {{StructName}}
+		err = rows.Scan(
+			{{ScanFields}}
+		)
+		results = append(results, item)
+	}
+
+	return results, nil
+}
