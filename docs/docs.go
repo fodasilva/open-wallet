@@ -1084,7 +1084,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "recurrence": {
-                    "$ref": "#/definitions/recurrences.Recurrence"
+                    "$ref": "#/definitions/repository.Recurrence"
                 }
             }
         },
@@ -1105,57 +1105,13 @@ const docTemplate = `{
                 "recurrences": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/recurrences.Recurrence"
+                        "$ref": "#/definitions/repository.Recurrence"
                     }
-                }
-            }
-        },
-        "recurrences.Recurrence": {
-            "type": "object",
-            "properties": {
-                "amount": {
-                    "type": "number"
-                },
-                "category_color": {
-                    "type": "string"
-                },
-                "category_id": {
-                    "type": "string"
-                },
-                "category_name": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "day_of_month": {
-                    "type": "integer"
-                },
-                "end_period": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "note": {
-                    "type": "string"
-                },
-                "start_period": {
-                    "type": "string"
-                },
-                "user_id": {
-                    "type": "string"
                 }
             }
         },
         "recurrences.UpdateRecurrenceRequest": {
             "type": "object",
-            "required": [
-                "update"
-            ],
             "properties": {
                 "amount": {
                     "type": "number"
@@ -1183,13 +1139,6 @@ const docTemplate = `{
                 },
                 "start_period": {
                     "type": "string"
-                },
-                "update": {
-                    "type": "array",
-                    "minItems": 1,
-                    "items": {
-                        "type": "string"
-                    }
                 }
             }
         },
@@ -1205,7 +1154,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "recurrence": {
-                    "$ref": "#/definitions/recurrences.Recurrence"
+                    "$ref": "#/definitions/repository.Recurrence"
                 }
             }
         },
@@ -1246,6 +1195,47 @@ const docTemplate = `{
                 },
                 "total_amount": {
                     "type": "number"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "repository.Recurrence": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number"
+                },
+                "category_color": {
+                    "type": "string"
+                },
+                "category_id": {
+                    "type": "string"
+                },
+                "category_name": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "day_of_month": {
+                    "type": "integer"
+                },
+                "end_period": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "note": {
+                    "type": "string"
+                },
+                "start_period": {
+                    "type": "string"
                 },
                 "user_id": {
                     "type": "string"

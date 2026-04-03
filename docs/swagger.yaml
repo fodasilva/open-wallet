@@ -131,7 +131,7 @@ definitions:
   recurrences.CreateRecurrenceResponseData:
     properties:
       recurrence:
-        $ref: '#/definitions/recurrences.Recurrence'
+        $ref: '#/definitions/repository.Recurrence'
     type: object
   recurrences.ListRecurrencesResponse:
     properties:
@@ -144,35 +144,8 @@ definitions:
     properties:
       recurrences:
         items:
-          $ref: '#/definitions/recurrences.Recurrence'
+          $ref: '#/definitions/repository.Recurrence'
         type: array
-    type: object
-  recurrences.Recurrence:
-    properties:
-      amount:
-        type: number
-      category_color:
-        type: string
-      category_id:
-        type: string
-      category_name:
-        type: string
-      created_at:
-        type: string
-      day_of_month:
-        type: integer
-      end_period:
-        type: string
-      id:
-        type: string
-      name:
-        type: string
-      note:
-        type: string
-      start_period:
-        type: string
-      user_id:
-        type: string
     type: object
   recurrences.UpdateRecurrenceRequest:
     properties:
@@ -196,13 +169,6 @@ definitions:
         type: string
       start_period:
         type: string
-      update:
-        items:
-          type: string
-        minItems: 1
-        type: array
-    required:
-    - update
     type: object
   recurrences.UpdateRecurrenceResponse:
     properties:
@@ -212,7 +178,7 @@ definitions:
   recurrences.UpdateRecurrenceResponseData:
     properties:
       recurrence:
-        $ref: '#/definitions/recurrences.Recurrence'
+        $ref: '#/definitions/repository.Recurrence'
     type: object
   repository.Category:
     properties:
@@ -239,6 +205,33 @@ definitions:
         type: string
       total_amount:
         type: number
+      user_id:
+        type: string
+    type: object
+  repository.Recurrence:
+    properties:
+      amount:
+        type: number
+      category_color:
+        type: string
+      category_id:
+        type: string
+      category_name:
+        type: string
+      created_at:
+        type: string
+      day_of_month:
+        type: integer
+      end_period:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      note:
+        type: string
+      start_period:
+        type: string
       user_id:
         type: string
     type: object

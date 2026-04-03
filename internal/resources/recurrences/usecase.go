@@ -9,28 +9,30 @@ import (
 
 	"github.com/felipe1496/open-wallet/internal/constants"
 	"github.com/felipe1496/open-wallet/internal/resources/categories"
+	"github.com/felipe1496/open-wallet/internal/resources/recurrences/repository"
 	"github.com/felipe1496/open-wallet/internal/resources/transactions"
 	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/oklog/ulid/v2"
 	"go.opentelemetry.io/otel"
 )
 
 type RecurrencesUseCase interface {
-	Create(payload CreateRecurrenceDTO) (Recurrence, error)
-	List(ctx context.Context, filter *utils.QueryOptsBuilder) ([]Recurrence, error)
+	Create(payload repository.CreateRecurrenceDTO) (repository.Recurrence, error)
+	List(ctx context.Context, filter *utils.QueryOptsBuilder) ([]repository.Recurrence, error)
 	Count(ctx context.Context, filter *utils.QueryOptsBuilder) (int, error)
 	DeleteByID(id string, scope string) error
-	Update(id string, userID string, payload UpdateRecurrenceDTO) (Recurrence, error)
+	Update(id string, userID string, payload repository.UpdateRecurrenceDTO) (repository.Recurrence, error)
 	PrepareRecurrences(ctx context.Context, userID string, targetPeriod string) error
 }
 
 type recurrencesUseCaseImpl struct {
-	repo                RecurrencesRepo
+	repo                repository.RecurrencesRepo
 	categoriesUseCase   categories.CategoriesUseCase
 	transactionsUseCase transactions.TransactionsUseCase
 	db                  *sql.DB
 }
 
-func NewRecurrencesUseCase(repo RecurrencesRepo, categoriesUseCase categories.CategoriesUseCase, transactionsUseCase transactions.TransactionsUseCase, db *sql.DB) RecurrencesUseCase {
+func NewRecurrencesUseCase(repo repository.RecurrencesRepo, categoriesUseCase categories.CategoriesUseCase, transactionsUseCase transactions.TransactionsUseCase, db *sql.DB) RecurrencesUseCase {
 	return &recurrencesUseCaseImpl{
 		repo:                repo,
 		categoriesUseCase:   categoriesUseCase,
@@ -39,34 +41,43 @@ func NewRecurrencesUseCase(repo RecurrencesRepo, categoriesUseCase categories.Ca
 	}
 }
 
-func (uc *recurrencesUseCaseImpl) Create(payload CreateRecurrenceDTO) (Recurrence, error) {
-	if payload.CategoryID != nil {
+func (uc *recurrencesUseCaseImpl) Create(payload repository.CreateRecurrenceDTO) (repository.Recurrence, error) {
+	if payload.CategoryID.Set && payload.CategoryID.Value != nil {
 		categoryExists, err := uc.categoriesUseCase.List(utils.QueryOpts().
-			And("id", "eq", *payload.CategoryID).
+			And("id", "eq", *payload.CategoryID.Value).
 			And("user_id", "eq", payload.UserID))
 		if err != nil {
-			return Recurrence{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to check if category exists")
+			return repository.Recurrence{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to check if category exists")
 		}
 
 		if len(categoryExists) == 0 {
-			return Recurrence{}, utils.NewHTTPError(http.StatusNotFound, "category not found")
+			return repository.Recurrence{}, utils.NewHTTPError(http.StatusNotFound, "category not found")
 		}
 	}
 
-	rec, err := uc.repo.Create(uc.db, payload)
-	if err != nil {
-		return Recurrence{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to create recurrence")
+	if payload.ID == "" {
+		payload.ID = ulid.Make().String()
 	}
 
-	return rec, nil
+	err := uc.repo.Insert(uc.db, payload)
+	if err != nil {
+		return repository.Recurrence{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to create recurrence")
+	}
+
+	recs, err := uc.repo.Select(uc.db, utils.QueryOpts().And("id", "eq", payload.ID))
+	if err != nil || len(recs) == 0 {
+		return repository.Recurrence{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to fetch created recurrence")
+	}
+
+	return recs[0], nil
 }
 
-func (uc *recurrencesUseCaseImpl) List(ctx context.Context, filter *utils.QueryOptsBuilder) ([]Recurrence, error) {
+func (uc *recurrencesUseCaseImpl) List(ctx context.Context, filter *utils.QueryOptsBuilder) ([]repository.Recurrence, error) {
 	tracer := otel.Tracer("usecase")
 	ctx, span := tracer.Start(ctx, "RecurrencesUseCase.List")
 	defer span.End()
 
-	items, err := uc.repo.List(ctx, uc.db, filter)
+	items, err := uc.repo.Select(uc.db, filter)
 	if err != nil {
 		span.RecordError(err)
 		return nil, utils.NewHTTPError(http.StatusInternalServerError, "failed to list recurrences")
@@ -80,7 +91,7 @@ func (uc *recurrencesUseCaseImpl) Count(ctx context.Context, filter *utils.Query
 	ctx, span := tracer.Start(ctx, "RecurrencesUseCase.Count")
 	defer span.End()
 
-	count, err := uc.repo.Count(ctx, uc.db, filter)
+	count, err := uc.repo.Count(uc.db, filter)
 	if err != nil {
 		span.RecordError(err)
 		return 0, utils.NewHTTPError(http.StatusInternalServerError, "failed to count recurrences")
@@ -90,7 +101,7 @@ func (uc *recurrencesUseCaseImpl) Count(ctx context.Context, filter *utils.Query
 }
 
 func (uc *recurrencesUseCaseImpl) DeleteByID(id string, scope string) error {
-	exists, err := uc.repo.List(context.TODO(), uc.db, utils.QueryOpts().And("id", "eq", id))
+	exists, err := uc.repo.Select(uc.db, utils.QueryOpts().And("id", "eq", id))
 	if err != nil {
 		return utils.NewHTTPError(http.StatusInternalServerError, "failed to fetch recurrence")
 	}
@@ -141,7 +152,7 @@ func (uc *recurrencesUseCaseImpl) DeleteByID(id string, scope string) error {
 		}
 	}
 
-	err = uc.repo.DeleteByID(uc.db, id)
+	err = uc.repo.Delete(uc.db, utils.QueryOpts().And("id", "eq", id))
 	if err != nil {
 		return utils.NewHTTPError(http.StatusInternalServerError, "failed to delete recurrence")
 	}
@@ -149,38 +160,44 @@ func (uc *recurrencesUseCaseImpl) DeleteByID(id string, scope string) error {
 	return nil
 }
 
-func (uc *recurrencesUseCaseImpl) Update(id string, userID string, payload UpdateRecurrenceDTO) (Recurrence, error) {
-	exists, err := uc.repo.List(context.TODO(), uc.db, utils.QueryOpts().
+func (uc *recurrencesUseCaseImpl) Update(id string, userID string, payload repository.UpdateRecurrenceDTO) (repository.Recurrence, error) {
+	exists, err := uc.repo.Select(uc.db, utils.QueryOpts().
 		And("id", "eq", id).
 		And("user_id", "eq", userID))
 
 	if err != nil {
-		return Recurrence{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to check if recurrence exists")
+		return repository.Recurrence{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to check if recurrence exists")
 	}
 
 	if len(exists) == 0 {
-		return Recurrence{}, utils.NewHTTPError(http.StatusNotFound, "recurrence not found")
+		return repository.Recurrence{}, utils.NewHTTPError(http.StatusNotFound, "recurrence not found")
 	}
 
-	if payload.CategoryID != nil && utils.Contains(payload.Update, "category_id") {
+	if payload.CategoryID.Set && payload.CategoryID.Value != nil {
 		categoryExists, err := uc.categoriesUseCase.List(utils.QueryOpts().
-			And("id", "eq", *payload.CategoryID).
+			And("id", "eq", *payload.CategoryID.Value).
 			And("user_id", "eq", userID))
 		if err != nil {
-			return Recurrence{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to check if category exists")
+			return repository.Recurrence{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to check if category exists")
 		}
 
 		if len(categoryExists) == 0 {
-			return Recurrence{}, utils.NewHTTPError(http.StatusNotFound, "category not found")
+			return repository.Recurrence{}, utils.NewHTTPError(http.StatusNotFound, "category not found")
 		}
 	}
 
-	rec, err := uc.repo.Update(uc.db, id, payload)
+	err = uc.repo.Update(uc.db, payload, utils.QueryOpts().And("id", "eq", id))
 	if err != nil {
-		return Recurrence{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to update recurrence")
+		return repository.Recurrence{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to update recurrence")
 	}
 
-	if payload.Amount != nil && utils.Contains(payload.Update, "amount") {
+	updatedRecs, err := uc.repo.Select(uc.db, utils.QueryOpts().And("id", "eq", id))
+	if err != nil || len(updatedRecs) == 0 {
+		return repository.Recurrence{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to fetch updated recurrence")
+	}
+	rec := updatedRecs[0]
+
+	if payload.Amount.Set && payload.Amount.Value != nil {
 		txs, err := uc.transactionsUseCase.ListViewEntries(context.TODO(), utils.QueryOpts().
 			And("user_id", "eq", userID).
 			And("recurrence_id", "eq", id))
@@ -193,7 +210,7 @@ func (uc *recurrencesUseCaseImpl) Update(id string, userID string, payload Updat
 			var updatedEntries []transactions.UpdateEntryDTO
 			for _, entry := range txs {
 				updatedEntries = append(updatedEntries, transactions.UpdateEntryDTO{
-					Amount:        *payload.Amount,
+					Amount:        *payload.Amount.Value,
 					ReferenceDate: entry.ReferenceDate,
 				})
 			}
@@ -212,7 +229,7 @@ func (uc *recurrencesUseCaseImpl) Update(id string, userID string, payload Updat
 }
 
 func (uc *recurrencesUseCaseImpl) PrepareRecurrences(ctx context.Context, userID string, targetPeriod string) error {
-	recurrences, err := uc.repo.List(ctx, uc.db, utils.QueryOpts().And("user_id", "eq", userID))
+	recurrences, err := uc.repo.Select(uc.db, utils.QueryOpts().And("user_id", "eq", userID))
 	if err != nil {
 		return utils.NewHTTPError(http.StatusInternalServerError, "failed to fetch recurrences")
 	}

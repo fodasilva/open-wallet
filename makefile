@@ -16,6 +16,9 @@ db-migrate-create:
 gen-repos:
 	bash scripts/repository/gen-repos.sh
 
+gen-docs:
+	swag init -g cmd/api/main.go
+
 check-docs:
 	@swag init -g cmd/api/main.go
 	@if [ -n "$$(git status -s docs/)" ]; then \
