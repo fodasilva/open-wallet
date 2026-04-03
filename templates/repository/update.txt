@@ -1,4 +1,4 @@
-func (r *{{RepoName}}) Update(db utils.Executer, data {{PayloadType}}, filter *utils.QueryOptsBuilder) error {
+func (r *{{RepoName}}) {{MethodName}}(db utils.Executer, data {{PayloadType}}, filter *utils.QueryOptsBuilder) error {
 	query := squirrel.Update("{{TableName}}").
 		PlaceholderFormat(squirrel.Dollar)
 

@@ -20,6 +20,7 @@ fi
 
 # Replace placeholders in template
 cat "$TEMPLATE" | \
+    sed "s/{{MethodName}}/$METHOD_NAME/g" | \
     sed "s/{{RepoName}}/${REPO_NAME}/g" | \
     sed "s/{{TableName}}/$TABLE_NAME/g" | \
     sed "s/{{ReturnType}}/${RETURN_TYPE}/g"

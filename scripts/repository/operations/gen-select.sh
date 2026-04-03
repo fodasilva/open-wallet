@@ -29,6 +29,7 @@ echo "$SCAN_FIELDS" > "$SCAN_FILE"
 # Replace placeholders in template
 # We replace most things with sed, then insert the scan fields file
 cat "$TEMPLATE" | \
+    sed "s/{{MethodName}}/$METHOD_NAME/g" | \
     sed "s/{{StructName}}/$STRUCT_NAME/g" | \
     sed "s/{{TableName}}/$TABLE_NAME/g" | \
     sed "s/{{Columns}}/$COLUMNS/g" | \

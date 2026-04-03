@@ -19,28 +19,28 @@ This project uses a custom script-based generator to automate the creation of re
 Copy and paste this into your `repository.go` and adjust as needed:
 
 ```go
-package <your_package>
+package repository
 
 import (
     "github.com/felipe1496/open-wallet/internal/utils"
 )
 
-// Repository interface. Make sure to only include methods
-// that you defined with @method tags in models.go
-type <Entity>Repo interface {
+// Repository interface. Make sure to include methods
+// that you defined with @method tags in models.go and any other methods you need.
+type <Entities>Repo interface {
     Select(db utils.Executer, filter *utils.QueryOptsBuilder) ([]<Entity>, error)
-    Insert(db utils.Executer, data Create<Entity>DTO) (<Entity>, error)
+    Insert(db utils.Executer, data Create<Entity>DTO) error
     Update(db utils.Executer, data Update<Entity>DTO, filter *utils.QueryOptsBuilder) error
     Delete(db utils.Executer, filter *utils.QueryOptsBuilder) error
     Count(db utils.Executer, filter *utils.QueryOptsBuilder) (int, error)
 }
 
 // Implementation struct. Name must match @name tag in models.go
-type <Entity>RepoImpl struct {
+type <Entities>RepoImpl struct {
 }
 
-func New<Entity>Repo() <Entity>Repo {
-    return &<Entity>RepoImpl{}
+func New<Entities>Repo() <Entities>Repo {
+    return &<Entities>RepoImpl{}
 }
 ```
 
@@ -58,22 +58,22 @@ func New<Entity>Repo() <Entity>Repo {
 Methods are defined with the `@method:` tag, followed by a pipe-separated list of properties.
 
 ```go
-// @method: <Operation> | fields: <column>:<Field>, ... | payload: <DTO> | return: <column>:<Field>, ...
+// @method: <Operation> | fields: <column>:<Field>, ... | payload: <DTO>
 ```
 
 #### Operations supported:
 
 - `Select`: Generates a `FindAll` style method with query options support.
-- `Insert`: Generates an `Insert` method returning the new entity.
+- `Insert`: Generates an `Insert` method returning an `error`.
 - `Update`: Generates an `Update` method for partial updates.
 - `Delete`: Generates a `Delete` method using a filter.
 - `Count`: Generates a `Count` method using a filter.
 
 #### Properties:
 
+- `alias`: Renames the generated method. Standard operations (e.g. `Select`) can be aliased (e.g. `SelectView`) allowing multiple of the same operation mapped to different tables or views within the same repository.
 - `fields`: A comma-separated list of `db_column:GoFieldName`. Use a `?` suffix on `GoFieldName` to mark it as optional.
 - `payload`: The name of the DTO struct used as input for `Insert` and `Update`.
-- `return`: For `Insert`, defines which columns to return via `RETURNING` clause and how to scan them into the entity.
 
 ## Handling Optional / Nullable Fields
 
@@ -117,8 +117,18 @@ Use the following utilities to create `OptionalNullable` values:
 // @entity: Category
 // @name: CategoriesRepoImpl
 // @method: Select | fields: id:ID, user_id:UserID, name:Name, color:Color, created_at:CreatedAt
-// @method: Insert | fields: user_id:UserID, name:Name, color:Color | return: id:ID, user_id:UserID, name:Name, color:Color, created_at:CreatedAt | payload: CreateCategoryDTO
+// @method: Insert | fields: id:ID, user_id:UserID, name:Name, color:Color | payload: CreateCategoryDTO
 // @method: Update | fields: name:Name?, color:Color? | payload: UpdateCategoryDTO
+// @method: Delete
+// @method: Count
+
+// Example Using Alias for Database Views
+// @gen_repo
+// @table: v_categories
+// @entity: Category
+// @name: CategoriesRepoImpl
+// @method: Select | alias: SelectView | fields: id:ID, user_id:UserID, name:Name, color:Color, created_at:CreatedAt
+// @method: Count | alias: CountView
 ```
 
 ## Running the Generator
