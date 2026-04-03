@@ -2,16 +2,19 @@ package recurrences
 
 import (
 	"database/sql"
+	"fmt"
 	"net/http"
+	"reflect"
+	"slices"
 
 	"github.com/felipe1496/open-wallet/internal/resources/categories"
-	"github.com/felipe1496/open-wallet/internal/resources/categories/repository"
+	catRepo "github.com/felipe1496/open-wallet/internal/resources/categories/repository"
+	"github.com/felipe1496/open-wallet/internal/resources/recurrences/repository"
 	"github.com/felipe1496/open-wallet/internal/resources/transactions"
 	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/gin-gonic/gin"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
-
-	"github.com/gin-gonic/gin"
 )
 
 type API struct {
@@ -19,13 +22,13 @@ type API struct {
 }
 
 func NewHandler(db *sql.DB) *API {
-	catsRepo := repository.NewCategoriesRepo()
+	catsRepo := catRepo.NewCategoriesRepo()
 	catsUseCase := categories.NewCategoriesUseCase(catsRepo, db)
 	txsRepo := transactions.NewTransactionsRepo(db)
 	txsUseCase := transactions.NewTransactionsUseCase(txsRepo, catsUseCase, db)
 
 	return &API{
-		recurrencesUseCase: NewRecurrencesUseCase(NewRecurrencesRepo(),
+		recurrencesUseCase: NewRecurrencesUseCase(repository.NewRecurrencesRepo(),
 			catsUseCase,
 			txsUseCase,
 			db),
@@ -46,6 +49,13 @@ func NewHandler(db *sql.DB) *API {
 // @Router /recurrences [post]
 func (api *API) Create(ctx *gin.Context) {
 	userID := ctx.GetString("user_id")
+	passedKeys, err := utils.GetJSONKeys(ctx)
+	if err != nil {
+		apiErr := utils.NewHTTPError(http.StatusBadRequest, err.Error())
+		ctx.JSON(apiErr.StatusCode, apiErr)
+		return
+	}
+
 	var body CreateRecurrenceRequest
 
 	if err := ctx.ShouldBindJSON(&body); err != nil {
@@ -54,16 +64,18 @@ func (api *API) Create(ctx *gin.Context) {
 		return
 	}
 
-	rec, err := api.recurrencesUseCase.Create(CreateRecurrenceDTO{
+	payload := repository.CreateRecurrenceDTO{
 		UserID:      userID,
 		Name:        body.Name,
-		CategoryID:  body.CategoryID,
-		Note:        body.Note,
+		CategoryID:  utils.OptionalNullable[string]{Set: slices.Contains(passedKeys, "category_id"), Value: body.CategoryID},
+		Note:        utils.OptionalNullable[string]{Set: slices.Contains(passedKeys, "note"), Value: body.Note},
 		Amount:      body.Amount,
 		DayOfMonth:  body.DayOfMonth,
 		StartPeriod: body.StartPeriod,
-		EndPeriod:   body.EndPeriod,
-	})
+		EndPeriod:   utils.OptionalNullable[string]{Set: slices.Contains(passedKeys, "end_period"), Value: body.EndPeriod},
+	}
+
+	rec, err := api.recurrencesUseCase.Create(payload)
 
 	if err != nil {
 		apiErr := utils.GetApiErr(err)
@@ -179,8 +191,20 @@ func (api *API) DeleteByID(ctx *gin.Context) {
 func (api *API) Update(ctx *gin.Context) {
 	userID := ctx.GetString("user_id")
 	id := ctx.Param("id")
-	var body UpdateRecurrenceRequest
+	passedKeys, err := utils.GetJSONKeys(ctx)
+	if err != nil {
+		apiErr := utils.NewHTTPError(http.StatusBadRequest, err.Error())
+		ctx.JSON(apiErr.StatusCode, apiErr)
+		return
+	}
 
+	if len(passedKeys) == 0 {
+		apiErr := utils.NewHTTPError(http.StatusBadRequest, "At least one field must be provided for update")
+		ctx.JSON(apiErr.StatusCode, apiErr)
+		return
+	}
+
+	var body UpdateRecurrenceRequest
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		apiErr := utils.NewHTTPError(http.StatusBadRequest, err.Error())
 		ctx.JSON(apiErr.StatusCode, apiErr)
@@ -188,16 +212,33 @@ func (api *API) Update(ctx *gin.Context) {
 		return
 	}
 
-	rec, err := api.recurrencesUseCase.Update(id, userID, UpdateRecurrenceDTO{
-		Update:      body.Update,
-		Name:        body.Name,
-		CategoryID:  body.CategoryID,
-		Note:        body.Note,
-		Amount:      body.Amount,
-		DayOfMonth:  body.DayOfMonth,
-		StartPeriod: body.StartPeriod,
-		EndPeriod:   body.EndPeriod,
-	})
+	// Validate non-nullable fields
+	nonNullable := map[string]interface{}{
+		"name":         body.Name,
+		"amount":       body.Amount,
+		"day_of_month": body.DayOfMonth,
+		"start_period": body.StartPeriod,
+	}
+
+	for _, key := range passedKeys {
+		if val, ok := nonNullable[key]; ok && (val == nil || reflect.ValueOf(val).IsNil()) {
+			apiErr := utils.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("%s cannot be null", key))
+			ctx.JSON(apiErr.StatusCode, apiErr)
+			return
+		}
+	}
+
+	payload := repository.UpdateRecurrenceDTO{
+		Name:        utils.OptionalNullable[string]{Set: slices.Contains(passedKeys, "name"), Value: body.Name},
+		CategoryID:  utils.OptionalNullable[string]{Set: slices.Contains(passedKeys, "category_id"), Value: body.CategoryID},
+		Note:        utils.OptionalNullable[string]{Set: slices.Contains(passedKeys, "note"), Value: body.Note},
+		Amount:      utils.OptionalNullable[float64]{Set: slices.Contains(passedKeys, "amount"), Value: body.Amount},
+		DayOfMonth:  utils.OptionalNullable[int]{Set: slices.Contains(passedKeys, "day_of_month"), Value: body.DayOfMonth},
+		StartPeriod: utils.OptionalNullable[string]{Set: slices.Contains(passedKeys, "start_period"), Value: body.StartPeriod},
+		EndPeriod:   utils.OptionalNullable[string]{Set: slices.Contains(passedKeys, "end_period"), Value: body.EndPeriod},
+	}
+
+	rec, err := api.recurrencesUseCase.Update(id, userID, payload)
 
 	if err != nil {
 		apiErr := utils.GetApiErr(err)
