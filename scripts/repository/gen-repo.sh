@@ -4,7 +4,7 @@
 
 MODEL_FILE=$1
 if [ -z "$MODEL_FILE" ]; then
-    echo "Usage: $0 <models.go>"
+    echo "Usage: $0 <types.go>"
     exit 1
 fi
 

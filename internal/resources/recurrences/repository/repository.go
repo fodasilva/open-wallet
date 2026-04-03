@@ -5,7 +5,7 @@ import (
 )
 
 // Repository interface. Make sure to include methods
-// that you defined with @method tags in models.go and any other methods you need.
+// that you defined with @method tags in types.go and any other methods you need.
 type RecurrencesRepo interface {
 	Select(db utils.Executer, filter *utils.QueryOptsBuilder) ([]Recurrence, error)
 	Insert(db utils.Executer, data CreateRecurrenceDTO) error
@@ -14,7 +14,7 @@ type RecurrencesRepo interface {
 	Count(db utils.Executer, filter *utils.QueryOptsBuilder) (int, error)
 }
 
-// Implementation struct. Name must match @name tag in models.go
+// Implementation struct. Name must match @name tag in types.go
 type RecurrencesRepoImpl struct {
 }
 

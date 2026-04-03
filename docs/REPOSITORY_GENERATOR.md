@@ -4,7 +4,7 @@ This project uses a custom script-based generator to automate the creation of re
 
 ## How to use
 
-1. Define your model structs in a `models.go` file.
+1. Define your model structs in a `types.go` file.
 2. Add the generator tags as comments above your structs.
 3. Run the generator script or use the make target:
    ```bash
@@ -26,7 +26,7 @@ import (
 )
 
 // Repository interface. Make sure to include methods
-// that you defined with @method tags in models.go and any other methods you need.
+// that you defined with @method tags in types.go and any other methods you need.
 type <Entities>Repo interface {
     Select(db utils.Executer, filter *utils.QueryOptsBuilder) ([]<Entity>, error)
     Insert(db utils.Executer, data Create<Entity>DTO) error
@@ -35,7 +35,7 @@ type <Entities>Repo interface {
     Count(db utils.Executer, filter *utils.QueryOptsBuilder) (int, error)
 }
 
-// Implementation struct. Name must match @name tag in models.go
+// Implementation struct. Name must match @name tag in types.go
 type <Entities>RepoImpl struct {
 }
 
@@ -142,5 +142,5 @@ The generator scans for all `.go` files containing the `@gen_repo` tag (excludin
 make gen-repo
 
 # Update a specific file
-./scripts/repository/gen-repo.sh internal/resources/categories/repository/models.go
+./scripts/repository/gen-repo.sh internal/resources/categories/repository/types.go
 ```
