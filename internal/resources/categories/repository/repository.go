@@ -6,7 +6,7 @@ import (
 )
 
 // Repository interface. Make sure to only include methods
-// that you defined with @method tags in models.go
+// that you defined with @method tags in types.go
 type CategoriesRepo interface {
 	Select(db utils.Executer, filter *utils.QueryOptsBuilder) ([]Category, error)
 	Insert(db utils.Executer, data CreateCategoryDTO) error
@@ -17,7 +17,7 @@ type CategoriesRepo interface {
 	ListCategoryAmountPerPeriod(db utils.Executer, period string, filter *utils.QueryOptsBuilder) ([]CategoryAmountPerPeriod, error)
 }
 
-// Implementation struct. Name must match @name tag in models.go
+// Implementation struct. Name must match @name tag in types.go
 type CategoriesRepoImpl struct {
 }
 
