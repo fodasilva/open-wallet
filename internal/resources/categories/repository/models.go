@@ -11,7 +11,7 @@ import (
 // @entity: Category
 // @name: CategoriesRepoImpl
 // @method: Select | fields: id:ID, user_id:UserID, name:Name, color:Color, created_at:CreatedAt
-// @method: Insert | fields: id:ID, user_id:UserID, name:Name, color:Color | return: id:ID, user_id:UserID, name:Name, color:Color, created_at:CreatedAt | payload: CreateCategoryDTO
+// @method: Insert | fields: id:ID, user_id:UserID, name:Name, color:Color | payload: CreateCategoryDTO
 // @method: Update | fields: name:Name?, color:Color? | payload: UpdateCategoryDTO
 // @method: Delete
 // @method: Count
