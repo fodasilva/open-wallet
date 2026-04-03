@@ -33,15 +33,22 @@ func NewCategoriesUseCase(repo repository.CategoriesRepo, db *sql.DB) Categories
 }
 
 func (uc *CategoriesUseCaseImpl) Create(payload repository.CreateCategoryDTO) (repository.Category, error) {
-	payload.ID = ulid.Make().String()
+	if payload.ID == "" {
+		payload.ID = ulid.Make().String()
+	}
 
-	category, err := uc.repo.Insert(uc.db, payload)
+	err := uc.repo.Insert(uc.db, payload)
 
 	if err != nil {
 		return repository.Category{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to create category")
 	}
 
-	return category, nil
+	return repository.Category{
+		ID:     payload.ID,
+		UserID: payload.UserID,
+		Name:   payload.Name,
+		Color:  payload.Color,
+	}, nil
 }
 
 func (uc *CategoriesUseCaseImpl) List(filter *utils.QueryOptsBuilder) ([]repository.Category, error) {

@@ -7,7 +7,7 @@ import (
 	"github.com/felipe1496/open-wallet/internal/utils"
 )
 
-func (r *CategoriesRepoImpl) Insert(db utils.Executer, data CreateCategoryDTO) (Category, error) {
+func (r *CategoriesRepoImpl) Insert(db utils.Executer, data CreateCategoryDTO) error {
 	query := squirrel.Insert("categories").
 		PlaceholderFormat(squirrel.Dollar)
 
@@ -23,25 +23,12 @@ func (r *CategoriesRepoImpl) Insert(db utils.Executer, data CreateCategoryDTO) (
 	values = append(values, data.Color)
 	query = query.Columns(columns...).Values(values...)
 
-	query = query.Suffix("RETURNING id, user_id, name, color, created_at")
-
 	sql, args, err := query.ToSql()
 	if err != nil {
-		return Category{}, err
+		return err
 	}
 
-	var result Category
-	err = db.QueryRow(sql, args...).Scan(
-		&result.ID,
-		&result.UserID,
-		&result.Name,
-		&result.Color,
-		&result.CreatedAt,
-	)
+	_, err = db.Exec(sql, args...)
 
-	if err != nil {
-		return Category{}, err
-	}
-
-	return result, nil
+	return err
 }

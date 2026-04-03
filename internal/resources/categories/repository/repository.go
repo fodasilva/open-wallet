@@ -9,7 +9,7 @@ import (
 // that you defined with @method tags in models.go
 type CategoriesRepo interface {
 	Select(db utils.Executer, filter *utils.QueryOptsBuilder) ([]Category, error)
-	Insert(db utils.Executer, data CreateCategoryDTO) (Category, error)
+	Insert(db utils.Executer, data CreateCategoryDTO) error
 	Update(db utils.Executer, data UpdateCategoryDTO, filter *utils.QueryOptsBuilder) error
 	Delete(db utils.Executer, filter *utils.QueryOptsBuilder) error
 	Count(db utils.Executer, filter *utils.QueryOptsBuilder) (int, error)
