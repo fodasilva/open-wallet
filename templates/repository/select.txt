@@ -1,4 +1,4 @@
-func (r *{{RepoName}}) Select(db utils.Executer, filter *utils.QueryOptsBuilder) ({{ReturnType}}, error) {
+func (r *{{RepoName}}) {{MethodName}}(db utils.Executer, filter *utils.QueryOptsBuilder) ({{ReturnType}}, error) {
 	query := squirrel.Select({{Columns}}).
 		From("{{TableName}}").
 		PlaceholderFormat(squirrel.Dollar)

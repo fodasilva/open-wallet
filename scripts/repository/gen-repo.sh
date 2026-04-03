@@ -103,16 +103,21 @@ for (( i=0; i<$NUM_TABLES; i++ )); do
 
         PAYLOAD=$(echo "$METHOD_RAW" | grep -E -o "payload:[ ]*[^|]+" | sed -E 's/payload:[ ]*//' | xargs)
         
+        ALIAS=$METHOD_NAME
+        if echo "$METHOD_RAW" | grep -q "alias:[ ]*"; then
+            ALIAS=$(echo "$METHOD_RAW" | grep -E -o "alias:[ ]*[^|]+" | sed -E 's/alias:[ ]*//' | xargs)
+        fi
+        
         # Hardcode return type inference since 'return:' now contains fields mapping
         RETURN_TYPE=""
         if [ "$OPERATION" == "Select" ]; then
             RETURN_TYPE="[]$ENTITY"
-        elif [ "$OPERATION" == "Insert" ] || [ "$OPERATION" == "GetByID" ]; then
-            RETURN_TYPE="$ENTITY"
+        elif [ "$OPERATION" == "Insert" ] || [ "$OPERATION" == "Update" ] || [ "$OPERATION" == "Delete" ]; then
+            RETURN_TYPE="error"
         elif [ "$OPERATION" == "Count" ]; then
             RETURN_TYPE="int"
-        elif [ "$OPERATION" == "Update" ] || [ "$OPERATION" == "Delete" ]; then
-            RETURN_TYPE="error"
+        elif [ "$OPERATION" == "GetByID" ]; then
+            RETURN_TYPE="$ENTITY"
         fi
 
         # Parse IN Fields
@@ -150,16 +155,18 @@ for (( i=0; i<$NUM_TABLES; i++ )); do
         fi
         rm -f "/tmp/${ENTITY}_in_cols_vals.txt" "/tmp/${ENTITY}_in_update.txt"
 
-        # Parse OUT Fields
+        # Parse OUT Fields (not needed for Insert anymore)
         rm -f "/tmp/${ENTITY}_out_cols.txt" "/tmp/${ENTITY}_out_scan.txt"
-        echo "$FIELDS_OUT" | tr ',' '\n' | while read -r field_pair; do
-            COL=$(echo "$field_pair" | cut -d: -f1 | xargs)
-            GO_FIELD=$(echo "$field_pair" | cut -d: -f2 | xargs)
-            if [ -n "$COL" ] && [ -n "$GO_FIELD" ]; then
-                echo "$COL" >> "/tmp/${ENTITY}_out_cols.txt"
-                echo "&item.$GO_FIELD," >> "/tmp/${ENTITY}_out_scan.txt"
-            fi
-        done
+        if [ "$OPERATION" != "Insert" ]; then
+            echo "$FIELDS_OUT" | tr ',' '\n' | while read -r field_pair; do
+                COL=$(echo "$field_pair" | cut -d: -f1 | xargs)
+                GO_FIELD=$(echo "$field_pair" | cut -d: -f2 | xargs)
+                if [ -n "$COL" ] && [ -n "$GO_FIELD" ]; then
+                    echo "$COL" >> "/tmp/${ENTITY}_out_cols.txt"
+                    echo "&item.$GO_FIELD," >> "/tmp/${ENTITY}_out_scan.txt"
+                fi
+            done
+        fi
         OUT_COLS=""
         OUT_SCAN=""
         RAW_OUT_COLS=""
@@ -193,7 +200,7 @@ EOF
         SCRIPT_PATH="scripts/repository/operations/gen-${OPERATION_LOWER}.sh"
         if [ -f "$SCRIPT_PATH" ]; then
             bash "$SCRIPT_PATH" \
-                "$METHOD_NAME" "$ENTITY" "$TABLE" "$IN_COLS_VALS" "" "$OUT_COLS" "$OUT_SCAN" "$REPO_NAME" "$RETURN_TYPE" "$PAYLOAD" "$RAW_OUT_COLS" "$IN_UPDATE" >> "$OUT_FILE"
+                "$ALIAS" "$ENTITY" "$TABLE" "$IN_COLS_VALS" "" "$OUT_COLS" "$OUT_SCAN" "$REPO_NAME" "$RETURN_TYPE" "$PAYLOAD" "$RAW_OUT_COLS" "$IN_UPDATE" >> "$OUT_FILE"
             
             # Format the newly created file
             if command -v gofmt &> /dev/null; then
