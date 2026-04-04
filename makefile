@@ -17,10 +17,10 @@ gen-repos:
 	bash scripts/repository/gen-repos.sh
 
 gen-docs:
-	swag init -g cmd/api/main.go
+	swag init -g cmd/api/main.go --parseDependency --parseInternal
 
 check-docs:
-	@swag init -g cmd/api/main.go
+	@swag init -g cmd/api/main.go --parseDependency --parseInternal
 	@if [ -n "$$(git status -s docs/)" ]; then \
 		echo "Documentation is out of sync!"; \
 		echo "Please run 'swag init -g cmd/api/main.go' locally and commit the updated docs/ folder."; \

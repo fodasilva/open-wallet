@@ -1,89 +1,5 @@
 definitions:
-  auth.LoginGoogleRequest:
-    properties:
-      code:
-        type: string
-    type: object
-  auth.LoginGoogleResponse:
-    properties:
-      data:
-        $ref: '#/definitions/auth.LoginGoogleResponseData'
-    type: object
-  auth.LoginGoogleResponseData:
-    properties:
-      access_token:
-        type: string
-      user:
-        $ref: '#/definitions/repository.User'
-    type: object
-  categories.CreateCategoryRequest:
-    properties:
-      color:
-        type: string
-      name:
-        type: string
-    required:
-    - color
-    - name
-    type: object
-  categories.CreateCategoryResponse:
-    properties:
-      data:
-        $ref: '#/definitions/categories.CreateCategoryResponseData'
-    type: object
-  categories.CreateCategoryResponseData:
-    properties:
-      category:
-        $ref: '#/definitions/repository.Category'
-    type: object
-  categories.ListCategoriesResponse:
-    properties:
-      data:
-        $ref: '#/definitions/categories.ListCategoriesResponseData'
-      query:
-        $ref: '#/definitions/utils.QueryMeta'
-    type: object
-  categories.ListCategoriesResponseData:
-    properties:
-      categories:
-        items:
-          $ref: '#/definitions/repository.Category'
-        type: array
-    type: object
-  categories.ListCategoryAmountPerPeriodResponse:
-    properties:
-      data:
-        $ref: '#/definitions/categories.ListCategoryAmountPerPeriodResponseData'
-      query:
-        $ref: '#/definitions/utils.QueryMeta'
-    type: object
-  categories.ListCategoryAmountPerPeriodResponseData:
-    properties:
-      categories:
-        items:
-          $ref: '#/definitions/repository.CategoryAmountPerPeriod'
-        type: array
-    type: object
-  categories.UpdateCategoryRequest:
-    properties:
-      color:
-        type: string
-      name:
-        maxLength: 50
-        minLength: 1
-        type: string
-    type: object
-  categories.UpdateCategoryResponse:
-    properties:
-      data:
-        $ref: '#/definitions/categories.UpdateCategoryResponseData'
-    type: object
-  categories.UpdateCategoryResponseData:
-    properties:
-      category:
-        $ref: '#/definitions/repository.Category'
-    type: object
-  constants.TransactionType:
+  github_com_felipe1496_open-wallet_internal_constants.TransactionType:
     enum:
     - simple_expense
     - income
@@ -95,92 +11,7 @@ definitions:
     - Income
     - Installment
     - Recurrence
-  recurrences.CreateRecurrenceRequest:
-    properties:
-      amount:
-        type: number
-      category_id:
-        type: string
-      day_of_month:
-        maximum: 31
-        minimum: 1
-        type: integer
-      end_period:
-        type: string
-      name:
-        maxLength: 100
-        minLength: 1
-        type: string
-      note:
-        maxLength: 400
-        minLength: 0
-        type: string
-      start_period:
-        type: string
-    required:
-    - amount
-    - day_of_month
-    - name
-    - start_period
-    type: object
-  recurrences.CreateRecurrenceResponse:
-    properties:
-      data:
-        $ref: '#/definitions/recurrences.CreateRecurrenceResponseData'
-    type: object
-  recurrences.CreateRecurrenceResponseData:
-    properties:
-      recurrence:
-        $ref: '#/definitions/repository.Recurrence'
-    type: object
-  recurrences.ListRecurrencesResponse:
-    properties:
-      data:
-        $ref: '#/definitions/recurrences.ListRecurrencesResponseData'
-      query:
-        $ref: '#/definitions/utils.QueryMeta'
-    type: object
-  recurrences.ListRecurrencesResponseData:
-    properties:
-      recurrences:
-        items:
-          $ref: '#/definitions/repository.Recurrence'
-        type: array
-    type: object
-  recurrences.UpdateRecurrenceRequest:
-    properties:
-      amount:
-        type: number
-      category_id:
-        type: string
-      day_of_month:
-        maximum: 31
-        minimum: 1
-        type: integer
-      end_period:
-        type: string
-      name:
-        maxLength: 100
-        minLength: 1
-        type: string
-      note:
-        maxLength: 400
-        minLength: 0
-        type: string
-      start_period:
-        type: string
-    type: object
-  recurrences.UpdateRecurrenceResponse:
-    properties:
-      data:
-        $ref: '#/definitions/recurrences.UpdateRecurrenceResponseData'
-    type: object
-  recurrences.UpdateRecurrenceResponseData:
-    properties:
-      recurrence:
-        $ref: '#/definitions/repository.Recurrence'
-    type: object
-  repository.Category:
+  github_com_felipe1496_open-wallet_internal_resources_categories_repository.Category:
     properties:
       color:
         type: string
@@ -193,7 +24,7 @@ definitions:
       user_id:
         type: string
     type: object
-  repository.CategoryAmountPerPeriod:
+  github_com_felipe1496_open-wallet_internal_resources_categories_repository.CategoryAmountPerPeriod:
     properties:
       color:
         type: string
@@ -208,7 +39,7 @@ definitions:
       user_id:
         type: string
     type: object
-  repository.Recurrence:
+  github_com_felipe1496_open-wallet_internal_resources_recurrences_repository.Recurrence:
     properties:
       amount:
         type: number
@@ -235,7 +66,7 @@ definitions:
       user_id:
         type: string
     type: object
-  repository.Transaction:
+  github_com_felipe1496_open-wallet_internal_resources_transactions_repository.Transaction:
     properties:
       category_id:
         type: string
@@ -250,26 +81,11 @@ definitions:
       recurrence_id:
         type: string
       type:
-        $ref: '#/definitions/constants.TransactionType'
+        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_constants.TransactionType'
       user_id:
         type: string
     type: object
-  repository.User:
-    properties:
-      avatar_url:
-        type: string
-      created_at:
-        type: string
-      email:
-        type: string
-      id:
-        type: string
-      name:
-        type: string
-      username:
-        type: string
-    type: object
-  repository.ViewEntry:
+  github_com_felipe1496_open-wallet_internal_resources_transactions_repository.ViewEntry:
     properties:
       amount:
         type: number
@@ -302,11 +118,222 @@ definitions:
       transaction_id:
         type: string
       type:
-        $ref: '#/definitions/constants.TransactionType'
+        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_constants.TransactionType'
       user_id:
         type: string
     type: object
-  transactions.CreateEntryRequest:
+  github_com_felipe1496_open-wallet_internal_resources_users_repository.User:
+    properties:
+      avatar_url:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      username:
+        type: string
+    type: object
+  github_com_felipe1496_open-wallet_internal_utils.HTTPError:
+    properties:
+      error:
+        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPErrorData'
+      status:
+        type: integer
+    type: object
+  github_com_felipe1496_open-wallet_internal_utils.HTTPErrorData:
+    properties:
+      message:
+        type: string
+      type:
+        type: string
+    type: object
+  github_com_felipe1496_open-wallet_internal_utils.QueryMeta:
+    properties:
+      next_page:
+        type: boolean
+      page:
+        type: integer
+      per_page:
+        type: integer
+      total_items:
+        type: integer
+      total_pages:
+        type: integer
+    type: object
+  internal_resources_auth.LoginGoogleRequest:
+    properties:
+      code:
+        type: string
+    type: object
+  internal_resources_auth.LoginGoogleResponse:
+    properties:
+      data:
+        $ref: '#/definitions/internal_resources_auth.LoginGoogleResponseData'
+    type: object
+  internal_resources_auth.LoginGoogleResponseData:
+    properties:
+      access_token:
+        type: string
+      user:
+        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_users_repository.User'
+    type: object
+  internal_resources_categories.CreateCategoryRequest:
+    properties:
+      color:
+        type: string
+      name:
+        type: string
+    required:
+    - color
+    - name
+    type: object
+  internal_resources_categories.CreateCategoryResponse:
+    properties:
+      data:
+        $ref: '#/definitions/internal_resources_categories.CreateCategoryResponseData'
+    type: object
+  internal_resources_categories.CreateCategoryResponseData:
+    properties:
+      category:
+        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_categories_repository.Category'
+    type: object
+  internal_resources_categories.ListCategoriesResponse:
+    properties:
+      data:
+        $ref: '#/definitions/internal_resources_categories.ListCategoriesResponseData'
+      query:
+        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.QueryMeta'
+    type: object
+  internal_resources_categories.ListCategoriesResponseData:
+    properties:
+      categories:
+        items:
+          $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_categories_repository.Category'
+        type: array
+    type: object
+  internal_resources_categories.ListCategoryAmountPerPeriodResponse:
+    properties:
+      data:
+        $ref: '#/definitions/internal_resources_categories.ListCategoryAmountPerPeriodResponseData'
+      query:
+        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.QueryMeta'
+    type: object
+  internal_resources_categories.ListCategoryAmountPerPeriodResponseData:
+    properties:
+      categories:
+        items:
+          $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_categories_repository.CategoryAmountPerPeriod'
+        type: array
+    type: object
+  internal_resources_categories.UpdateCategoryRequest:
+    properties:
+      color:
+        type: string
+      name:
+        maxLength: 50
+        minLength: 1
+        type: string
+    type: object
+  internal_resources_categories.UpdateCategoryResponse:
+    properties:
+      data:
+        $ref: '#/definitions/internal_resources_categories.UpdateCategoryResponseData'
+    type: object
+  internal_resources_categories.UpdateCategoryResponseData:
+    properties:
+      category:
+        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_categories_repository.Category'
+    type: object
+  internal_resources_recurrences.CreateRecurrenceRequest:
+    properties:
+      amount:
+        type: number
+      category_id:
+        type: string
+      day_of_month:
+        maximum: 31
+        minimum: 1
+        type: integer
+      end_period:
+        type: string
+      name:
+        maxLength: 100
+        minLength: 1
+        type: string
+      note:
+        maxLength: 400
+        minLength: 0
+        type: string
+      start_period:
+        type: string
+    required:
+    - amount
+    - day_of_month
+    - name
+    - start_period
+    type: object
+  internal_resources_recurrences.CreateRecurrenceResponse:
+    properties:
+      data:
+        $ref: '#/definitions/internal_resources_recurrences.CreateRecurrenceResponseData'
+    type: object
+  internal_resources_recurrences.CreateRecurrenceResponseData:
+    properties:
+      recurrence:
+        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_recurrences_repository.Recurrence'
+    type: object
+  internal_resources_recurrences.ListRecurrencesResponse:
+    properties:
+      data:
+        $ref: '#/definitions/internal_resources_recurrences.ListRecurrencesResponseData'
+      query:
+        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.QueryMeta'
+    type: object
+  internal_resources_recurrences.ListRecurrencesResponseData:
+    properties:
+      recurrences:
+        items:
+          $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_recurrences_repository.Recurrence'
+        type: array
+    type: object
+  internal_resources_recurrences.UpdateRecurrenceRequest:
+    properties:
+      amount:
+        type: number
+      category_id:
+        type: string
+      day_of_month:
+        maximum: 31
+        minimum: 1
+        type: integer
+      end_period:
+        type: string
+      name:
+        maxLength: 100
+        minLength: 1
+        type: string
+      note:
+        maxLength: 400
+        minLength: 0
+        type: string
+      start_period:
+        type: string
+    type: object
+  internal_resources_recurrences.UpdateRecurrenceResponse:
+    properties:
+      data:
+        $ref: '#/definitions/internal_resources_recurrences.UpdateRecurrenceResponseData'
+    type: object
+  internal_resources_recurrences.UpdateRecurrenceResponseData:
+    properties:
+      recurrence:
+        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_recurrences_repository.Recurrence'
+    type: object
+  internal_resources_transactions.CreateEntryRequest:
     properties:
       amount:
         maximum: 999999
@@ -318,13 +345,13 @@ definitions:
     - amount
     - reference_date
     type: object
-  transactions.CreateTransactionRequest:
+  internal_resources_transactions.CreateTransactionRequest:
     properties:
       category_id:
         type: string
       entries:
         items:
-          $ref: '#/definitions/transactions.CreateEntryRequest'
+          $ref: '#/definitions/internal_resources_transactions.CreateEntryRequest'
         maxItems: 100
         minItems: 1
         type: array
@@ -338,7 +365,7 @@ definitions:
         type: string
       type:
         allOf:
-        - $ref: '#/definitions/constants.TransactionType'
+        - $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_constants.TransactionType'
         enum:
         - installment
         - simple_expense
@@ -348,31 +375,31 @@ definitions:
     - name
     - type
     type: object
-  transactions.CreateTransactionResponse:
+  internal_resources_transactions.CreateTransactionResponse:
     properties:
       data:
-        $ref: '#/definitions/transactions.CreateTransactionResponseData'
+        $ref: '#/definitions/internal_resources_transactions.CreateTransactionResponseData'
     type: object
-  transactions.CreateTransactionResponseData:
+  internal_resources_transactions.CreateTransactionResponseData:
     properties:
       transaction:
-        $ref: '#/definitions/repository.Transaction'
+        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions_repository.Transaction'
     type: object
-  transactions.ListEntriesResponse:
+  internal_resources_transactions.ListEntriesResponse:
     properties:
       data:
-        $ref: '#/definitions/transactions.ListEntriesResponseData'
+        $ref: '#/definitions/internal_resources_transactions.ListEntriesResponseData'
       query:
-        $ref: '#/definitions/utils.QueryMeta'
+        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.QueryMeta'
     type: object
-  transactions.ListEntriesResponseData:
+  internal_resources_transactions.ListEntriesResponseData:
     properties:
       entries:
         items:
-          $ref: '#/definitions/repository.ViewEntry'
+          $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions_repository.ViewEntry'
         type: array
     type: object
-  transactions.UpdateEntryRequest:
+  internal_resources_transactions.UpdateEntryRequest:
     properties:
       amount:
         maximum: 999999
@@ -384,13 +411,13 @@ definitions:
     - amount
     - reference_date
     type: object
-  transactions.UpdateTransactionRequest:
+  internal_resources_transactions.UpdateTransactionRequest:
     properties:
       category_id:
         type: string
       entries:
         items:
-          $ref: '#/definitions/transactions.UpdateEntryRequest'
+          $ref: '#/definitions/internal_resources_transactions.UpdateEntryRequest'
         maxItems: 100
         minItems: 1
         type: array
@@ -410,42 +437,15 @@ definitions:
     required:
     - update
     type: object
-  transactions.UpdateTransactionResponse:
+  internal_resources_transactions.UpdateTransactionResponse:
     properties:
       data:
-        $ref: '#/definitions/transactions.UpdateTransactionResponseData'
+        $ref: '#/definitions/internal_resources_transactions.UpdateTransactionResponseData'
     type: object
-  transactions.UpdateTransactionResponseData:
+  internal_resources_transactions.UpdateTransactionResponseData:
     properties:
       transaction:
-        $ref: '#/definitions/repository.Transaction'
-    type: object
-  utils.HTTPError:
-    properties:
-      error:
-        $ref: '#/definitions/utils.HTTPErrorData'
-      status:
-        type: integer
-    type: object
-  utils.HTTPErrorData:
-    properties:
-      message:
-        type: string
-      type:
-        type: string
-    type: object
-  utils.QueryMeta:
-    properties:
-      next_page:
-        type: boolean
-      page:
-        type: integer
-      per_page:
-        type: integer
-      total_items:
-        type: integer
-      total_pages:
-        type: integer
+        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions_repository.Transaction'
     type: object
 info:
   contact: {}
@@ -462,22 +462,22 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/auth.LoginGoogleRequest'
+          $ref: '#/definitions/internal_resources_auth.LoginGoogleRequest'
       produces:
       - application/json
       responses:
         "200":
           description: User logged in
           schema:
-            $ref: '#/definitions/auth.LoginGoogleResponse'
+            $ref: '#/definitions/internal_resources_auth.LoginGoogleResponse'
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
       summary: Login with Google
       tags:
       - auth
@@ -516,15 +516,15 @@ paths:
         "200":
           description: List of categories
           schema:
-            $ref: '#/definitions/categories.ListCategoriesResponse'
+            $ref: '#/definitions/internal_resources_categories.ListCategoriesResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
       security:
       - BearerAuth: []
       summary: List categories
@@ -540,22 +540,22 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/categories.CreateCategoryRequest'
+          $ref: '#/definitions/internal_resources_categories.CreateCategoryRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Category created
           schema:
-            $ref: '#/definitions/categories.CreateCategoryResponse'
+            $ref: '#/definitions/internal_resources_categories.CreateCategoryResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
       security:
       - BearerAuth: []
       summary: Create a category
@@ -580,15 +580,15 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
         "404":
           description: Not found
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
       security:
       - BearerAuth: []
       summary: Delete Category By ID
@@ -609,26 +609,26 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/categories.UpdateCategoryRequest'
+          $ref: '#/definitions/internal_resources_categories.UpdateCategoryRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Category updated
           schema:
-            $ref: '#/definitions/categories.UpdateCategoryResponse'
+            $ref: '#/definitions/internal_resources_categories.UpdateCategoryResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
         "404":
           description: Not found
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
       security:
       - BearerAuth: []
       summary: Update Category By ID
@@ -670,15 +670,15 @@ paths:
         "200":
           description: List of categories with amount per period
           schema:
-            $ref: '#/definitions/categories.ListCategoryAmountPerPeriodResponse'
+            $ref: '#/definitions/internal_resources_categories.ListCategoryAmountPerPeriodResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
       security:
       - BearerAuth: []
       summary: List categories with amount per period
@@ -706,15 +706,15 @@ paths:
         "200":
           description: List of recurrences
           schema:
-            $ref: '#/definitions/recurrences.ListRecurrencesResponse'
+            $ref: '#/definitions/internal_resources_recurrences.ListRecurrencesResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
       security:
       - BearerAuth: []
       summary: List recurrences
@@ -730,26 +730,26 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/recurrences.CreateRecurrenceRequest'
+          $ref: '#/definitions/internal_resources_recurrences.CreateRecurrenceRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Recurrence created
           schema:
-            $ref: '#/definitions/recurrences.CreateRecurrenceResponse'
+            $ref: '#/definitions/internal_resources_recurrences.CreateRecurrenceResponse'
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
       security:
       - BearerAuth: []
       summary: Create a recurrence
@@ -774,15 +774,15 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
         "404":
           description: Not found
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
       security:
       - BearerAuth: []
       summary: Delete Recurrence By ID
@@ -803,26 +803,26 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/recurrences.UpdateRecurrenceRequest'
+          $ref: '#/definitions/internal_resources_recurrences.UpdateRecurrenceRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Recurrence updated
           schema:
-            $ref: '#/definitions/recurrences.UpdateRecurrenceResponse'
+            $ref: '#/definitions/internal_resources_recurrences.UpdateRecurrenceResponse'
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
       security:
       - BearerAuth: []
       summary: Update a recurrence
@@ -848,15 +848,15 @@ paths:
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
       security:
       - BearerAuth: []
       summary: Prepare recurrences for a period
@@ -873,26 +873,26 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/transactions.CreateTransactionRequest'
+          $ref: '#/definitions/internal_resources_transactions.CreateTransactionRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Installment updated
           schema:
-            $ref: '#/definitions/transactions.CreateTransactionResponse'
+            $ref: '#/definitions/internal_resources_transactions.CreateTransactionResponse'
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
       security:
       - BearerAuth: []
       summary: Create a transaction
@@ -917,15 +917,15 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
         "404":
           description: Not found
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
       security:
       - BearerAuth: []
       summary: Delete Transaction By ID
@@ -946,26 +946,26 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/transactions.UpdateTransactionRequest'
+          $ref: '#/definitions/internal_resources_transactions.UpdateTransactionRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Installment updated
           schema:
-            $ref: '#/definitions/transactions.UpdateTransactionResponse'
+            $ref: '#/definitions/internal_resources_transactions.UpdateTransactionResponse'
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
       security:
       - BearerAuth: []
       summary: Update a transaction
@@ -999,15 +999,15 @@ paths:
         "200":
           description: List of entries
           schema:
-            $ref: '#/definitions/transactions.ListEntriesResponse'
+            $ref: '#/definitions/internal_resources_transactions.ListEntriesResponse'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
       security:
       - BearerAuth: []
       summary: List entries

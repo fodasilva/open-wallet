@@ -10,6 +10,7 @@ import (
 	"testing"
 
 	"github.com/felipe1496/open-wallet/internal/resources/auth"
+	authUseCases "github.com/felipe1496/open-wallet/internal/resources/auth/usecases"
 	"github.com/felipe1496/open-wallet/internal/resources/users"
 	"github.com/felipe1496/open-wallet/internal/resources/users/repository"
 	"github.com/felipe1496/open-wallet/internal/services"
@@ -27,7 +28,7 @@ func setupTestServer(db *sql.DB, googleService services.GoogleService, jwtServic
 
 	usersRepo := repository.NewUsersRepo()
 	usersUseCase := users.NewUsersUseCase(usersRepo, db)
-	authUseCase := auth.NewAuthUseCase(googleService, usersUseCase)
+	authUseCase := authUseCases.NewAuthUseCases(googleService, usersUseCase)
 	handler := auth.NewHandler(googleService, jwtService, usersUseCase, authUseCase)
 	authGroup := router.Group("/api/v1/auth")
 	{
