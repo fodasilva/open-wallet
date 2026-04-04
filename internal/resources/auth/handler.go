@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"github.com/felipe1496/open-wallet/internal/resources/auth/usecases"
-	"github.com/felipe1496/open-wallet/internal/resources/users"
+	usersUseCases "github.com/felipe1496/open-wallet/internal/resources/users/usecases"
 
 	"github.com/felipe1496/open-wallet/internal/services"
 	"github.com/felipe1496/open-wallet/internal/utils"
@@ -14,12 +14,12 @@ import (
 
 type API struct {
 	googleService services.GoogleService
-	usersUseCase  users.UsersUseCase
+	usersUseCase  usersUseCases.UsersUseCases
 	JWTService    services.JWTService
 	authUseCases  usecases.AuthUseCases
 }
 
-func NewHandler(googleService services.GoogleService, jwtService services.JWTService, usersUseCase users.UsersUseCase, authUseCases usecases.AuthUseCases) *API {
+func NewHandler(googleService services.GoogleService, jwtService services.JWTService, usersUseCase usersUseCases.UsersUseCases, authUseCases usecases.AuthUseCases) *API {
 	return &API{
 		googleService: googleService,
 		usersUseCase:  usersUseCase,

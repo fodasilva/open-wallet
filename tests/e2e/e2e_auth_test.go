@@ -11,7 +11,7 @@ import (
 
 	"github.com/felipe1496/open-wallet/internal/resources/auth"
 	authUseCases "github.com/felipe1496/open-wallet/internal/resources/auth/usecases"
-	"github.com/felipe1496/open-wallet/internal/resources/users"
+	usersUseCases "github.com/felipe1496/open-wallet/internal/resources/users/usecases"
 	"github.com/felipe1496/open-wallet/internal/resources/users/repository"
 	"github.com/felipe1496/open-wallet/internal/services"
 	"github.com/felipe1496/open-wallet/internal/services/mocks"
@@ -27,7 +27,7 @@ func setupTestServer(db *sql.DB, googleService services.GoogleService, jwtServic
 	router := gin.New()
 
 	usersRepo := repository.NewUsersRepo()
-	usersUseCase := users.NewUsersUseCase(usersRepo, db)
+	usersUseCase := usersUseCases.NewUsersUseCases(usersRepo, db)
 	authUseCase := authUseCases.NewAuthUseCases(googleService, usersUseCase)
 	handler := auth.NewHandler(googleService, jwtService, usersUseCase, authUseCase)
 	authGroup := router.Group("/api/v1/auth")

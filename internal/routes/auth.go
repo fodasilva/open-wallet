@@ -10,7 +10,7 @@ import (
 )
 
 func SetupAuthRoutes(r *gin.Engine, f *factory.Factory, redisClient *redis.Client, cfg *infra.Config) {
-	authHandler := auth.NewHandler(f.GoogleService(), f.JWTService(), f.UsersUseCase(), f.AuthUseCases())
+	authHandler := auth.NewHandler(f.GoogleService(), f.JWTService(), f.UsersUseCases(), f.AuthUseCases())
 	authGroup := r.Group("/api/v1/auth")
 	{
 		authGroup.POST("/login/google",
