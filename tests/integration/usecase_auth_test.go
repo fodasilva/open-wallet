@@ -7,8 +7,8 @@ import (
 	"github.com/felipe1496/open-wallet/internal/resources/auth"
 	"github.com/felipe1496/open-wallet/internal/resources/users"
 	mockUsers "github.com/felipe1496/open-wallet/internal/resources/users/mocks"
+	"github.com/felipe1496/open-wallet/internal/resources/users/repository"
 	"github.com/felipe1496/open-wallet/internal/services"
-	"github.com/felipe1496/open-wallet/internal/services/mocks"
 	mockServices "github.com/felipe1496/open-wallet/internal/services/mocks"
 
 	"github.com/stretchr/testify/assert"
@@ -19,7 +19,7 @@ func TestAuthUseCase_LoginWithGoogle(t *testing.T) {
 	t.Run("should not login if code is invalid", func(t *testing.T) {
 		mockGoogle := new(mockServices.MockGoogleService)
 		mockRepo := new(mockUsers.MockUsersRepo)
-		usersUC := users.NewUsersUseCase(mockRepo)
+		usersUC := users.NewUsersUseCase(mockRepo, nil)
 		uc := auth.NewAuthUseCase(mockGoogle, usersUC)
 
 		mockGoogle.On("GetUserAccessToken", "invalid-code").Return(nil, services.FailedGoogleAuthenticationErr)
@@ -33,7 +33,7 @@ func TestAuthUseCase_LoginWithGoogle(t *testing.T) {
 	t.Run("should not login if google email is not verified", func(t *testing.T) {
 		mockGoogle := new(mockServices.MockGoogleService)
 		mockRepo := new(mockUsers.MockUsersRepo)
-		usersUC := users.NewUsersUseCase(mockRepo)
+		usersUC := users.NewUsersUseCase(mockRepo, nil)
 		uc := auth.NewAuthUseCase(mockGoogle, usersUC)
 
 		accessToken := "valid-access-token"
@@ -58,7 +58,7 @@ func TestAuthUseCase_LoginWithGoogle(t *testing.T) {
 	t.Run("should not login if google did not provide email", func(t *testing.T) {
 		mockGoogle := new(mockServices.MockGoogleService)
 		mockRepo := new(mockUsers.MockUsersRepo)
-		usersUC := users.NewUsersUseCase(mockRepo)
+		usersUC := users.NewUsersUseCase(mockRepo, nil)
 		uc := auth.NewAuthUseCase(mockGoogle, usersUC)
 
 		accessToken := "valid-access-token"
@@ -79,9 +79,9 @@ func TestAuthUseCase_LoginWithGoogle(t *testing.T) {
 	})
 
 	t.Run("should return error if users usecase list fails", func(t *testing.T) {
-		mockGoogleService := new(mocks.MockGoogleService)
+		mockGoogleService := new(mockServices.MockGoogleService)
 		mockRepo := new(mockUsers.MockUsersRepo)
-		usersUseCase := users.NewUsersUseCase(mockRepo)
+		usersUseCase := users.NewUsersUseCase(mockRepo, nil)
 		uc := auth.NewAuthUseCase(mockGoogleService, usersUseCase)
 
 		emailVerified := true
@@ -102,8 +102,8 @@ func TestAuthUseCase_LoginWithGoogle(t *testing.T) {
 			}, nil)
 
 		mockRepo.
-			On("ListUsers", mock.Anything).
-			Return([]users.User{}, errors.New("db error"))
+			On("Select", mock.Anything, mock.Anything).
+			Return(nil, errors.New("db error"))
 
 		_, err := uc.LoginWithGoogle("valid-code")
 
@@ -114,9 +114,9 @@ func TestAuthUseCase_LoginWithGoogle(t *testing.T) {
 	})
 
 	t.Run("should_return_error_if_creating_user_fails", func(t *testing.T) {
-		googleSvcMock := new(mocks.MockGoogleService)
+		googleSvcMock := new(mockServices.MockGoogleService)
 		usersRepoMock := new(mockUsers.MockUsersRepo)
-		usersUseCase := users.NewUsersUseCase(usersRepoMock)
+		usersUseCase := users.NewUsersUseCase(usersRepoMock, nil)
 		authUseCase := auth.NewAuthUseCase(googleSvcMock, usersUseCase)
 
 		accessToken := "valid-access-token"
@@ -135,25 +135,32 @@ func TestAuthUseCase_LoginWithGoogle(t *testing.T) {
 				Name:          "New User",
 			}, nil)
 
+		// List check in auth usecase
 		usersRepoMock.
-			On("ListUsers", mock.Anything).
-			Return([]users.User{}, nil).
-			Times(3)
+			On("Select", mock.Anything, mock.Anything).
+			Return([]repository.User{}, nil).
+			Once()
+
+		// List checks (username and email) in users usecase Create
+		usersRepoMock.
+			On("Select", mock.Anything, mock.Anything).
+			Return([]repository.User{}, nil).
+			Times(2)
 
 		usersRepoMock.
-			On("CreateUser", mock.Anything).
-			Return(users.User{}, errors.New("db error"))
+			On("Insert", mock.Anything, mock.Anything).
+			Return(errors.New("db error")).
+			Once()
 
-		token, err := authUseCase.LoginWithGoogle("valid-code")
+		_, err := authUseCase.LoginWithGoogle("valid-code")
 
-		assert.Error(t, err, users.FailedToCreateUserError)
-		assert.Empty(t, token)
+		assert.ErrorIs(t, err, users.FailedToCreateUserError)
 	})
 
 	t.Run("should login successfully if user does not exist and is created", func(t *testing.T) {
 		mockGoogle := new(mockServices.MockGoogleService)
 		mockRepo := new(mockUsers.MockUsersRepo)
-		usersUC := users.NewUsersUseCase(mockRepo)
+		usersUC := users.NewUsersUseCase(mockRepo, nil)
 		uc := auth.NewAuthUseCase(mockGoogle, usersUC)
 
 		accessToken := "valid-access-token"
@@ -170,12 +177,21 @@ func TestAuthUseCase_LoginWithGoogle(t *testing.T) {
 			EmailVerified: &emailVerified,
 		}, nil)
 
+		// List check in auth usecase
 		mockRepo.
-			On("ListUsers", mock.Anything).
-			Return([]users.User{}, nil)
+			On("Select", mock.Anything, mock.Anything).
+			Return([]repository.User{}, nil).Once()
 
-		createdUser := users.User{ID: "2", Name: "New User", Email: email}
-		mockRepo.On("CreateUser", mock.Anything).Return(createdUser, nil)
+		// List checks (username and email) in users usecase Create
+		mockRepo.
+			On("Select", mock.Anything, mock.Anything).
+			Return([]repository.User{}, nil).Times(2)
+
+		createdUser := repository.User{ID: "2", Name: "New User", Email: email}
+		mockRepo.On("Insert", mock.Anything, mock.Anything).Return(nil).Once()
+
+		// Always fetch after creation
+		mockRepo.On("Select", mock.Anything, mock.Anything).Return([]repository.User{createdUser}, nil).Once()
 
 		user, err := uc.LoginWithGoogle("valid-code")
 		assert.NoError(t, err)

@@ -911,7 +911,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "user": {
-                    "$ref": "#/definitions/users.User"
+                    "$ref": "#/definitions/repository.User"
                 }
             }
         },
@@ -1271,6 +1271,29 @@ const docTemplate = `{
                 }
             }
         },
+        "repository.User": {
+            "type": "object",
+            "properties": {
+                "avatar_url": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
         "repository.ViewEntry": {
             "type": "object",
             "properties": {
@@ -1491,29 +1514,6 @@ const docTemplate = `{
             "properties": {
                 "transaction": {
                     "$ref": "#/definitions/repository.Transaction"
-                }
-            }
-        },
-        "users.User": {
-            "type": "object",
-            "properties": {
-                "avatar_url": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
                 }
             }
         },
