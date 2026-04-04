@@ -1242,6 +1242,91 @@ const docTemplate = `{
                 }
             }
         },
+        "repository.Transaction": {
+            "type": "object",
+            "properties": {
+                "category_id": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "recurrence_id": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/constants.TransactionType"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "repository.ViewEntry": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "type": "number"
+                },
+                "category_color": {
+                    "type": "string"
+                },
+                "category_id": {
+                    "type": "string"
+                },
+                "category_name": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "installment": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "period": {
+                    "type": "string"
+                },
+                "recurrence_id": {
+                    "type": "string"
+                },
+                "reference_date": {
+                    "type": "string"
+                },
+                "total_amount": {
+                    "type": "number"
+                },
+                "total_installments": {
+                    "type": "integer"
+                },
+                "transaction_id": {
+                    "type": "string"
+                },
+                "type": {
+                    "$ref": "#/definitions/constants.TransactionType"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
         "transactions.CreateEntryRequest": {
             "type": "object",
             "required": [
@@ -1314,7 +1399,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "transaction": {
-                    "$ref": "#/definitions/transactions.Transaction"
+                    "$ref": "#/definitions/repository.Transaction"
                 }
             }
         },
@@ -1335,37 +1420,8 @@ const docTemplate = `{
                 "entries": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/transactions.ViewEntry"
+                        "$ref": "#/definitions/repository.ViewEntry"
                     }
-                }
-            }
-        },
-        "transactions.Transaction": {
-            "type": "object",
-            "properties": {
-                "category_id": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "recurrence_id": {
-                    "type": "string"
-                },
-                "type": {
-                    "$ref": "#/definitions/constants.TransactionType"
-                },
-                "user_id": {
-                    "type": "string"
                 }
             }
         },
@@ -1434,63 +1490,7 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "transaction": {
-                    "$ref": "#/definitions/transactions.Transaction"
-                }
-            }
-        },
-        "transactions.ViewEntry": {
-            "type": "object",
-            "properties": {
-                "amount": {
-                    "type": "number"
-                },
-                "category_color": {
-                    "type": "string"
-                },
-                "category_id": {
-                    "type": "string"
-                },
-                "category_name": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "installment": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "period": {
-                    "type": "string"
-                },
-                "recurrence_id": {
-                    "type": "string"
-                },
-                "reference_date": {
-                    "type": "string"
-                },
-                "total_amount": {
-                    "type": "number"
-                },
-                "total_installments": {
-                    "type": "integer"
-                },
-                "transaction_id": {
-                    "type": "string"
-                },
-                "type": {
-                    "$ref": "#/definitions/constants.TransactionType"
-                },
-                "user_id": {
-                    "type": "string"
+                    "$ref": "#/definitions/repository.Transaction"
                 }
             }
         },

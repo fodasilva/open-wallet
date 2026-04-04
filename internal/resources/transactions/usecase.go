@@ -3,48 +3,51 @@ package transactions
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/felipe1496/open-wallet/internal/constants"
 	"github.com/felipe1496/open-wallet/internal/resources/categories"
+	transactionRepo "github.com/felipe1496/open-wallet/internal/resources/transactions/repository"
 	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/oklog/ulid/v2"
 	"go.opentelemetry.io/otel"
 )
 
 type TransactionsUseCase interface {
-	ListViewEntries(ctx context.Context, filter *utils.QueryOptsBuilder) ([]ViewEntry, error)
+	ListViewEntries(ctx context.Context, filter *utils.QueryOptsBuilder) ([]transactionRepo.ViewEntry, error)
 	CountViewEntries(ctx context.Context, filter *utils.QueryOptsBuilder) (int, error)
 	DeleteTransactionById(id string) error
-	CreateTransaction(payload CreateTransactionDTO) (Transaction, error)
-	UpdateTransaction(transactionID string, userID string, payload UpdateTransactionDTO) (Transaction, error)
+	CreateTransaction(payload CreateTransactionDTO) (transactionRepo.Transaction, error)
+	UpdateTransaction(transactionID string, userID string, payload UpdateTransactionDTO) (transactionRepo.Transaction, error)
 }
 
 type transactionsUseCaseImpl struct {
-	repo              TransactionsRepo
+	transactionsRepo  transactionRepo.TransactionsRepo
+	entriesRepo       transactionRepo.EntriesRepo
 	categoriesUseCase categories.CategoriesUseCase
 	db                *sql.DB
 }
 
-func NewTransactionsUseCase(repo TransactionsRepo, categoriesUseCase categories.CategoriesUseCase, db *sql.DB) TransactionsUseCase {
+func NewTransactionsUseCase(transactionsRepo transactionRepo.TransactionsRepo, entriesRepo transactionRepo.EntriesRepo, categoriesUseCase categories.CategoriesUseCase, db *sql.DB) TransactionsUseCase {
 	return &transactionsUseCaseImpl{
-		repo:              repo,
+		transactionsRepo:  transactionsRepo,
+		entriesRepo:       entriesRepo,
 		categoriesUseCase: categoriesUseCase,
 		db:                db,
 	}
 }
 
-func (uc *transactionsUseCaseImpl) ListViewEntries(ctx context.Context, filter *utils.QueryOptsBuilder) ([]ViewEntry, error) {
+func (uc *transactionsUseCaseImpl) ListViewEntries(ctx context.Context, filter *utils.QueryOptsBuilder) ([]transactionRepo.ViewEntry, error) {
 	tracer := otel.Tracer("usecase")
 	ctx, span := tracer.Start(ctx, "TransactionsUseCase.ListViewEntries")
 	defer span.End()
 
-	entries, err := uc.repo.ListViewEntries(ctx, uc.db, filter)
+	entries, err := uc.entriesRepo.Select(uc.db, filter)
 
 	if err != nil {
 		span.RecordError(err)
-		return []ViewEntry{}, ErrFailedToFetchEntries
+		return []transactionRepo.ViewEntry{}, ErrFailedToFetchEntries
 	}
 
 	return entries, nil
@@ -55,7 +58,7 @@ func (uc *transactionsUseCaseImpl) CountViewEntries(ctx context.Context, filter 
 	ctx, span := tracer.Start(ctx, "TransactionsUseCase.CountViewEntries")
 	defer span.End()
 
-	count, err := uc.repo.CountViewEntries(ctx, uc.db, filter)
+	count, err := uc.entriesRepo.Count(uc.db, filter)
 
 	if err != nil {
 		span.RecordError(err)
@@ -66,7 +69,7 @@ func (uc *transactionsUseCaseImpl) CountViewEntries(ctx context.Context, filter 
 }
 
 func (uc *transactionsUseCaseImpl) DeleteTransactionById(id string) error {
-	transactionExists, err := uc.repo.ListTransactions(uc.db, utils.QueryOpts().And("id", "eq", id))
+	transactionExists, err := uc.transactionsRepo.Select(uc.db, utils.QueryOpts().And("id", "eq", id))
 
 	if err != nil {
 		return AnErrorOccuredWhileFetchingTransactions
@@ -76,7 +79,7 @@ func (uc *transactionsUseCaseImpl) DeleteTransactionById(id string) error {
 		return TransactionNotFound
 	}
 
-	err = uc.repo.DeleteTransactionById(uc.db, id)
+	err = uc.transactionsRepo.Delete(uc.db, utils.QueryOpts().And("id", "eq", id))
 
 	if err != nil {
 		return ItWasNotPossibleDeleteTransactionErr
@@ -156,8 +159,7 @@ func validateTransaction(entries []validateTransactionPropsEntry, transactionTyp
 	return nil
 }
 
-func (uc *transactionsUseCaseImpl) CreateTransaction(payload CreateTransactionDTO) (Transaction, error) {
-
+func (uc *transactionsUseCaseImpl) CreateTransaction(payload CreateTransactionDTO) (transactionRepo.Transaction, error) {
 	err := validateTransaction(func() []validateTransactionPropsEntry {
 		entries := make([]validateTransactionPropsEntry, 0)
 		if payload.Entries != nil {
@@ -171,27 +173,29 @@ func (uc *transactionsUseCaseImpl) CreateTransaction(payload CreateTransactionDT
 		return entries
 	}(), payload.Type)
 	if err != nil {
-		return Transaction{}, err
+		return transactionRepo.Transaction{}, err
 	}
 
 	tx, err := uc.db.Begin()
 
 	if err != nil {
-		return Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to begin transaction")
+		return transactionRepo.Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to begin transaction")
 	}
 
-	transaction, err := uc.repo.CreateTransaction(tx, CreateTransactionDTO{
+	transactionID := ulid.Make().String()
+	err = uc.transactionsRepo.Insert(tx, transactionRepo.CreateTransactionDTO{
+		ID:           transactionID,
 		UserID:       payload.UserID,
 		Type:         payload.Type,
 		Name:         payload.Name,
-		Note:         payload.Note,
-		CategoryID:   payload.CategoryID,
-		RecurrenceID: payload.RecurrenceID,
+		Note:         utils.OptionalNullable[string]{Set: payload.Note != nil, Value: payload.Note},
+		CategoryID:   utils.OptionalNullable[string]{Set: payload.CategoryID != nil, Value: payload.CategoryID},
+		RecurrenceID: utils.OptionalNullable[string]{Set: payload.RecurrenceID != nil, Value: payload.RecurrenceID},
 	})
 
 	if err != nil {
 		tx.Rollback()
-		return Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to create transaction")
+		return transactionRepo.Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to create transaction")
 	}
 
 	for _, entry := range payload.Entries {
@@ -200,28 +204,36 @@ func (uc *transactionsUseCaseImpl) CreateTransaction(payload CreateTransactionDT
 		} else if payload.Type == constants.Income && entry.Amount < 0 {
 			entry.Amount = entry.Amount * -1
 		}
-		_, err = uc.repo.CreateEntry(tx, PersistEntryDTO{
-			TransactionID: transaction.ID,
+
+		err = uc.entriesRepo.Insert(tx, transactionRepo.CreateEntryDTO{
+			ID:            ulid.Make().String(),
+			TransactionID: transactionID,
 			Amount:        entry.Amount,
 			ReferenceDate: entry.ReferenceDate,
 		})
 
 		if err != nil {
 			tx.Rollback()
-			return Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to create entry")
+			return transactionRepo.Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to create entry")
 		}
 	}
 
 	err = tx.Commit()
 
 	if err != nil {
-		return Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to commit transaction")
+		return transactionRepo.Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to commit transaction")
 	}
 
-	return transaction, nil
+	// Always fetch after mutation
+	created, err := uc.transactionsRepo.Select(uc.db, utils.QueryOpts().And("id", "eq", transactionID))
+	if err != nil || len(created) == 0 {
+		return transactionRepo.Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to fetch created transaction")
+	}
+
+	return created[0], nil
 }
 
-func (uc *transactionsUseCaseImpl) UpdateTransaction(transactionID string, userID string, payload UpdateTransactionDTO) (t Transaction, err error) {
+func (uc *transactionsUseCaseImpl) UpdateTransaction(transactionID string, userID string, payload UpdateTransactionDTO) (t transactionRepo.Transaction, err error) {
 	tx, err := uc.db.Begin()
 	defer func() {
 		if tx == nil {
@@ -234,44 +246,42 @@ func (uc *transactionsUseCaseImpl) UpdateTransaction(transactionID string, userI
 		}
 	}()
 	if err != nil {
-		return Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to start transaction")
+		return transactionRepo.Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to start transaction")
 	}
 
-	exists, err := uc.repo.ListViewEntries(context.TODO(), tx, utils.QueryOpts().
+	exists, err := uc.entriesRepo.Select(tx, utils.QueryOpts().
 		And("transaction_id", "eq", transactionID).
 		And("user_id", "eq", userID))
 	if err != nil {
-		return Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to check if transaction exists")
+		return transactionRepo.Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to check if transaction exists")
 	}
 
 	if len(exists) == 0 {
-		return Transaction{}, utils.NewHTTPError(http.StatusNotFound, "transaction not found")
+		return transactionRepo.Transaction{}, utils.NewHTTPError(http.StatusNotFound, "transaction not found")
 	}
 
-	fmt.Println(">>> UpdateTransaction - update: ", payload.Update)
 	if payload.CategoryID != nil && utils.Contains(payload.Update, "category_id") {
 		categoryExists, err := uc.categoriesUseCase.List(utils.QueryOpts().
 			And("id", "eq", *payload.CategoryID).
 			And("user_id", "eq", userID))
 		if err != nil {
-			return Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to check if category exists")
+			return transactionRepo.Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to check if category exists")
 		}
 
 		if len(categoryExists) == 0 {
-			return Transaction{}, utils.NewHTTPError(http.StatusNotFound, "category not found")
+			return transactionRepo.Transaction{}, utils.NewHTTPError(http.StatusNotFound, "category not found")
 		}
 	}
 
 	if utils.ContainsSome(payload.Update, []string{"name", "note", "category_id", "recurrence_id"}) {
-		_, err = uc.repo.UpdateTransaction(tx, transactionID, UpdateTransactionDTO{
-			Update:       payload.Update,
-			Name:         payload.Name,
-			Note:         payload.Note,
-			CategoryID:   payload.CategoryID,
-			RecurrenceID: payload.RecurrenceID,
-		})
+		err = uc.transactionsRepo.Update(tx, transactionRepo.UpdateTransactionDTO{
+			Name:         utils.OptionalNullable[string]{Set: utils.Contains(payload.Update, "name"), Value: payload.Name},
+			Note:         utils.OptionalNullable[string]{Set: utils.Contains(payload.Update, "note"), Value: payload.Note},
+			CategoryID:   utils.OptionalNullable[string]{Set: utils.Contains(payload.Update, "category_id"), Value: payload.CategoryID},
+			RecurrenceID: utils.OptionalNullable[string]{Set: utils.Contains(payload.Update, "recurrence_id"), Value: payload.RecurrenceID},
+		}, utils.QueryOpts().And("id", "eq", transactionID))
 		if err != nil {
-			return Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to update transaction")
+			return transactionRepo.Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to update transaction")
 		}
 	}
 
@@ -290,31 +300,30 @@ func (uc *transactionsUseCaseImpl) UpdateTransaction(transactionID string, userI
 		}(), exists[0].Type)
 
 		if err != nil {
-			return Transaction{}, err
+			return transactionRepo.Transaction{}, err
 		}
 
-		err = uc.repo.DeleteEntry(tx, utils.QueryOpts().
-			And("transaction_id", "eq", exists[0].TransactionID))
+		err = uc.entriesRepo.Delete(tx, utils.QueryOpts().And("transaction_id", "eq", exists[0].TransactionID))
 		if err != nil {
-			return Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to delete previous entries")
+			return transactionRepo.Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to delete previous entries")
 		}
 
 		for _, entry := range *payload.Entries {
-			_, err = uc.repo.CreateEntry(tx, PersistEntryDTO{
+			err = uc.entriesRepo.Insert(tx, transactionRepo.CreateEntryDTO{
+				ID:            ulid.Make().String(),
 				TransactionID: exists[0].TransactionID,
 				Amount:        entry.Amount,
 				ReferenceDate: entry.ReferenceDate,
 			})
 			if err != nil {
-				return Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to create entry")
+				return transactionRepo.Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to create entry")
 			}
 		}
 	}
 
-	transactions, err := uc.repo.ListTransactions(tx, utils.QueryOpts().
-		And("id", "eq", exists[0].TransactionID))
-	if err != nil {
-		return Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to list transaction")
+	transactions, err := uc.transactionsRepo.Select(tx, utils.QueryOpts().And("id", "eq", transactionID))
+	if err != nil || len(transactions) == 0 {
+		return transactionRepo.Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to list transaction")
 	}
 
 	return transactions[0], nil

@@ -1,9 +1,8 @@
 package transactions
 
 import (
-	"time"
-
 	"github.com/felipe1496/open-wallet/internal/constants"
+	"github.com/felipe1496/open-wallet/internal/resources/transactions/repository"
 	"github.com/felipe1496/open-wallet/internal/utils"
 )
 
@@ -43,7 +42,7 @@ type UpdateTransactionResponse struct {
 }
 
 type UpdateTransactionResponseData struct {
-	Transaction Transaction `json:"transaction"`
+	Transaction repository.Transaction `json:"transaction"`
 }
 
 type CreateTransactionResponse struct {
@@ -51,7 +50,7 @@ type CreateTransactionResponse struct {
 }
 
 type CreateTransactionResponseData struct {
-	Transaction Transaction `json:"transaction"`
+	Transaction repository.Transaction `json:"transaction"`
 }
 
 type ListEntriesResponse struct {
@@ -60,7 +59,7 @@ type ListEntriesResponse struct {
 }
 
 type ListEntriesResponseData struct {
-	Entries []ViewEntry `json:"entries"`
+	Entries []repository.ViewEntry `json:"entries"`
 }
 
 // ==============================================================================
@@ -103,49 +102,4 @@ type PersistEntryDTO struct {
 	ReferenceDate string
 }
 
-// ==============================================================================
-// 3. DATABASE
-//    Models that represents database objects
-// ==============================================================================
-
-// View that mixes the entries with the transaction information, riched with some valuable information about the totality of this relationship
-type ViewEntry struct {
-	ID                string                    `json:"id"`
-	TransactionID     string                    `json:"transaction_id"`
-	Name              string                    `json:"name"`
-	Description       *string                   `json:"description"`
-	Amount            float64                   `json:"amount"`
-	Period            string                    `json:"period"`
-	UserID            string                    `json:"user_id"`
-	Type              constants.TransactionType `json:"type"`
-	TotalAmount       float64                   `json:"total_amount"`
-	Installment       int                       `json:"installment"`
-	TotalInstallments int                       `json:"total_installments"`
-	CreatedAt         time.Time                 `json:"created_at"`
-	ReferenceDate     string                    `json:"reference_date"`
-	CategoryID        *string                   `json:"category_id,omitempty"`
-	CategoryName      *string                   `json:"category_name,omitempty"`
-	CategoryColor     *string                   `json:"category_color,omitempty"`
-	RecurrenceID      *string                   `json:"recurrence_id,omitempty"`
-}
-
-// Entries table record
-type Entry struct {
-	ID            string
-	TransactionID string
-	Amount        float64
-	ReferenceDate string
-	CreatedAt     time.Time
-}
-
-// Transactions table record
-type Transaction struct {
-	ID           string                    `json:"id"`
-	UserID       string                    `json:"user_id"`
-	Type         constants.TransactionType `json:"type"`
-	Name         string                    `json:"name"`
-	Description  *string                   `json:"description"`
-	CreatedAt    time.Time                 `json:"created_at"`
-	CategoryID   *string                   `json:"category_id"`
-	RecurrenceID *string                   `json:"recurrence_id"`
-}
+// DELETED Transaction, Entry, ViewEntry models from here as they are now in the repository package.
