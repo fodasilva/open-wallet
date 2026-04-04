@@ -1,10 +1,10 @@
 package usecases
 
 import (
+	transactionRepo "github.com/felipe1496/open-wallet/internal/resources/transactions/repository"
 	"net/http"
 	"time"
 
-	"github.com/felipe1496/open-wallet/internal/constants"
 	"github.com/felipe1496/open-wallet/internal/utils"
 )
 
@@ -13,17 +13,17 @@ type validateTransactionPropsEntry struct {
 	ReferenceDate string
 }
 
-func validateTransaction(entries []validateTransactionPropsEntry, transactionType constants.TransactionType) error {
+func validateTransaction(entries []validateTransactionPropsEntry, transactionType transactionRepo.TransactionType) error {
 	switch transactionType {
-	case constants.SimpleExpense, constants.Income:
+	case transactionRepo.SimpleExpense, transactionRepo.Income:
 		if len(entries) > 1 {
 			msg := "expense must have only one entry"
-			if transactionType == constants.Income {
+			if transactionType == transactionRepo.Income {
 				msg = "income must have only one entry"
 			}
 			return utils.NewHTTPError(http.StatusBadRequest, msg)
 		}
-	case constants.Installment:
+	case transactionRepo.Installment:
 		if len(entries) < 2 {
 			return utils.NewHTTPError(http.StatusBadRequest, "installment must have at least two entries")
 		}
@@ -43,17 +43,17 @@ func validateTransaction(entries []validateTransactionPropsEntry, transactionTyp
 		}
 
 		switch transactionType {
-		case constants.Installment, constants.SimpleExpense, constants.Recurrence:
+		case transactionRepo.Installment, transactionRepo.SimpleExpense, transactionRepo.Recurrence:
 			if refEntry.Amount >= 0 {
 				msg := "installment entries must have amount lower than zero"
-				if transactionType == constants.SimpleExpense {
+				if transactionType == transactionRepo.SimpleExpense {
 					msg = "expense entry must have amount lower than zero"
-				} else if transactionType == constants.Recurrence {
+				} else if transactionType == transactionRepo.Recurrence {
 					msg = "recurrence entries must have amount lower than zero"
 				}
 				return utils.NewHTTPError(http.StatusBadRequest, msg)
 			}
-		case constants.Income:
+		case transactionRepo.Income:
 			if refEntry.Amount <= 0 {
 				return utils.NewHTTPError(http.StatusBadRequest, "income entry must have amount greater than zero")
 			}

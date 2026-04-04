@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/felipe1496/open-wallet/internal/constants"
+	transactionRepo "github.com/felipe1496/open-wallet/internal/resources/transactions/repository"
 	"github.com/felipe1496/open-wallet/internal/utils"
 )
 
@@ -38,7 +38,7 @@ func (uc *RecurrencesUseCasesImpl) PrepareRecurrences(ctx context.Context, userI
 				Name:         rec.Name,
 				CategoryID:   utils.OptionalNullable[string]{Set: rec.CategoryID != nil, Value: rec.CategoryID},
 				Note:         utils.OptionalNullable[string]{Set: rec.Note != nil, Value: rec.Note},
-				Type:         constants.Recurrence,
+				Type:         transactionRepo.Recurrence,
 				RecurrenceID: utils.OptionalNullable[string]{Set: true, Value: &rec.ID},
 				Entries: []usecases.CreateEntryDTO{{
 					Amount:        rec.Amount,

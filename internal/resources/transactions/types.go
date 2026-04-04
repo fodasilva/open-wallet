@@ -1,8 +1,7 @@
 package transactions
 
 import (
-	"github.com/felipe1496/open-wallet/internal/constants"
-	"github.com/felipe1496/open-wallet/internal/resources/transactions/repository"
+	transactionRepo "github.com/felipe1496/open-wallet/internal/resources/transactions/repository"
 	"github.com/felipe1496/open-wallet/internal/utils"
 )
 
@@ -15,7 +14,7 @@ type CreateTransactionRequest struct {
 	Name       string                    `json:"name" binding:"required,min=1,max=100"`
 	CategoryID *string                   `json:"category_id" binding:"omitempty"`
 	Note       *string                   `json:"note" binding:"omitempty,min=0,max=400"`
-	Type       constants.TransactionType `json:"type" binding:"required,oneof=installment simple_expense income"`
+	Type       transactionRepo.TransactionType `json:"type" binding:"required,oneof=installment simple_expense income"`
 	Entries    []CreateEntryRequest      `json:"entries" binding:"required,min=1,max=100,dive"`
 }
 
@@ -41,7 +40,7 @@ type UpdateTransactionResponse struct {
 }
 
 type UpdateTransactionResponseData struct {
-	Transaction repository.Transaction `json:"transaction"`
+	Transaction transactionRepo.Transaction `json:"transaction"`
 }
 
 type CreateTransactionResponse struct {
@@ -49,7 +48,7 @@ type CreateTransactionResponse struct {
 }
 
 type CreateTransactionResponseData struct {
-	Transaction repository.Transaction `json:"transaction"`
+	Transaction transactionRepo.Transaction `json:"transaction"`
 }
 
 type ListEntriesResponse struct {
@@ -58,7 +57,7 @@ type ListEntriesResponse struct {
 }
 
 type ListEntriesResponseData struct {
-	Entries []repository.ViewEntry `json:"entries"`
+	Entries []transactionRepo.ViewEntry `json:"entries"`
 }
 
 // ==============================================================================

@@ -3,7 +3,6 @@ package usecases
 import (
 	"net/http"
 
-	"github.com/felipe1496/open-wallet/internal/constants"
 	transactionRepo "github.com/felipe1496/open-wallet/internal/resources/transactions/repository"
 	"github.com/felipe1496/open-wallet/internal/utils"
 	"github.com/oklog/ulid/v2"
@@ -59,9 +58,9 @@ func (uc *TransactionsUseCasesImpl) CreateTransaction(payload CreateTransactionD
 	}
 
 	for _, entry := range payload.Entries {
-		if (payload.Type == constants.SimpleExpense || payload.Type == constants.Installment) && entry.Amount > 0 {
+		if (payload.Type == transactionRepo.SimpleExpense || payload.Type == transactionRepo.Installment) && entry.Amount > 0 {
 			entry.Amount = entry.Amount * -1
-		} else if payload.Type == constants.Income && entry.Amount < 0 {
+		} else if payload.Type == transactionRepo.Income && entry.Amount < 0 {
 			entry.Amount = entry.Amount * -1
 		}
 

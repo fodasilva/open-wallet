@@ -3,7 +3,6 @@ package repository
 import (
 	"time"
 
-	"github.com/felipe1496/open-wallet/internal/constants"
 	"github.com/felipe1496/open-wallet/internal/utils"
 )
 
@@ -19,7 +18,7 @@ import (
 type Transaction struct {
 	ID           string                    `json:"id"`
 	UserID       string                    `json:"user_id"`
-	Type         constants.TransactionType `json:"type"`
+	Type         TransactionType `json:"type"`
 	Name         string                    `json:"name"`
 	Description  *string                   `json:"description"`
 	CreatedAt    time.Time                 `json:"created_at"`
@@ -33,7 +32,7 @@ type CreateTransactionDTO struct {
 	Name         string
 	CategoryID   utils.OptionalNullable[string]
 	Note         utils.OptionalNullable[string]
-	Type         constants.TransactionType
+	Type         TransactionType
 	RecurrenceID utils.OptionalNullable[string]
 }
 
@@ -86,7 +85,7 @@ type ViewEntry struct {
 	Amount            float64                   `json:"amount"`
 	Period            string                    `json:"period"`
 	UserID            string                    `json:"user_id"`
-	Type              constants.TransactionType `json:"type"`
+	Type              TransactionType `json:"type"`
 	TotalAmount       float64                   `json:"total_amount"`
 	Installment       int                       `json:"installment"`
 	TotalInstallments int                       `json:"total_installments"`
@@ -97,3 +96,12 @@ type ViewEntry struct {
 	CategoryColor     *string                   `json:"category_color,omitempty"`
 	RecurrenceID      *string                   `json:"recurrence_id,omitempty"`
 }
+
+type TransactionType string
+
+const (
+SimpleExpense TransactionType = "simple_expense"
+Income        TransactionType = "income"
+Installment   TransactionType = "installment"
+Recurrence    TransactionType = "recurrence"
+)
