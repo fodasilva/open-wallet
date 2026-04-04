@@ -1,12 +1,9 @@
 package transactions
 
 import (
-	"database/sql"
 	"net/http"
 
-	"github.com/felipe1496/open-wallet/internal/resources/categories"
-	categoriesRepository "github.com/felipe1496/open-wallet/internal/resources/categories/repository"
-	transactionsRepository "github.com/felipe1496/open-wallet/internal/resources/transactions/repository"
+
 	"github.com/felipe1496/open-wallet/internal/utils"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -18,13 +15,9 @@ type API struct {
 	transactionsUseCase TransactionsUseCase
 }
 
-func NewHandler(db *sql.DB) *API {
+func NewHandler(transactionsUseCase TransactionsUseCase) *API {
 	return &API{
-		transactionsUseCase: NewTransactionsUseCase(
-			transactionsRepository.NewTransactionsRepo(),
-			transactionsRepository.NewEntriesRepo(),
-			categories.NewCategoriesUseCase(categoriesRepository.NewCategoriesRepo(), db),
-			db),
+		transactionsUseCase: transactionsUseCase,
 	}
 }
 

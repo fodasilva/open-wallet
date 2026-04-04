@@ -1,40 +1,37 @@
-package recurrences
+package routes
 
 import (
-	"database/sql"
-
 	"github.com/felipe1496/open-wallet/infra"
-	"github.com/redis/go-redis/v9"
-
+	"github.com/felipe1496/open-wallet/internal/factory"
 	"github.com/felipe1496/open-wallet/internal/middlewares"
-	"github.com/felipe1496/open-wallet/internal/services"
-
+	"github.com/felipe1496/open-wallet/internal/resources/recurrences"
 	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
 )
 
-func Router(router *gin.Engine, db *sql.DB, redisClient *redis.Client, cfg *infra.Config) {
-	jwtService := services.NewJWTService(cfg)
-	handler := NewHandler(db)
-	recurrencesGroup := router.Group("/api/v1/recurrences")
+func SetupRecurrencesRoutes(r *gin.Engine, f *factory.Factory, redisClient *redis.Client, cfg *infra.Config) {
+	jwtService := f.JWTService()
+	recurrencesHandler := recurrences.NewHandler(f.RecurrencesUseCase())
+	recurrencesGroup := r.Group("/api/v1/recurrences")
 	{
 		recurrencesGroup.GET("",
 			middlewares.RequireAuthMiddleware(jwtService),
 			middlewares.QueryOptsMiddleware(),
-			handler.List)
+			recurrencesHandler.List)
 		recurrencesGroup.DELETE("/:id",
 			middlewares.RequireAuthMiddleware(jwtService),
-			handler.DeleteByID)
+			recurrencesHandler.DeleteByID)
 		recurrencesGroup.POST("",
 			middlewares.RequireAuthMiddleware(jwtService),
 			middlewares.RouteRateLimitMiddleware(redisClient, 5, 60000, "POST:/api/v1/recurrences"),
-			handler.Create)
+			recurrencesHandler.Create)
 		recurrencesGroup.PATCH("/:id",
 			middlewares.RequireAuthMiddleware(jwtService),
 			middlewares.RouteRateLimitMiddleware(redisClient, 5, 60000, "PATCH:/api/v1/recurrences/:id"),
-			handler.Update)
+			recurrencesHandler.Update)
 		recurrencesGroup.POST("/:period",
 			middlewares.RequireAuthMiddleware(jwtService),
 			middlewares.RouteRateLimitMiddleware(redisClient, 20, 60000, "POST:/api/v1/recurrences/:period"),
-			handler.Prepare)
+			recurrencesHandler.Prepare)
 	}
 }

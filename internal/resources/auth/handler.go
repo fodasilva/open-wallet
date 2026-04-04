@@ -1,10 +1,11 @@
 package auth
 
 import (
-	"database/sql"
+	
 	"net/http"
 
 	"github.com/felipe1496/open-wallet/internal/resources/users"
+	
 	"github.com/felipe1496/open-wallet/internal/services"
 	"github.com/felipe1496/open-wallet/internal/utils"
 
@@ -18,11 +19,11 @@ type API struct {
 	authUseCase   AuthUseCase
 }
 
-func NewHandler(db *sql.DB, googleService services.GoogleService, jwtService services.JWTService) *API {
+func NewHandler(googleService services.GoogleService, jwtService services.JWTService, usersUseCase users.UsersUseCase, authUseCase AuthUseCase) *API {
 	return &API{
 		googleService: googleService,
-		usersUseCase:  users.NewUsersUseCase(users.NewUsersRepo(db)),
-		authUseCase:   NewAuthUseCase(googleService, users.NewUsersUseCase(users.NewUsersRepo(db))),
+		usersUseCase:  usersUseCase,
+		authUseCase:   authUseCase,
 		JWTService:    jwtService,
 	}
 }

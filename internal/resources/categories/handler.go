@@ -1,10 +1,9 @@
 package categories
 
 import (
-	"database/sql"
+
 	"net/http"
 	"slices"
-
 	"github.com/felipe1496/open-wallet/internal/resources/categories/repository"
 	"github.com/felipe1496/open-wallet/internal/utils"
 
@@ -15,9 +14,9 @@ type API struct {
 	categoriesUseCase CategoriesUseCase
 }
 
-func NewHandler(db *sql.DB) *API {
+func NewHandler(categoriesUseCase CategoriesUseCase) *API {
 	return &API{
-		categoriesUseCase: NewCategoriesUseCase(repository.NewCategoriesRepo(), db),
+		categoriesUseCase: categoriesUseCase,
 	}
 }
 

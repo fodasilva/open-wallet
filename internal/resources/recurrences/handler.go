@@ -1,17 +1,12 @@
 package recurrences
 
 import (
-	"database/sql"
 	"fmt"
 	"net/http"
 	"reflect"
 	"slices"
 
-	"github.com/felipe1496/open-wallet/internal/resources/categories"
-	categoriesRepository "github.com/felipe1496/open-wallet/internal/resources/categories/repository"
 	"github.com/felipe1496/open-wallet/internal/resources/recurrences/repository"
-	"github.com/felipe1496/open-wallet/internal/resources/transactions"
-	transactionsRepository "github.com/felipe1496/open-wallet/internal/resources/transactions/repository"
 	"github.com/felipe1496/open-wallet/internal/utils"
 	"github.com/gin-gonic/gin"
 	"go.opentelemetry.io/otel"
@@ -22,18 +17,9 @@ type API struct {
 	recurrencesUseCase RecurrencesUseCase
 }
 
-func NewHandler(db *sql.DB) *API {
-	catsRepo := categoriesRepository.NewCategoriesRepo()
-	catsUseCase := categories.NewCategoriesUseCase(catsRepo, db)
-	txsRepo := transactionsRepository.NewTransactionsRepo()
-	entriesRepo := transactionsRepository.NewEntriesRepo()
-	txsUseCase := transactions.NewTransactionsUseCase(txsRepo, entriesRepo, catsUseCase, db)
-
+func NewHandler(recurrencesUseCase RecurrencesUseCase) *API {
 	return &API{
-		recurrencesUseCase: NewRecurrencesUseCase(repository.NewRecurrencesRepo(),
-			catsUseCase,
-			txsUseCase,
-			db),
+		recurrencesUseCase: recurrencesUseCase,
 	}
 }
 

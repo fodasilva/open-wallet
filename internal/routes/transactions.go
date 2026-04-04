@@ -1,36 +1,33 @@
-package transactions
+package routes
 
 import (
-	"database/sql"
-
 	"github.com/felipe1496/open-wallet/infra"
-	"github.com/redis/go-redis/v9"
-
+	"github.com/felipe1496/open-wallet/internal/factory"
 	"github.com/felipe1496/open-wallet/internal/middlewares"
-	"github.com/felipe1496/open-wallet/internal/services"
-
+	"github.com/felipe1496/open-wallet/internal/resources/transactions"
 	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
 )
 
-func Router(router *gin.Engine, db *sql.DB, redisClient *redis.Client, cfg *infra.Config) {
-	jwtService := services.NewJWTService(cfg)
-	handler := NewHandler(db)
-	transactionsGroup := router.Group("/api/v1/transactions")
+func SetupTransactionsRoutes(r *gin.Engine, f *factory.Factory, redisClient *redis.Client, cfg *infra.Config) {
+	jwtService := f.JWTService()
+	transactionsHandler := transactions.NewHandler(f.TransactionsUseCase())
+	transactionsGroup := r.Group("/api/v1/transactions")
 	{
 		transactionsGroup.GET("/entries",
 			middlewares.RequireAuthMiddleware(jwtService),
 			middlewares.QueryOptsMiddleware(),
-			handler.ListEntries)
+			transactionsHandler.ListEntries)
 		transactionsGroup.DELETE("/:transaction_id",
 			middlewares.RequireAuthMiddleware(jwtService),
-			handler.DeleteTransaction)
+			transactionsHandler.DeleteTransaction)
 		transactionsGroup.POST("",
 			middlewares.RequireAuthMiddleware(jwtService),
 			middlewares.RouteRateLimitMiddleware(redisClient, 5, 60000, "POST:/api/v1/transactions"),
-			handler.CreateTransaction)
+			transactionsHandler.CreateTransaction)
 		transactionsGroup.PATCH("/:transaction_id",
 			middlewares.RequireAuthMiddleware(jwtService),
 			middlewares.RouteRateLimitMiddleware(redisClient, 5, 60000, "PATCH:/api/v1/transactions/:transaction_id"),
-			handler.UpdateTransaction)
+			transactionsHandler.UpdateTransaction)
 	}
 }

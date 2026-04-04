@@ -10,11 +10,9 @@ import (
 	"github.com/felipe1496/open-wallet/infra"
 	"github.com/redis/go-redis/v9"
 
+	"github.com/felipe1496/open-wallet/internal/factory"
 	"github.com/felipe1496/open-wallet/internal/middlewares"
-	"github.com/felipe1496/open-wallet/internal/resources/auth"
-	"github.com/felipe1496/open-wallet/internal/resources/categories"
-	"github.com/felipe1496/open-wallet/internal/resources/recurrences"
-	"github.com/felipe1496/open-wallet/internal/resources/transactions"
+	"github.com/felipe1496/open-wallet/internal/routes"
 
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
@@ -51,10 +49,8 @@ func main() {
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	r.GET("/api-docs/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 
-	auth.Router(r, dbConn, redisClient, cfg)
-	categories.Router(r, dbConn, redisClient, cfg)
-	transactions.Router(r, dbConn, redisClient, cfg)
-	recurrences.Router(r, dbConn, redisClient, cfg)
+	f := factory.NewFactory(dbConn, cfg)
+	routes.SetupRoutes(r, f, redisClient, cfg)
 
 	if err := r.Run(fmt.Sprintf(":%d", cfg.Port)); err != nil {
 		log.Fatalf("failed to start server: %v", err)
