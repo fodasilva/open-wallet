@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/felipe1496/open-wallet/internal/resources/users"
+	usersUseCases "github.com/felipe1496/open-wallet/internal/resources/users/usecases"
 	"github.com/felipe1496/open-wallet/internal/resources/users/mocks"
 	"github.com/felipe1496/open-wallet/internal/resources/users/repository"
 	"github.com/felipe1496/open-wallet/internal/utils"
@@ -16,7 +16,7 @@ import (
 func TestUsersUseCase_List(t *testing.T) {
 	t.Run("should list users successfully", func(t *testing.T) {
 		mockRepo := new(mocks.MockUsersRepo)
-		uc := users.NewUsersUseCase(mockRepo, nil)
+		uc := usersUseCases.NewUsersUseCases(mockRepo, nil)
 
 		expectedUsers := []repository.User{
 			{ID: "1", Username: "alice", Name: "Alice", Email: "alice@gmail.com"},
@@ -37,7 +37,7 @@ func TestUsersUseCase_List(t *testing.T) {
 
 	t.Run("should return error when repository fails", func(t *testing.T) {
 		mockRepo := new(mocks.MockUsersRepo)
-		uc := users.NewUsersUseCase(mockRepo, nil)
+		uc := usersUseCases.NewUsersUseCases(mockRepo, nil)
 
 		mockRepo.
 			On("Select", mock.Anything, mock.Anything).
@@ -46,7 +46,7 @@ func TestUsersUseCase_List(t *testing.T) {
 		result, err := uc.List(utils.QueryOpts().And("email", "eq", "john@gmail.com"))
 
 		assert.Nil(t, result)
-		assert.ErrorIs(t, err, users.FailedToFetchUsersError)
+		assert.Contains(t, err.Error(), "failed to fetch users")
 		mockRepo.AssertExpectations(t)
 	})
 }
@@ -54,7 +54,7 @@ func TestUsersUseCase_List(t *testing.T) {
 func TestUsersUseCase_Create(t *testing.T) {
 	t.Run("should return error if username is already taken", func(t *testing.T) {
 		mockRepo := new(mocks.MockUsersRepo)
-		uc := users.NewUsersUseCase(mockRepo, nil)
+		uc := usersUseCases.NewUsersUseCases(mockRepo, nil)
 
 		input := repository.CreateUserDTO{Username: "johndoethegreat", Name: "John", Email: "john@gmail.com"}
 
@@ -75,13 +75,13 @@ func TestUsersUseCase_Create(t *testing.T) {
 		result, err := uc.Create(input)
 
 		assert.Equal(t, repository.User{}, result)
-		assert.ErrorIs(t, err, users.UsernameAlreadyExists)
+		assert.Contains(t, err.Error(), "user with this username already exists")
 		mockRepo.AssertExpectations(t)
 	})
 
 	t.Run("should return error if email already exists", func(t *testing.T) {
 		mockRepo := new(mocks.MockUsersRepo)
-		uc := users.NewUsersUseCase(mockRepo, nil)
+		uc := usersUseCases.NewUsersUseCases(mockRepo, nil)
 
 		input := repository.CreateUserDTO{
 			Username: "johndoethegreat",
@@ -109,14 +109,14 @@ func TestUsersUseCase_Create(t *testing.T) {
 		result, err := uc.Create(input)
 
 		assert.Equal(t, repository.User{}, result)
-		assert.ErrorIs(t, err, users.EmailAlreadyExists)
+		assert.Contains(t, err.Error(), "user with this email already exists")
 
 		mockRepo.AssertExpectations(t)
 	})
 
 	t.Run("should create user successfully", func(t *testing.T) {
 		mockRepo := new(mocks.MockUsersRepo)
-		uc := users.NewUsersUseCase(mockRepo, nil)
+		uc := usersUseCases.NewUsersUseCases(mockRepo, nil)
 
 		input := repository.CreateUserDTO{
 			Username: "johndoethegreat",

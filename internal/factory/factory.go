@@ -11,8 +11,8 @@ import (
 	recurrencesUseCases "github.com/felipe1496/open-wallet/internal/resources/recurrences/usecases"
 	transactionsRepo "github.com/felipe1496/open-wallet/internal/resources/transactions/repository"
 	transactionsUseCases "github.com/felipe1496/open-wallet/internal/resources/transactions/usecases"
-	"github.com/felipe1496/open-wallet/internal/resources/users"
 	usersRepo "github.com/felipe1496/open-wallet/internal/resources/users/repository"
+	usersUseCases "github.com/felipe1496/open-wallet/internal/resources/users/usecases"
 	"github.com/felipe1496/open-wallet/internal/services"
 )
 
@@ -22,7 +22,7 @@ type Factory struct {
 
 	googleService        services.GoogleService
 	jwtService           services.JWTService
-	usersUseCase         users.UsersUseCase
+	usersUseCases        usersUseCases.UsersUseCases
 	authUseCases         authUseCases.AuthUseCases
 	categoriesUseCases   categoriesUseCases.CategoriesUseCases
 	transactionsUseCases transactionsUseCases.TransactionsUseCases
@@ -47,16 +47,16 @@ func (f *Factory) JWTService() services.JWTService {
 	return f.jwtService
 }
 
-func (f *Factory) UsersUseCase() users.UsersUseCase {
-	if f.usersUseCase == nil {
-		f.usersUseCase = users.NewUsersUseCase(usersRepo.NewUsersRepo(), f.db)
+func (f *Factory) UsersUseCases() usersUseCases.UsersUseCases {
+	if f.usersUseCases == nil {
+		f.usersUseCases = usersUseCases.NewUsersUseCases(usersRepo.NewUsersRepo(), f.db)
 	}
-	return f.usersUseCase
+	return f.usersUseCases
 }
 
 func (f *Factory) AuthUseCases() authUseCases.AuthUseCases {
 	if f.authUseCases == nil {
-		f.authUseCases = authUseCases.NewAuthUseCases(f.GoogleService(), f.UsersUseCase())
+		f.authUseCases = authUseCases.NewAuthUseCases(f.GoogleService(), f.UsersUseCases())
 	}
 	return f.authUseCases
 }

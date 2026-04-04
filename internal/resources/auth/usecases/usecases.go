@@ -3,7 +3,7 @@ package usecases
 import (
 	"net/http"
 
-	"github.com/felipe1496/open-wallet/internal/resources/users"
+	usersUseCases "github.com/felipe1496/open-wallet/internal/resources/users/usecases"
 	"github.com/felipe1496/open-wallet/internal/resources/users/repository"
 	"github.com/felipe1496/open-wallet/internal/services"
 	"github.com/felipe1496/open-wallet/internal/utils"
@@ -22,10 +22,10 @@ type AuthUseCases interface {
 
 type AuthUseCasesImpl struct {
 	googleService services.GoogleService
-	usersUseCase  users.UsersUseCase
+	usersUseCase  usersUseCases.UsersUseCases
 }
 
-func NewAuthUseCases(googleService services.GoogleService, usersUseCase users.UsersUseCase) AuthUseCases {
+func NewAuthUseCases(googleService services.GoogleService, usersUseCase usersUseCases.UsersUseCases) AuthUseCases {
 	return &AuthUseCasesImpl{
 		googleService: googleService,
 		usersUseCase:  usersUseCase,
