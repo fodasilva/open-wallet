@@ -2,8 +2,9 @@ package transactions
 
 import (
 	"net/http"
+	"slices"
 
-
+	"github.com/felipe1496/open-wallet/internal/resources/transactions/usecases"
 	"github.com/felipe1496/open-wallet/internal/utils"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
@@ -12,12 +13,12 @@ import (
 )
 
 type API struct {
-	transactionsUseCase TransactionsUseCase
+	transactionsUseCases usecases.TransactionsUseCases
 }
 
-func NewHandler(transactionsUseCase TransactionsUseCase) *API {
+func NewHandler(transactionsUseCases usecases.TransactionsUseCases) *API {
 	return &API{
-		transactionsUseCase: transactionsUseCase,
+		transactionsUseCases: transactionsUseCases,
 	}
 }
 
@@ -45,7 +46,7 @@ func (api *API) ListEntries(ctx *gin.Context) {
 	perPage := ctx.GetInt("per_page")
 	queryOpts := ctx.MustGet("query_opts").(*utils.QueryOptsBuilder).And("user_id", "eq", userID)
 
-	entries, err := api.transactionsUseCase.ListViewEntries(tCtx, queryOpts)
+	entries, err := api.transactionsUseCases.ListEntries(tCtx, queryOpts)
 
 	if err != nil {
 		span.RecordError(err)
@@ -54,7 +55,7 @@ func (api *API) ListEntries(ctx *gin.Context) {
 		return
 	}
 
-	count, err := api.transactionsUseCase.CountViewEntries(tCtx, utils.QueryOpts().
+	count, err := api.transactionsUseCases.CountEntries(tCtx, utils.QueryOpts().
 		And("user_id", "eq", userID))
 
 	if err != nil {
@@ -101,7 +102,7 @@ func (api *API) ListEntries(ctx *gin.Context) {
 func (api *API) DeleteTransaction(ctx *gin.Context) {
 	id := ctx.Param("transaction_id")
 
-	err := api.transactionsUseCase.DeleteTransactionById(id)
+	err := api.transactionsUseCases.DeleteTransactionById(id)
 
 	if err != nil {
 		apiErr := err.(*utils.HTTPError)
@@ -136,11 +137,11 @@ func (api *API) CreateTransaction(ctx *gin.Context) {
 		return
 	}
 
-	var entriesDTO []CreateEntryDTO
+	var entriesDTO []usecases.CreateEntryDTO
 	if body.Entries != nil {
-		entries := make([]CreateEntryDTO, len(body.Entries))
+		entries := make([]usecases.CreateEntryDTO, len(body.Entries))
 		for i, entry := range body.Entries {
-			entries[i] = CreateEntryDTO{
+			entries[i] = usecases.CreateEntryDTO{
 				Amount:        entry.Amount,
 				ReferenceDate: entry.ReferenceDate,
 			}
@@ -148,13 +149,13 @@ func (api *API) CreateTransaction(ctx *gin.Context) {
 		entriesDTO = entries
 	}
 
-	transaction, err := api.transactionsUseCase.CreateTransaction(CreateTransactionDTO{
-		UserID:     userID,
-		Name:       body.Name,
-		CategoryID: body.CategoryID,
-		Note:       body.Note,
-		Type:       body.Type,
-		Entries:    entriesDTO,
+	transaction, err := api.transactionsUseCases.CreateTransaction(usecases.CreateTransactionDTO{
+		UserID:       userID,
+		Name:         body.Name,
+		CategoryID:   utils.OptionalNullable[string]{Set: body.CategoryID != nil, Value: body.CategoryID},
+		Note:         utils.OptionalNullable[string]{Set: body.Note != nil, Value: body.Note},
+		Type:         body.Type,
+		Entries:      entriesDTO,
 	})
 
 	if err != nil {
@@ -184,37 +185,66 @@ func (api *API) CreateTransaction(ctx *gin.Context) {
 // @Failure 500 {object} utils.HTTPError "Internal server error"
 // @Router /transactions/{transaction_id} [patch]
 func (api *API) UpdateTransaction(ctx *gin.Context) {
+	id := ctx.Param("transaction_id")
 	userID := ctx.GetString("user_id")
-	transactionID := ctx.Param("transaction_id")
-	var body UpdateTransactionRequest
 
-	err := ctx.ShouldBindJSON(&body)
+	passedKeys, err := utils.GetJSONKeys(ctx)
 	if err != nil {
 		apiErr := utils.NewHTTPError(http.StatusBadRequest, err.Error())
 		ctx.JSON(apiErr.StatusCode, apiErr)
-		ctx.Abort()
 		return
 	}
 
-	var entriesDTO *[]UpdateEntryDTO
-	if body.Entries != nil {
-		entries := make([]UpdateEntryDTO, len(*body.Entries))
+	if len(passedKeys) == 0 {
+		apiErr := utils.NewHTTPError(http.StatusBadRequest, "At least one field must be provided for update")
+		ctx.JSON(apiErr.StatusCode, apiErr)
+		return
+	}
+
+	var body UpdateTransactionRequest
+	if err := ctx.ShouldBindJSON(&body); err != nil {
+		apiErr := utils.NewHTTPError(http.StatusBadRequest, err.Error())
+		ctx.JSON(apiErr.StatusCode, apiErr)
+		return
+	}
+
+	var payload usecases.UpdateTransactionDTO
+
+	if slices.Contains(passedKeys, "name") {
+		if body.Name == nil {
+			apiErr := utils.NewHTTPError(http.StatusBadRequest, "name cannot be null")
+			ctx.AbortWithStatusJSON(apiErr.StatusCode, apiErr)
+			return
+		}
+		payload.Name = utils.OptionalNullable[string]{Set: true, Value: body.Name}
+	}
+
+	if slices.Contains(passedKeys, "note") {
+		payload.Note = utils.OptionalNullable[string]{Set: true, Value: body.Note}
+	}
+
+	if slices.Contains(passedKeys, "category_id") {
+		payload.CategoryID = utils.OptionalNullable[string]{Set: true, Value: body.CategoryID}
+	}
+
+	if slices.Contains(passedKeys, "entries") {
+		if body.Entries == nil {
+			apiErr := utils.NewHTTPError(http.StatusBadRequest, "entries cannot be null")
+			ctx.AbortWithStatusJSON(apiErr.StatusCode, apiErr)
+			return
+		}
+
+		entries := make([]usecases.UpdateEntryDTO, len(*body.Entries))
 		for i, entry := range *body.Entries {
-			entries[i] = UpdateEntryDTO{
+			entries[i] = usecases.UpdateEntryDTO{
 				Amount:        entry.Amount,
 				ReferenceDate: entry.ReferenceDate,
 			}
 		}
-		entriesDTO = &entries
+		payload.Entries = utils.OptionalNullable[[]usecases.UpdateEntryDTO]{Set: true, Value: &entries}
 	}
 
-	transaction, err := api.transactionsUseCase.UpdateTransaction(transactionID, userID, UpdateTransactionDTO{
-		Update:     body.Update,
-		Name:       body.Name,
-		Note:       body.Note,
-		CategoryID: body.CategoryID,
-		Entries:    entriesDTO,
-	})
+	transaction, err := api.transactionsUseCases.UpdateTransaction(id, userID, payload)
 
 	if err != nil {
 		apiErr := utils.GetApiErr(err)

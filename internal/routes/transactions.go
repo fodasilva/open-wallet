@@ -11,7 +11,7 @@ import (
 
 func SetupTransactionsRoutes(r *gin.Engine, f *factory.Factory, redisClient *redis.Client, cfg *infra.Config) {
 	jwtService := f.JWTService()
-	transactionsHandler := transactions.NewHandler(f.TransactionsUseCase())
+	transactionsHandler := transactions.NewHandler(f.TransactionsUseCases())
 	transactionsGroup := r.Group("/api/v1/transactions")
 	{
 		transactionsGroup.GET("/entries",

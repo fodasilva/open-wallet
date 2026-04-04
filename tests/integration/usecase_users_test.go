@@ -61,7 +61,7 @@ func TestUsersUseCase_Create(t *testing.T) {
 		mockRepo.
 			On("Select", mock.Anything, mock.MatchedBy(func(filter *utils.QueryOptsBuilder) bool {
 				// Very simple check to identify which Select call this is
-				return filter != nil 
+				return filter != nil
 			})).
 			Return([]repository.User{
 				{

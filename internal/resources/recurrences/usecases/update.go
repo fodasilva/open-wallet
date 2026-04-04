@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/felipe1496/open-wallet/internal/resources/recurrences/repository"
-	"github.com/felipe1496/open-wallet/internal/resources/transactions"
+	"github.com/felipe1496/open-wallet/internal/resources/transactions/usecases"
 	"github.com/felipe1496/open-wallet/internal/utils"
 )
 
@@ -47,7 +47,7 @@ func (uc *RecurrencesUseCasesImpl) Update(id string, userID string, payload repo
 	rec := updatedRecs[0]
 
 	if payload.Amount.Set && payload.Amount.Value != nil {
-		txs, err := uc.transactionsUseCase.ListViewEntries(context.TODO(), utils.QueryOpts().
+		txs, err := uc.transactionsUseCase.ListEntries(context.TODO(), utils.QueryOpts().
 			And("user_id", "eq", userID).
 			And("recurrence_id", "eq", id))
 		if err != nil {
@@ -56,17 +56,16 @@ func (uc *RecurrencesUseCasesImpl) Update(id string, userID string, payload repo
 
 		if len(txs) > 0 {
 			transactionID := txs[0].TransactionID
-			var updatedEntries []transactions.UpdateEntryDTO
+			var updatedEntries []usecases.UpdateEntryDTO
 			for _, entry := range txs {
-				updatedEntries = append(updatedEntries, transactions.UpdateEntryDTO{
+				updatedEntries = append(updatedEntries, usecases.UpdateEntryDTO{
 					Amount:        *payload.Amount.Value,
 					ReferenceDate: entry.ReferenceDate,
 				})
 			}
 
-			_, err = uc.transactionsUseCase.UpdateTransaction(transactionID, userID, transactions.UpdateTransactionDTO{
-				Update:  []string{"entries"},
-				Entries: &updatedEntries,
+			_, err = uc.transactionsUseCase.UpdateTransaction(transactionID, userID, usecases.UpdateTransactionDTO{
+				Entries: utils.OptionalNullable[[]usecases.UpdateEntryDTO]{Set: true, Value: &updatedEntries},
 			})
 			if err != nil {
 				return rec, utils.NewHTTPError(http.StatusInternalServerError, "failed to sync transaction entries")

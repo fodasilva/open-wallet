@@ -6,7 +6,7 @@ import (
 
 	"github.com/felipe1496/open-wallet/internal/resources/categories/usecases"
 	"github.com/felipe1496/open-wallet/internal/resources/recurrences/repository"
-	"github.com/felipe1496/open-wallet/internal/resources/transactions"
+	transactionsUseCases "github.com/felipe1496/open-wallet/internal/resources/transactions/usecases"
 	"github.com/felipe1496/open-wallet/internal/utils"
 )
 
@@ -22,14 +22,14 @@ type RecurrencesUseCases interface {
 type RecurrencesUseCasesImpl struct {
 	repo                repository.RecurrencesRepo
 	categoriesUseCase   usecases.CategoriesUseCases
-	transactionsUseCase transactions.TransactionsUseCase
+	transactionsUseCase transactionsUseCases.TransactionsUseCases
 	db                  *sql.DB
 }
 
 func NewRecurrencesUseCases(
 	repo repository.RecurrencesRepo,
 	categoriesUseCase usecases.CategoriesUseCases,
-	transactionsUseCase transactions.TransactionsUseCase,
+	transactionsUseCase transactionsUseCases.TransactionsUseCases,
 	db *sql.DB,
 ) RecurrencesUseCases {
 	return &RecurrencesUseCasesImpl{

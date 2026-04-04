@@ -1509,9 +1509,6 @@ const docTemplate = `{
         },
         "internal_resources_transactions.UpdateTransactionRequest": {
             "type": "object",
-            "required": [
-                "update"
-            ],
             "properties": {
                 "category_id": {
                     "type": "string"
@@ -1533,13 +1530,6 @@ const docTemplate = `{
                     "type": "string",
                     "maxLength": 400,
                     "minLength": 0
-                },
-                "update": {
-                    "type": "array",
-                    "minItems": 1,
-                    "items": {
-                        "type": "string"
-                    }
                 }
             }
         },
