@@ -10,6 +10,8 @@ import (
 	"testing"
 
 	"github.com/felipe1496/open-wallet/internal/resources/auth"
+	"github.com/felipe1496/open-wallet/internal/resources/users"
+	"github.com/felipe1496/open-wallet/internal/resources/users/repository"
 	"github.com/felipe1496/open-wallet/internal/services"
 	"github.com/felipe1496/open-wallet/internal/services/mocks"
 
@@ -23,7 +25,10 @@ func setupTestServer(db *sql.DB, googleService services.GoogleService, jwtServic
 	gin.SetMode(gin.TestMode)
 	router := gin.New()
 
-	handler := auth.NewHandler(db, googleService, jwtService)
+	usersRepo := repository.NewUsersRepo()
+	usersUseCase := users.NewUsersUseCase(usersRepo, db)
+	authUseCase := auth.NewAuthUseCase(googleService, usersUseCase)
+	handler := auth.NewHandler(googleService, jwtService, usersUseCase, authUseCase)
 	authGroup := router.Group("/api/v1/auth")
 	{
 		authGroup.POST("/login/google", handler.LoginGoogle)
