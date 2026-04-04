@@ -7,6 +7,7 @@ import (
 	"slices"
 
 	"github.com/felipe1496/open-wallet/internal/resources/recurrences/repository"
+	"github.com/felipe1496/open-wallet/internal/resources/recurrences/usecases"
 	"github.com/felipe1496/open-wallet/internal/utils"
 	"github.com/gin-gonic/gin"
 	"go.opentelemetry.io/otel"
@@ -14,12 +15,12 @@ import (
 )
 
 type API struct {
-	recurrencesUseCase RecurrencesUseCase
+	recurrencesUseCases usecases.RecurrencesUseCases
 }
 
-func NewHandler(recurrencesUseCase RecurrencesUseCase) *API {
+func NewHandler(recurrencesUseCases usecases.RecurrencesUseCases) *API {
 	return &API{
-		recurrencesUseCase: recurrencesUseCase,
+		recurrencesUseCases: recurrencesUseCases,
 	}
 }
 
@@ -63,7 +64,7 @@ func (api *API) Create(ctx *gin.Context) {
 		EndPeriod:   utils.OptionalNullable[string]{Set: slices.Contains(passedKeys, "end_period"), Value: body.EndPeriod},
 	}
 
-	rec, err := api.recurrencesUseCase.Create(payload)
+	rec, err := api.recurrencesUseCases.Create(payload)
 
 	if err != nil {
 		apiErr := utils.GetApiErr(err)
@@ -101,7 +102,7 @@ func (api *API) List(ctx *gin.Context) {
 	perPage := ctx.GetInt("per_page")
 	queryOpts := ctx.MustGet("query_opts").(*utils.QueryOptsBuilder).And("user_id", "eq", userID)
 
-	items, err := api.recurrencesUseCase.List(tCtx, queryOpts)
+	items, err := api.recurrencesUseCases.List(tCtx, queryOpts)
 	if err != nil {
 		span.RecordError(err)
 		apiErr := err.(*utils.HTTPError)
@@ -109,7 +110,7 @@ func (api *API) List(ctx *gin.Context) {
 		return
 	}
 
-	count, err := api.recurrencesUseCase.Count(tCtx, utils.QueryOpts().And("user_id", "eq", userID))
+	count, err := api.recurrencesUseCases.Count(tCtx, utils.QueryOpts().And("user_id", "eq", userID))
 	if err != nil {
 		span.RecordError(err)
 		apiErr := err.(*utils.HTTPError)
@@ -153,7 +154,7 @@ func (api *API) DeleteByID(ctx *gin.Context) {
 	id := ctx.Param("id")
 	scope := ctx.DefaultQuery("scope", "all")
 
-	err := api.recurrencesUseCase.DeleteByID(id, scope)
+	err := api.recurrencesUseCases.DeleteByID(id, scope)
 	if err != nil {
 		apiErr := utils.GetApiErr(err)
 		ctx.JSON(apiErr.StatusCode, apiErr)
@@ -226,7 +227,7 @@ func (api *API) Update(ctx *gin.Context) {
 		EndPeriod:   utils.OptionalNullable[string]{Set: slices.Contains(passedKeys, "end_period"), Value: body.EndPeriod},
 	}
 
-	rec, err := api.recurrencesUseCase.Update(id, userID, payload)
+	rec, err := api.recurrencesUseCases.Update(id, userID, payload)
 
 	if err != nil {
 		apiErr := utils.GetApiErr(err)
@@ -268,7 +269,7 @@ func (api *API) Prepare(ctx *gin.Context) {
 		return
 	}
 
-	err := api.recurrencesUseCase.PrepareRecurrences(tCtx, userID, period)
+	err := api.recurrencesUseCases.PrepareRecurrences(tCtx, userID, period)
 	if err != nil {
 		span.RecordError(err)
 		apiErr := utils.GetApiErr(err)

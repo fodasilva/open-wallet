@@ -7,7 +7,7 @@ import (
 	authUseCases "github.com/felipe1496/open-wallet/internal/resources/auth/usecases"
 	categoriesUseCases "github.com/felipe1496/open-wallet/internal/resources/categories/usecases"
 	categoriesRepo "github.com/felipe1496/open-wallet/internal/resources/categories/repository"
-	"github.com/felipe1496/open-wallet/internal/resources/recurrences"
+	recurrencesUseCases "github.com/felipe1496/open-wallet/internal/resources/recurrences/usecases"
 	recurrencesRepo "github.com/felipe1496/open-wallet/internal/resources/recurrences/repository"
 	"github.com/felipe1496/open-wallet/internal/resources/transactions"
 	transactionsRepo "github.com/felipe1496/open-wallet/internal/resources/transactions/repository"
@@ -26,7 +26,7 @@ type Factory struct {
 	authUseCases        authUseCases.AuthUseCases
 	categoriesUseCases  categoriesUseCases.CategoriesUseCases
 	transactionsUseCase transactions.TransactionsUseCase
-	recurrencesUseCase  recurrences.RecurrencesUseCase
+	recurrencesUseCases  recurrencesUseCases.RecurrencesUseCases
 }
 
 func NewFactory(db *sql.DB, cfg *infra.Config) *Factory {
@@ -80,14 +80,14 @@ func (f *Factory) TransactionsUseCase() transactions.TransactionsUseCase {
 	return f.transactionsUseCase
 }
 
-func (f *Factory) RecurrencesUseCase() recurrences.RecurrencesUseCase {
-	if f.recurrencesUseCase == nil {
-		f.recurrencesUseCase = recurrences.NewRecurrencesUseCase(
+func (f *Factory) RecurrencesUseCases() recurrencesUseCases.RecurrencesUseCases {
+	if f.recurrencesUseCases == nil {
+		f.recurrencesUseCases = recurrencesUseCases.NewRecurrencesUseCases(
 			recurrencesRepo.NewRecurrencesRepo(),
 			f.CategoriesUseCases(),
 			f.TransactionsUseCase(),
 			f.db,
 		)
 	}
-	return f.recurrencesUseCase
+	return f.recurrencesUseCases
 }
