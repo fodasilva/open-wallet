@@ -888,21 +888,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "github_com_felipe1496_open-wallet_internal_constants.TransactionType": {
-            "type": "string",
-            "enum": [
-                "simple_expense",
-                "income",
-                "installment",
-                "recurrence"
-            ],
-            "x-enum-varnames": [
-                "SimpleExpense",
-                "Income",
-                "Installment",
-                "Recurrence"
-            ]
-        },
         "github_com_felipe1496_open-wallet_internal_resources_categories_repository.Category": {
             "type": "object",
             "properties": {
@@ -1009,12 +994,27 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "type": {
-                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_constants.TransactionType"
+                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions_repository.TransactionType"
                 },
                 "user_id": {
                     "type": "string"
                 }
             }
+        },
+        "github_com_felipe1496_open-wallet_internal_resources_transactions_repository.TransactionType": {
+            "type": "string",
+            "enum": [
+                "simple_expense",
+                "income",
+                "installment",
+                "recurrence"
+            ],
+            "x-enum-varnames": [
+                "SimpleExpense",
+                "Income",
+                "Installment",
+                "Recurrence"
+            ]
         },
         "github_com_felipe1496_open-wallet_internal_resources_transactions_repository.ViewEntry": {
             "type": "object",
@@ -1065,7 +1065,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "type": {
-                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_constants.TransactionType"
+                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions_repository.TransactionType"
                 },
                 "user_id": {
                     "type": "string"
@@ -1446,7 +1446,7 @@ const docTemplate = `{
                     ],
                     "allOf": [
                         {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_constants.TransactionType"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions_repository.TransactionType"
                         }
                     ]
                 }

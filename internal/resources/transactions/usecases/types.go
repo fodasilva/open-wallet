@@ -1,7 +1,7 @@
 package usecases
 
 import (
-	"github.com/felipe1496/open-wallet/internal/constants"
+	transactionRepo "github.com/felipe1496/open-wallet/internal/resources/transactions/repository"
 	"github.com/felipe1496/open-wallet/internal/utils"
 )
 
@@ -10,7 +10,7 @@ type CreateTransactionDTO struct {
 	Name         string
 	CategoryID   utils.OptionalNullable[string]
 	Note         utils.OptionalNullable[string]
-	Type         constants.TransactionType
+	Type         transactionRepo.TransactionType
 	Entries      []CreateEntryDTO
 	RecurrenceID utils.OptionalNullable[string]
 }

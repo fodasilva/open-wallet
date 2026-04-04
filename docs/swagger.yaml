@@ -1,16 +1,4 @@
 definitions:
-  github_com_felipe1496_open-wallet_internal_constants.TransactionType:
-    enum:
-    - simple_expense
-    - income
-    - installment
-    - recurrence
-    type: string
-    x-enum-varnames:
-    - SimpleExpense
-    - Income
-    - Installment
-    - Recurrence
   github_com_felipe1496_open-wallet_internal_resources_categories_repository.Category:
     properties:
       color:
@@ -81,10 +69,22 @@ definitions:
       recurrence_id:
         type: string
       type:
-        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_constants.TransactionType'
+        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions_repository.TransactionType'
       user_id:
         type: string
     type: object
+  github_com_felipe1496_open-wallet_internal_resources_transactions_repository.TransactionType:
+    enum:
+    - simple_expense
+    - income
+    - installment
+    - recurrence
+    type: string
+    x-enum-varnames:
+    - SimpleExpense
+    - Income
+    - Installment
+    - Recurrence
   github_com_felipe1496_open-wallet_internal_resources_transactions_repository.ViewEntry:
     properties:
       amount:
@@ -118,7 +118,7 @@ definitions:
       transaction_id:
         type: string
       type:
-        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_constants.TransactionType'
+        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions_repository.TransactionType'
       user_id:
         type: string
     type: object
@@ -365,7 +365,7 @@ definitions:
         type: string
       type:
         allOf:
-        - $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_constants.TransactionType'
+        - $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions_repository.TransactionType'
         enum:
         - installment
         - simple_expense
