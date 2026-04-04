@@ -1,12 +1,11 @@
 package categories
 
 import (
-
-	"net/http"
-	"slices"
 	"github.com/felipe1496/open-wallet/internal/resources/categories/repository"
 	"github.com/felipe1496/open-wallet/internal/resources/categories/usecases"
 	"github.com/felipe1496/open-wallet/internal/utils"
+	"net/http"
+	"slices"
 
 	"github.com/gin-gonic/gin"
 )

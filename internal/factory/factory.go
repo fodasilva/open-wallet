@@ -5,12 +5,12 @@ import (
 
 	"github.com/felipe1496/open-wallet/infra"
 	authUseCases "github.com/felipe1496/open-wallet/internal/resources/auth/usecases"
-	categoriesUseCases "github.com/felipe1496/open-wallet/internal/resources/categories/usecases"
 	categoriesRepo "github.com/felipe1496/open-wallet/internal/resources/categories/repository"
-	recurrencesUseCases "github.com/felipe1496/open-wallet/internal/resources/recurrences/usecases"
+	categoriesUseCases "github.com/felipe1496/open-wallet/internal/resources/categories/usecases"
 	recurrencesRepo "github.com/felipe1496/open-wallet/internal/resources/recurrences/repository"
-	"github.com/felipe1496/open-wallet/internal/resources/transactions"
+	recurrencesUseCases "github.com/felipe1496/open-wallet/internal/resources/recurrences/usecases"
 	transactionsRepo "github.com/felipe1496/open-wallet/internal/resources/transactions/repository"
+	transactionsUseCases "github.com/felipe1496/open-wallet/internal/resources/transactions/usecases"
 	"github.com/felipe1496/open-wallet/internal/resources/users"
 	usersRepo "github.com/felipe1496/open-wallet/internal/resources/users/repository"
 	"github.com/felipe1496/open-wallet/internal/services"
@@ -20,12 +20,12 @@ type Factory struct {
 	db  *sql.DB
 	cfg *infra.Config
 
-	googleService       services.GoogleService
-	jwtService          services.JWTService
-	usersUseCase        users.UsersUseCase
-	authUseCases        authUseCases.AuthUseCases
-	categoriesUseCases  categoriesUseCases.CategoriesUseCases
-	transactionsUseCase transactions.TransactionsUseCase
+	googleService        services.GoogleService
+	jwtService           services.JWTService
+	usersUseCase         users.UsersUseCase
+	authUseCases         authUseCases.AuthUseCases
+	categoriesUseCases   categoriesUseCases.CategoriesUseCases
+	transactionsUseCases transactionsUseCases.TransactionsUseCases
 	recurrencesUseCases  recurrencesUseCases.RecurrencesUseCases
 }
 
@@ -68,16 +68,16 @@ func (f *Factory) CategoriesUseCases() categoriesUseCases.CategoriesUseCases {
 	return f.categoriesUseCases
 }
 
-func (f *Factory) TransactionsUseCase() transactions.TransactionsUseCase {
-	if f.transactionsUseCase == nil {
-		f.transactionsUseCase = transactions.NewTransactionsUseCase(
+func (f *Factory) TransactionsUseCases() transactionsUseCases.TransactionsUseCases {
+	if f.transactionsUseCases == nil {
+		f.transactionsUseCases = transactionsUseCases.NewTransactionsUseCases(
 			transactionsRepo.NewTransactionsRepo(),
 			transactionsRepo.NewEntriesRepo(),
 			f.CategoriesUseCases(),
 			f.db,
 		)
 	}
-	return f.transactionsUseCase
+	return f.transactionsUseCases
 }
 
 func (f *Factory) RecurrencesUseCases() recurrencesUseCases.RecurrencesUseCases {
@@ -85,7 +85,7 @@ func (f *Factory) RecurrencesUseCases() recurrencesUseCases.RecurrencesUseCases 
 		f.recurrencesUseCases = recurrencesUseCases.NewRecurrencesUseCases(
 			recurrencesRepo.NewRecurrencesRepo(),
 			f.CategoriesUseCases(),
-			f.TransactionsUseCase(),
+			f.TransactionsUseCases(),
 			f.db,
 		)
 	}

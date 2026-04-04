@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/felipe1496/open-wallet/internal/resources/transactions"
+	"github.com/felipe1496/open-wallet/internal/resources/transactions/usecases"
 	"github.com/felipe1496/open-wallet/internal/utils"
 )
 
@@ -22,7 +22,7 @@ func (uc *RecurrencesUseCasesImpl) DeleteByID(id string, scope string) error {
 	rec := exists[0]
 
 	// Find linked transaction
-	txs, err := uc.transactionsUseCase.ListViewEntries(context.TODO(), utils.QueryOpts().
+	txs, err := uc.transactionsUseCase.ListEntries(context.TODO(), utils.QueryOpts().
 		And("user_id", "eq", rec.UserID).
 		And("recurrence_id", "eq", rec.ID))
 
@@ -40,20 +40,19 @@ func (uc *RecurrencesUseCasesImpl) DeleteByID(id string, scope string) error {
 			}
 		case "until_current":
 			currentPeriod := time.Now().Format("200601")
-			var filteredEntries []transactions.UpdateEntryDTO
+			var filteredEntries []usecases.UpdateEntryDTO
 			for _, entry := range txs {
 				if entry.Period <= currentPeriod {
-					filteredEntries = append(filteredEntries, transactions.UpdateEntryDTO{
+					filteredEntries = append(filteredEntries, usecases.UpdateEntryDTO{
 						Amount:        entry.Amount,
 						ReferenceDate: entry.ReferenceDate,
 					})
 				}
 			}
 
-			_, err = uc.transactionsUseCase.UpdateTransaction(transactionID, rec.UserID, transactions.UpdateTransactionDTO{
-				Update:       []string{"entries", "recurrence_id"},
-				Entries:      &filteredEntries,
-				RecurrenceID: nil,
+			_, err = uc.transactionsUseCase.UpdateTransaction(transactionID, rec.UserID, usecases.UpdateTransactionDTO{
+				Entries:      utils.OptionalNullable[[]usecases.UpdateEntryDTO]{Set: true, Value: &filteredEntries},
+				RecurrenceID: utils.OptionalNullable[string]{Set: true, Value: nil},
 			})
 			if err != nil {
 				return utils.NewHTTPError(http.StatusInternalServerError, "failed to update transactions entries")

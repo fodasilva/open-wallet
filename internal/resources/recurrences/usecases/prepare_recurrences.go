@@ -3,11 +3,11 @@ package usecases
 import (
 	"context"
 	"fmt"
+	"github.com/felipe1496/open-wallet/internal/resources/transactions/usecases"
 	"net/http"
 	"time"
 
 	"github.com/felipe1496/open-wallet/internal/constants"
-	"github.com/felipe1496/open-wallet/internal/resources/transactions"
 	"github.com/felipe1496/open-wallet/internal/utils"
 )
 
@@ -18,7 +18,7 @@ func (uc *RecurrencesUseCasesImpl) PrepareRecurrences(ctx context.Context, userI
 	}
 
 	for _, rec := range recurrences {
-		existingTxs, err := uc.transactionsUseCase.ListViewEntries(ctx, utils.QueryOpts().
+		existingTxs, err := uc.transactionsUseCase.ListEntries(ctx, utils.QueryOpts().
 			And("user_id", "eq", userID).
 			And("recurrence_id", "eq", rec.ID))
 		if err != nil {
@@ -33,14 +33,14 @@ func (uc *RecurrencesUseCasesImpl) PrepareRecurrences(ctx context.Context, userI
 		}
 
 		if len(existingTxs) == 0 {
-			_, err := uc.transactionsUseCase.CreateTransaction(transactions.CreateTransactionDTO{
+			_, err := uc.transactionsUseCase.CreateTransaction(usecases.CreateTransactionDTO{
 				UserID:       userID,
 				Name:         rec.Name,
-				CategoryID:   rec.CategoryID,
-				Note:         rec.Note,
+				CategoryID:   utils.OptionalNullable[string]{Set: rec.CategoryID != nil, Value: rec.CategoryID},
+				Note:         utils.OptionalNullable[string]{Set: rec.Note != nil, Value: rec.Note},
 				Type:         constants.Recurrence,
-				RecurrenceID: &rec.ID,
-				Entries: []transactions.CreateEntryDTO{{
+				RecurrenceID: utils.OptionalNullable[string]{Set: true, Value: &rec.ID},
+				Entries: []usecases.CreateEntryDTO{{
 					Amount:        rec.Amount,
 					ReferenceDate: newDateStr,
 				}},
@@ -63,22 +63,21 @@ func (uc *RecurrencesUseCasesImpl) PrepareRecurrences(ctx context.Context, userI
 				continue
 			}
 
-			var payloadEntries []transactions.UpdateEntryDTO
+			var payloadEntries []usecases.UpdateEntryDTO
 			for _, t := range existingTxs {
-				payloadEntries = append(payloadEntries, transactions.UpdateEntryDTO{
+				payloadEntries = append(payloadEntries, usecases.UpdateEntryDTO{
 					Amount:        t.Amount,
 					ReferenceDate: t.ReferenceDate,
 				})
 			}
 
-			payloadEntries = append(payloadEntries, transactions.UpdateEntryDTO{
+			payloadEntries = append(payloadEntries, usecases.UpdateEntryDTO{
 				Amount:        rec.Amount,
 				ReferenceDate: newDateStr,
 			})
 
-			_, err = uc.transactionsUseCase.UpdateTransaction(targetTxID, userID, transactions.UpdateTransactionDTO{
-				Update:  []string{"entries"},
-				Entries: &payloadEntries,
+			_, err = uc.transactionsUseCase.UpdateTransaction(targetTxID, userID, usecases.UpdateTransactionDTO{
+				Entries: utils.OptionalNullable[[]usecases.UpdateEntryDTO]{Set: true, Value: &payloadEntries},
 			})
 
 			if err != nil {

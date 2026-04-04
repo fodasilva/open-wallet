@@ -429,13 +429,6 @@ definitions:
         maxLength: 400
         minLength: 0
         type: string
-      update:
-        items:
-          type: string
-        minItems: 1
-        type: array
-    required:
-    - update
     type: object
   internal_resources_transactions.UpdateTransactionResponse:
     properties:

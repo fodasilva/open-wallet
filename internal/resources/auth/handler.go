@@ -1,12 +1,11 @@
 package auth
 
 import (
-	
 	"net/http"
 
 	"github.com/felipe1496/open-wallet/internal/resources/auth/usecases"
 	"github.com/felipe1496/open-wallet/internal/resources/users"
-	
+
 	"github.com/felipe1496/open-wallet/internal/services"
 	"github.com/felipe1496/open-wallet/internal/utils"
 

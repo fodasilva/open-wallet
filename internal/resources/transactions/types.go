@@ -25,7 +25,6 @@ type CreateEntryRequest struct {
 }
 
 type UpdateTransactionRequest struct {
-	Update     []string              `json:"update" binding:"required,min=1,dive,oneof=name category_id note entries"`
 	Name       *string               `json:"name" binding:"omitempty,min=1,max=100"`
 	CategoryID *string               `json:"category_id" binding:"omitempty"`
 	Note       *string               `json:"note" binding:"omitempty,min=0,max=400"`
@@ -66,40 +65,5 @@ type ListEntriesResponseData struct {
 // 2. DTO MODELS
 //    Models that represents data transfer objects between api layers
 // ==============================================================================
-
-type CreateTransactionDTO struct {
-	UserID       string
-	Name         string
-	CategoryID   *string
-	Note         *string
-	Type         constants.TransactionType
-	Entries      []CreateEntryDTO
-	RecurrenceID *string
-}
-
-type CreateEntryDTO struct {
-	Amount        float64
-	ReferenceDate string
-}
-
-type UpdateTransactionDTO struct {
-	Update       []string
-	Name         *string
-	Note         *string
-	CategoryID   *string
-	Entries      *[]UpdateEntryDTO
-	RecurrenceID *string
-}
-
-type UpdateEntryDTO struct {
-	Amount        float64
-	ReferenceDate string
-}
-
-type PersistEntryDTO struct {
-	TransactionID string
-	Amount        float64
-	ReferenceDate string
-}
 
 // DELETED Transaction, Entry, ViewEntry models from here as they are now in the repository package.
