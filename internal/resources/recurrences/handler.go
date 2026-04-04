@@ -8,9 +8,10 @@ import (
 	"slices"
 
 	"github.com/felipe1496/open-wallet/internal/resources/categories"
-	catRepo "github.com/felipe1496/open-wallet/internal/resources/categories/repository"
+	categoriesRepository "github.com/felipe1496/open-wallet/internal/resources/categories/repository"
 	"github.com/felipe1496/open-wallet/internal/resources/recurrences/repository"
 	"github.com/felipe1496/open-wallet/internal/resources/transactions"
+	transactionsRepository "github.com/felipe1496/open-wallet/internal/resources/transactions/repository"
 	"github.com/felipe1496/open-wallet/internal/utils"
 	"github.com/gin-gonic/gin"
 	"go.opentelemetry.io/otel"
@@ -22,10 +23,11 @@ type API struct {
 }
 
 func NewHandler(db *sql.DB) *API {
-	catsRepo := catRepo.NewCategoriesRepo()
+	catsRepo := categoriesRepository.NewCategoriesRepo()
 	catsUseCase := categories.NewCategoriesUseCase(catsRepo, db)
-	txsRepo := transactions.NewTransactionsRepo(db)
-	txsUseCase := transactions.NewTransactionsUseCase(txsRepo, catsUseCase, db)
+	txsRepo := transactionsRepository.NewTransactionsRepo()
+	entriesRepo := transactionsRepository.NewEntriesRepo()
+	txsUseCase := transactions.NewTransactionsUseCase(txsRepo, entriesRepo, catsUseCase, db)
 
 	return &API{
 		recurrencesUseCase: NewRecurrencesUseCase(repository.NewRecurrencesRepo(),
