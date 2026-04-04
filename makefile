@@ -28,3 +28,13 @@ check-docs:
 		exit 1; \
 	fi
 	@echo "Documentation is up to date."
+	
+check-repos:
+	@bash scripts/repository/gen-repos.sh
+	@if [ -n "$$(git status -s internal/resources/)" ]; then \
+		echo "Repositories are out of sync!"; \
+		echo "Please run 'make gen-repos' locally and commit the updated files."; \
+		git status -s internal/resources/; \
+		exit 1; \
+	fi
+	@echo "Repositories are up to date."
