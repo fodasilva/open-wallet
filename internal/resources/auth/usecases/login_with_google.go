@@ -1,34 +1,16 @@
-package auth
+package usecases
 
 import (
 	"fmt"
 	"strings"
 
-	"github.com/felipe1496/open-wallet/internal/resources/users"
 	"github.com/felipe1496/open-wallet/internal/resources/users/repository"
-	"github.com/felipe1496/open-wallet/internal/services"
 	"github.com/felipe1496/open-wallet/internal/utils"
 
 	"github.com/oklog/ulid/v2"
 )
 
-type AuthUseCase interface {
-	LoginWithGoogle(code string) (repository.User, error)
-}
-
-type AuthUseCaseImpl struct {
-	googleService services.GoogleService
-	usersUseCase  users.UsersUseCase
-}
-
-func NewAuthUseCase(googleService services.GoogleService, usersUseCase users.UsersUseCase) AuthUseCase {
-	return &AuthUseCaseImpl{
-		googleService: googleService,
-		usersUseCase:  usersUseCase,
-	}
-}
-
-func (uc *AuthUseCaseImpl) LoginWithGoogle(code string) (repository.User, error) {
+func (uc *AuthUseCasesImpl) LoginWithGoogle(code string) (repository.User, error) {
 	userAccessToken, err := uc.googleService.GetUserAccessToken(code)
 
 	if err != nil {

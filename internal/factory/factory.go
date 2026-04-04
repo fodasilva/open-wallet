@@ -4,7 +4,7 @@ import (
 	"database/sql"
 
 	"github.com/felipe1496/open-wallet/infra"
-	"github.com/felipe1496/open-wallet/internal/resources/auth"
+	"github.com/felipe1496/open-wallet/internal/resources/auth/usecases"
 	"github.com/felipe1496/open-wallet/internal/resources/categories"
 	categoriesRepo "github.com/felipe1496/open-wallet/internal/resources/categories/repository"
 	"github.com/felipe1496/open-wallet/internal/resources/recurrences"
@@ -23,7 +23,7 @@ type Factory struct {
 	googleService       services.GoogleService
 	jwtService          services.JWTService
 	usersUseCase        users.UsersUseCase
-	authUseCase         auth.AuthUseCase
+	authUseCases        usecases.AuthUseCases
 	categoriesUseCase   categories.CategoriesUseCase
 	transactionsUseCase transactions.TransactionsUseCase
 	recurrencesUseCase  recurrences.RecurrencesUseCase
@@ -54,11 +54,11 @@ func (f *Factory) UsersUseCase() users.UsersUseCase {
 	return f.usersUseCase
 }
 
-func (f *Factory) AuthUseCase() auth.AuthUseCase {
-	if f.authUseCase == nil {
-		f.authUseCase = auth.NewAuthUseCase(f.GoogleService(), f.UsersUseCase())
+func (f *Factory) AuthUseCases() usecases.AuthUseCases {
+	if f.authUseCases == nil {
+		f.authUseCases = usecases.NewAuthUseCases(f.GoogleService(), f.UsersUseCase())
 	}
-	return f.authUseCase
+	return f.authUseCases
 }
 
 func (f *Factory) CategoriesUseCase() categories.CategoriesUseCase {

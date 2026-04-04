@@ -4,6 +4,7 @@ import (
 	
 	"net/http"
 
+	"github.com/felipe1496/open-wallet/internal/resources/auth/usecases"
 	"github.com/felipe1496/open-wallet/internal/resources/users"
 	
 	"github.com/felipe1496/open-wallet/internal/services"
@@ -16,14 +17,14 @@ type API struct {
 	googleService services.GoogleService
 	usersUseCase  users.UsersUseCase
 	JWTService    services.JWTService
-	authUseCase   AuthUseCase
+	authUseCases  usecases.AuthUseCases
 }
 
-func NewHandler(googleService services.GoogleService, jwtService services.JWTService, usersUseCase users.UsersUseCase, authUseCase AuthUseCase) *API {
+func NewHandler(googleService services.GoogleService, jwtService services.JWTService, usersUseCase users.UsersUseCase, authUseCases usecases.AuthUseCases) *API {
 	return &API{
 		googleService: googleService,
 		usersUseCase:  usersUseCase,
-		authUseCase:   authUseCase,
+		authUseCases:  authUseCases,
 		JWTService:    jwtService,
 	}
 }
@@ -47,7 +48,7 @@ func (api *API) LoginGoogle(ctx *gin.Context) {
 		return
 	}
 
-	user, err := api.authUseCase.LoginWithGoogle(body.Code)
+	user, err := api.authUseCases.LoginWithGoogle(body.Code)
 
 	if err != nil {
 		apiErr := err.(*utils.HTTPError)

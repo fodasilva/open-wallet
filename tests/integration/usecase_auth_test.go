@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/felipe1496/open-wallet/internal/resources/auth"
+	"github.com/felipe1496/open-wallet/internal/resources/auth/usecases"
 	"github.com/felipe1496/open-wallet/internal/resources/users"
 	mockUsers "github.com/felipe1496/open-wallet/internal/resources/users/mocks"
 	"github.com/felipe1496/open-wallet/internal/resources/users/repository"
@@ -20,7 +20,7 @@ func TestAuthUseCase_LoginWithGoogle(t *testing.T) {
 		mockGoogle := new(mockServices.MockGoogleService)
 		mockRepo := new(mockUsers.MockUsersRepo)
 		usersUC := users.NewUsersUseCase(mockRepo, nil)
-		uc := auth.NewAuthUseCase(mockGoogle, usersUC)
+		uc := usecases.NewAuthUseCases(mockGoogle, usersUC)
 
 		mockGoogle.On("GetUserAccessToken", "invalid-code").Return(nil, services.FailedGoogleAuthenticationErr)
 
@@ -34,7 +34,7 @@ func TestAuthUseCase_LoginWithGoogle(t *testing.T) {
 		mockGoogle := new(mockServices.MockGoogleService)
 		mockRepo := new(mockUsers.MockUsersRepo)
 		usersUC := users.NewUsersUseCase(mockRepo, nil)
-		uc := auth.NewAuthUseCase(mockGoogle, usersUC)
+		uc := usecases.NewAuthUseCases(mockGoogle, usersUC)
 
 		accessToken := "valid-access-token"
 
@@ -51,7 +51,7 @@ func TestAuthUseCase_LoginWithGoogle(t *testing.T) {
 
 		_, err := uc.LoginWithGoogle("valid-code")
 
-		assert.ErrorIs(t, err, auth.GoogleEmailNotVerifiedErr)
+		assert.ErrorIs(t, err, usecases.GoogleEmailNotVerifiedErr)
 		mockGoogle.AssertExpectations(t)
 	})
 
@@ -59,7 +59,7 @@ func TestAuthUseCase_LoginWithGoogle(t *testing.T) {
 		mockGoogle := new(mockServices.MockGoogleService)
 		mockRepo := new(mockUsers.MockUsersRepo)
 		usersUC := users.NewUsersUseCase(mockRepo, nil)
-		uc := auth.NewAuthUseCase(mockGoogle, usersUC)
+		uc := usecases.NewAuthUseCases(mockGoogle, usersUC)
 
 		accessToken := "valid-access-token"
 
@@ -74,7 +74,7 @@ func TestAuthUseCase_LoginWithGoogle(t *testing.T) {
 		}, nil)
 
 		_, err := uc.LoginWithGoogle("valid-code")
-		assert.ErrorIs(t, err, auth.GoogleDintProvideEmailErr)
+		assert.ErrorIs(t, err, usecases.GoogleDintProvideEmailErr)
 		mockGoogle.AssertExpectations(t)
 	})
 
@@ -82,7 +82,7 @@ func TestAuthUseCase_LoginWithGoogle(t *testing.T) {
 		mockGoogleService := new(mockServices.MockGoogleService)
 		mockRepo := new(mockUsers.MockUsersRepo)
 		usersUseCase := users.NewUsersUseCase(mockRepo, nil)
-		uc := auth.NewAuthUseCase(mockGoogleService, usersUseCase)
+		uc := usecases.NewAuthUseCases(mockGoogleService, usersUseCase)
 
 		emailVerified := true
 		email := "valid@gmail.com"
@@ -117,7 +117,7 @@ func TestAuthUseCase_LoginWithGoogle(t *testing.T) {
 		googleSvcMock := new(mockServices.MockGoogleService)
 		usersRepoMock := new(mockUsers.MockUsersRepo)
 		usersUseCase := users.NewUsersUseCase(usersRepoMock, nil)
-		authUseCase := auth.NewAuthUseCase(googleSvcMock, usersUseCase)
+		authUseCase := usecases.NewAuthUseCases(googleSvcMock, usersUseCase)
 
 		accessToken := "valid-access-token"
 
@@ -161,7 +161,7 @@ func TestAuthUseCase_LoginWithGoogle(t *testing.T) {
 		mockGoogle := new(mockServices.MockGoogleService)
 		mockRepo := new(mockUsers.MockUsersRepo)
 		usersUC := users.NewUsersUseCase(mockRepo, nil)
-		uc := auth.NewAuthUseCase(mockGoogle, usersUC)
+		uc := usecases.NewAuthUseCases(mockGoogle, usersUC)
 
 		accessToken := "valid-access-token"
 
