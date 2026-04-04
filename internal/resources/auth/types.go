@@ -1,6 +1,8 @@
 package auth
 
-import "github.com/felipe1496/open-wallet/internal/resources/users"
+import (
+	"github.com/felipe1496/open-wallet/internal/resources/users/repository"
+)
 
 // ==============================================================================
 // 1. HTTP MODELS
@@ -16,6 +18,6 @@ type LoginGoogleResponse struct {
 }
 
 type LoginGoogleResponseData struct {
-	AccessToken string     `json:"access_token"`
-	User        users.User `json:"user"`
+	AccessToken string          `json:"access_token"`
+	User        repository.User `json:"user"`
 }

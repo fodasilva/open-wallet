@@ -14,7 +14,7 @@ definitions:
       access_token:
         type: string
       user:
-        $ref: '#/definitions/users.User'
+        $ref: '#/definitions/repository.User'
     type: object
   categories.CreateCategoryRequest:
     properties:
@@ -254,6 +254,21 @@ definitions:
       user_id:
         type: string
     type: object
+  repository.User:
+    properties:
+      avatar_url:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      username:
+        type: string
+    type: object
   repository.ViewEntry:
     properties:
       amount:
@@ -404,21 +419,6 @@ definitions:
     properties:
       transaction:
         $ref: '#/definitions/repository.Transaction'
-    type: object
-  users.User:
-    properties:
-      avatar_url:
-        type: string
-      created_at:
-        type: string
-      email:
-        type: string
-      id:
-        type: string
-      name:
-        type: string
-      username:
-        type: string
     type: object
   utils.HTTPError:
     properties:

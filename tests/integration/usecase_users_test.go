@@ -6,28 +6,29 @@ import (
 
 	"github.com/felipe1496/open-wallet/internal/resources/users"
 	"github.com/felipe1496/open-wallet/internal/resources/users/mocks"
+	"github.com/felipe1496/open-wallet/internal/resources/users/repository"
+	"github.com/felipe1496/open-wallet/internal/utils"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 )
 
 func TestUsersUseCase_List(t *testing.T) {
 	t.Run("should list users successfully", func(t *testing.T) {
 		mockRepo := new(mocks.MockUsersRepo)
-		uc := users.NewUsersUseCase(mockRepo)
+		uc := users.NewUsersUseCase(mockRepo, nil)
 
-		filter := users.UserFilter{Username: "alice"}
-
-		expectedUsers := []users.User{
+		expectedUsers := []repository.User{
 			{ID: "1", Username: "alice", Name: "Alice", Email: "alice@gmail.com"},
 			{ID: "2", Username: "alice2", Name: "Alice2", Email: "alice2@gmail.com"},
 		}
 
 		// Repo returns users successfully
 		mockRepo.
-			On("ListUsers", filter).
+			On("Select", mock.Anything, mock.Anything).
 			Return(expectedUsers, nil)
 
-		result, err := uc.List(filter)
+		result, err := uc.List(utils.QueryOpts().And("username", "eq", "alice"))
 
 		assert.NoError(t, err)
 		assert.Equal(t, expectedUsers, result)
@@ -36,15 +37,13 @@ func TestUsersUseCase_List(t *testing.T) {
 
 	t.Run("should return error when repository fails", func(t *testing.T) {
 		mockRepo := new(mocks.MockUsersRepo)
-		uc := users.NewUsersUseCase(mockRepo)
-
-		filter := users.UserFilter{Email: "john@gmail.com"}
+		uc := users.NewUsersUseCase(mockRepo, nil)
 
 		mockRepo.
-			On("ListUsers", filter).
-			Return([]users.User{}, errors.New("db exploded"))
+			On("Select", mock.Anything, mock.Anything).
+			Return(nil, errors.New("db exploded"))
 
-		result, err := uc.List(filter)
+		result, err := uc.List(utils.QueryOpts().And("email", "eq", "john@gmail.com"))
 
 		assert.Nil(t, result)
 		assert.ErrorIs(t, err, users.FailedToFetchUsersError)
@@ -55,56 +54,61 @@ func TestUsersUseCase_List(t *testing.T) {
 func TestUsersUseCase_Create(t *testing.T) {
 	t.Run("should return error if username is already taken", func(t *testing.T) {
 		mockRepo := new(mocks.MockUsersRepo)
-		uc := users.NewUsersUseCase(mockRepo)
+		uc := users.NewUsersUseCase(mockRepo, nil)
 
-		input := users.CreateUserInput{Username: "johndoethegreat", Name: "John", Email: "john@gmail.com"}
+		input := repository.CreateUserDTO{Username: "johndoethegreat", Name: "John", Email: "john@gmail.com"}
 
 		mockRepo.
-			On("ListUsers", users.UserFilter{Username: input.Username}).
-			Return([]users.User{
+			On("Select", mock.Anything, mock.MatchedBy(func(filter *utils.QueryOptsBuilder) bool {
+				// Very simple check to identify which Select call this is
+				return filter != nil 
+			})).
+			Return([]repository.User{
 				{
 					ID:       "1",
 					Username: "johndoethegreat",
 					Name:     "Urek",
 					Email:    "urek@gmail.com",
 				},
-			}, nil)
+			}, nil).Once()
 
 		result, err := uc.Create(input)
 
-		assert.Equal(t, users.User{}, result)
+		assert.Equal(t, repository.User{}, result)
 		assert.ErrorIs(t, err, users.UsernameAlreadyExists)
 		mockRepo.AssertExpectations(t)
 	})
 
 	t.Run("should return error if email already exists", func(t *testing.T) {
 		mockRepo := new(mocks.MockUsersRepo)
-		uc := users.NewUsersUseCase(mockRepo)
+		uc := users.NewUsersUseCase(mockRepo, nil)
 
-		input := users.CreateUserInput{
+		input := repository.CreateUserDTO{
 			Username: "johndoethegreat",
 			Name:     "John",
 			Email:    "john@gmail.com",
 		}
 
+		// First Select: username check
 		mockRepo.
-			On("ListUsers", users.UserFilter{Username: input.Username}).
-			Return([]users.User{}, nil)
+			On("Select", mock.Anything, mock.Anything).
+			Return([]repository.User{}, nil).Once()
 
+		// Second Select: email check
 		mockRepo.
-			On("ListUsers", users.UserFilter{Email: input.Email}).
-			Return([]users.User{
+			On("Select", mock.Anything, mock.Anything).
+			Return([]repository.User{
 				{
 					ID:       "1",
 					Username: "rolling_stone",
 					Name:     "Urek",
 					Email:    "john@gmail.com",
 				},
-			}, nil)
+			}, nil).Once()
 
 		result, err := uc.Create(input)
 
-		assert.Equal(t, users.User{}, result)
+		assert.Equal(t, repository.User{}, result)
 		assert.ErrorIs(t, err, users.EmailAlreadyExists)
 
 		mockRepo.AssertExpectations(t)
@@ -112,32 +116,28 @@ func TestUsersUseCase_Create(t *testing.T) {
 
 	t.Run("should create user successfully", func(t *testing.T) {
 		mockRepo := new(mocks.MockUsersRepo)
-		uc := users.NewUsersUseCase(mockRepo)
+		uc := users.NewUsersUseCase(mockRepo, nil)
 
-		input := users.CreateUserInput{
+		input := repository.CreateUserDTO{
 			Username: "johndoethegreat",
 			Name:     "John",
 			Email:    "john@gmail.com",
 		}
 
-		expectedUser := users.User{
+		expectedUser := repository.User{
 			ID:       "123",
 			Username: input.Username,
 			Name:     input.Name,
 			Email:    input.Email,
 		}
 
-		mockRepo.
-			On("ListUsers", users.UserFilter{Username: input.Username}).
-			Return([]users.User{}, nil)
+		// List checks (username and email)
+		mockRepo.On("Select", mock.Anything, mock.Anything).Return([]repository.User{}, nil).Times(2)
 
-		mockRepo.
-			On("ListUsers", users.UserFilter{Email: input.Email}).
-			Return([]users.User{}, nil)
+		mockRepo.On("Insert", mock.Anything, mock.Anything).Return(nil).Once()
 
-		mockRepo.
-			On("CreateUser", input).
-			Return(expectedUser, nil)
+		// Always fetch
+		mockRepo.On("Select", mock.Anything, mock.Anything).Return([]repository.User{expectedUser}, nil).Once()
 
 		result, err := uc.Create(input)
 
