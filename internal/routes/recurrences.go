@@ -11,7 +11,7 @@ import (
 
 func SetupRecurrencesRoutes(r *gin.Engine, f *factory.Factory, redisClient *redis.Client, cfg *infra.Config) {
 	jwtService := f.JWTService()
-	recurrencesHandler := recurrences.NewHandler(f.RecurrencesUseCase())
+	recurrencesHandler := recurrences.NewHandler(f.RecurrencesUseCases())
 	recurrencesGroup := r.Group("/api/v1/recurrences")
 	{
 		recurrencesGroup.GET("",
