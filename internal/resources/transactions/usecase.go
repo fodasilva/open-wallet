@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/felipe1496/open-wallet/internal/constants"
-	"github.com/felipe1496/open-wallet/internal/resources/categories"
+	"github.com/felipe1496/open-wallet/internal/resources/categories/usecases"
 	transactionRepo "github.com/felipe1496/open-wallet/internal/resources/transactions/repository"
 	"github.com/felipe1496/open-wallet/internal/utils"
 	"github.com/oklog/ulid/v2"
@@ -25,11 +25,11 @@ type TransactionsUseCase interface {
 type transactionsUseCaseImpl struct {
 	transactionsRepo  transactionRepo.TransactionsRepo
 	entriesRepo       transactionRepo.EntriesRepo
-	categoriesUseCase categories.CategoriesUseCase
+	categoriesUseCase usecases.CategoriesUseCases
 	db                *sql.DB
 }
 
-func NewTransactionsUseCase(transactionsRepo transactionRepo.TransactionsRepo, entriesRepo transactionRepo.EntriesRepo, categoriesUseCase categories.CategoriesUseCase, db *sql.DB) TransactionsUseCase {
+func NewTransactionsUseCase(transactionsRepo transactionRepo.TransactionsRepo, entriesRepo transactionRepo.EntriesRepo, categoriesUseCase usecases.CategoriesUseCases, db *sql.DB) TransactionsUseCase {
 	return &transactionsUseCaseImpl{
 		transactionsRepo:  transactionsRepo,
 		entriesRepo:       entriesRepo,

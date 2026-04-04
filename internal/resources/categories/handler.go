@@ -5,18 +5,19 @@ import (
 	"net/http"
 	"slices"
 	"github.com/felipe1496/open-wallet/internal/resources/categories/repository"
+	"github.com/felipe1496/open-wallet/internal/resources/categories/usecases"
 	"github.com/felipe1496/open-wallet/internal/utils"
 
 	"github.com/gin-gonic/gin"
 )
 
 type API struct {
-	categoriesUseCase CategoriesUseCase
+	categoriesUseCases usecases.CategoriesUseCases
 }
 
-func NewHandler(categoriesUseCase CategoriesUseCase) *API {
+func NewHandler(categoriesUseCases usecases.CategoriesUseCases) *API {
 	return &API{
-		categoriesUseCase: categoriesUseCase,
+		categoriesUseCases: categoriesUseCases,
 	}
 }
 
@@ -43,7 +44,7 @@ func (api *API) Create(ctx *gin.Context) {
 		return
 	}
 
-	category, err := api.categoriesUseCase.Create(repository.CreateCategoryDTO{
+	category, err := api.categoriesUseCases.Create(repository.CreateCategoryDTO{
 		UserID: userID,
 		Name:   body.Name,
 		Color:  body.Color,
@@ -86,7 +87,7 @@ func (api *API) List(ctx *gin.Context) {
 		queryOpts.And("name", "like", nameFilter)
 	}
 
-	categories, err := api.categoriesUseCase.List(queryOpts)
+	categories, err := api.categoriesUseCases.List(queryOpts)
 
 	if err != nil {
 		apiErr := utils.NewHTTPError(http.StatusInternalServerError, err.Error())
@@ -94,7 +95,7 @@ func (api *API) List(ctx *gin.Context) {
 		return
 	}
 
-	count, err := api.categoriesUseCase.Count(utils.ForCount(queryOpts))
+	count, err := api.categoriesUseCases.Count(utils.ForCount(queryOpts))
 	if err != nil {
 		apiErr := utils.NewHTTPError(http.StatusInternalServerError, err.Error())
 		ctx.JSON(apiErr.StatusCode, apiErr)
@@ -139,7 +140,7 @@ func (api *API) List(ctx *gin.Context) {
 func (api *API) DeleteByID(ctx *gin.Context) {
 	id := ctx.Param("category_id")
 
-	err := api.categoriesUseCase.DeleteByID(id)
+	err := api.categoriesUseCases.DeleteByID(id)
 
 	if err != nil {
 		apiErr := err.(*utils.HTTPError)
@@ -171,7 +172,7 @@ func (api *API) ListCategoryAmountPerPeriod(ctx *gin.Context) {
 	queryOpts := ctx.MustGet("query_opts").(*utils.QueryOptsBuilder).
 		And("user_id", "eq", userID)
 
-	categories, err := api.categoriesUseCase.ListCategoryAmountPerPeriod(period, queryOpts)
+	categories, err := api.categoriesUseCases.ListCategoryAmountPerPeriod(period, queryOpts)
 
 	if err != nil {
 		apiErr := utils.NewHTTPError(http.StatusInternalServerError, err.Error())
@@ -179,7 +180,7 @@ func (api *API) ListCategoryAmountPerPeriod(ctx *gin.Context) {
 		return
 	}
 
-	count, err := api.categoriesUseCase.CountCategoryAmountPerPeriod(period, utils.ForCount(queryOpts))
+	count, err := api.categoriesUseCases.CountCategoryAmountPerPeriod(period, utils.ForCount(queryOpts))
 	if err != nil {
 		apiErr := err.(*utils.HTTPError)
 		ctx.JSON(apiErr.StatusCode, apiErr)
@@ -268,7 +269,7 @@ func (api *API) Update(ctx *gin.Context) {
 		payload.Color = utils.NewValue(*body.Color)
 	}
 
-	category, err := api.categoriesUseCase.Update(id, payload)
+	category, err := api.categoriesUseCases.Update(id, payload)
 
 	if err != nil {
 		apiErr := err.(*utils.HTTPError)

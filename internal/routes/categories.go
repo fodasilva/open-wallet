@@ -11,7 +11,7 @@ import (
 
 func SetupCategoriesRoutes(r *gin.Engine, f *factory.Factory, redisClient *redis.Client, cfg *infra.Config) {
 	jwtService := f.JWTService()
-	categoriesHandler := categories.NewHandler(f.CategoriesUseCase())
+	categoriesHandler := categories.NewHandler(f.CategoriesUseCases())
 	categoriesGroup := r.Group("/api/v1/categories")
 	{
 		categoriesGroup.POST("",
