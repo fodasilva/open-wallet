@@ -16,9 +16,22 @@ This project uses a custom script-based generator to automate the creation of re
 
 ## Repository Interface Example
 
+### Template Parameters
+
+After copying the template below to your file, replace every occurrence of the following placeholders:
+
+| Placeholder | Description | Example |
+|---|---|---|
+| `<Entities>` | PascalCase plural resource name | `Categories` |
+| `<Entity>` | PascalCase singular resource name | `Category` |
+
 Copy and paste this into your `repository.go` and adjust as needed:
 
 ```go
+// Parameters to replace:
+// - <Entities>  → PascalCase plural resource name   (e.g. Categories)
+// - <Entity>    → PascalCase singular resource name (e.g. Category)
+
 package repository
 
 import (

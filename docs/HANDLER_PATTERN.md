@@ -16,11 +16,64 @@ Finally, you run these steps securely using `utils.RunCommand(ctx, options)`.
 
 ---
 
-## Handler Template
+## Handler Templates
 
-Use the following template below when creating a new endpoint in a `/handlers` package (e.g. `internal/resources/{resource}/handlers/{action}.go`).
+### Template Parameters
+
+After copying a template below to your file, replace every occurrence of the following placeholders:
+
+| Placeholder | Description | Example |
+|---|---|---|
+| `<entities>` | Lowercase plural resource name | `categories` |
+| `<Entities>` | PascalCase plural resource name | `Categories` |
+| `<Action>` | PascalCase name of the handler action | `Create`, `List`, `Update` |
+| `<action>` | Lowercase action name (used in routes) | `create`, `list`, `update` |
+
+---
+
+### `handlers.go` — Entry Point
+
+Every handlers package must have a `handlers.go` file that declares the `API` struct and its constructor. This is the dependency injection root for all handlers in the resource.
+
+Create it at `internal/resources/<entities>/handlers/handlers.go`:
 
 ```go
+// Parameters to replace:
+// - <entities>  → lowercase plural resource name  (e.g. categories)
+// - <Entities>  → PascalCase plural resource name (e.g. Categories)
+
+package handlers
+
+import (
+	"github.com/felipe1496/open-wallet/internal/resources/<entities>/usecases"
+)
+
+type API struct {
+	<entities>UseCases usecases.<Entities>UseCases
+}
+
+func NewHandler(<entities>UseCases usecases.<Entities>UseCases) *API {
+	return &API{
+		<entities>UseCases: <entities>UseCases,
+	}
+}
+```
+
+> Each individual endpoint (e.g. `create.go`, `list.go`) lives in its own file within the same package and accesses use cases via `api.<entities>UseCases`.
+
+---
+
+### `<Action>.go` — Individual Endpoint
+
+Use the following template when creating a new endpoint in a `/handlers` package (e.g. `internal/resources/<entities>/handlers/<Action>.go`).
+
+```go
+// Parameters to replace:
+// - <entities>  → lowercase plural resource name  (e.g. categories)
+// - <Entities>  → PascalCase plural resource name (e.g. Categories)
+// - <Action>    → PascalCase handler action name  (e.g. Create, List)
+// - <action>    → lowercase action name           (e.g. create, list)
+
 package handlers
 
 import (
@@ -30,17 +83,17 @@ import (
 	"github.com/felipe1496/open-wallet/internal/utils"
 
 	// Replace the following import with your actual resource use cases:
-	// "github.com/felipe1496/open-wallet/internal/resources/{resource}/usecases"
+	// "github.com/felipe1496/open-wallet/internal/resources/<entities>/usecases"
 )
 
 // -------------------------------------------------------------------------
 // 1. Define the Options Struct
 // -------------------------------------------------------------------------
 
-type ActionOptions struct {
+type <Action>Options struct {
 	// Base Dependencies
 	Ctx      *gin.Context
-	UseCases interface{} // Replace with e.g., usecases.MyResourceUseCases
+	UseCases interface{} // Replace with e.g., usecases.<Entities>UseCases
 
 	// Request State (extracted later by Complete)
 	UserID string
@@ -55,7 +108,7 @@ type ActionOptions struct {
 // -------------------------------------------------------------------------
 
 // Complete extracts and parses data from the Context
-func (o *ActionOptions) Complete(ctx *gin.Context) error {
+func (o *<Action>Options) Complete(ctx *gin.Context) error {
 	o.Ctx = ctx
 	o.UserID = ctx.GetString("user_id")
 
@@ -71,7 +124,7 @@ func (o *ActionOptions) Complete(ctx *gin.Context) error {
 }
 
 // Validate executes strict business rules against the parsed structural state
-func (o *ActionOptions) Validate() error {
+func (o *<Action>Options) Validate() error {
 	// Example validation
 	// if o.Body.Name == "" {
 	//     return errors.New("name cannot be empty")
@@ -80,7 +133,7 @@ func (o *ActionOptions) Validate() error {
 }
 
 // Run executes the core database or external actions
-func (o *ActionOptions) Run() error {
+func (o *<Action>Options) Run() error {
 	// Execute your use cases logic here
 	// data, err := o.UseCases.Action(o.ID, o.Body)
 	// if err != nil {
@@ -96,19 +149,19 @@ func (o *ActionOptions) Run() error {
 // 3. The API Wrapper Hook
 // -------------------------------------------------------------------------
 
-// @Summary Action Example
-// @Description Action Example
-// @Tags {resource}
+// @Summary <Action> Example
+// @Description <Action> Example
+// @Tags <entities>
 // @Security BearerAuth
 // @Accept json
 // @Produce json
 // @Success 200 {object} interface{} "Success"
 // @Failure 401 {object} utils.HTTPError "Unauthorized"
 // @Failure 500 {object} utils.HTTPError "Internal server error"
-// @Router /{resource}/action [post]
-func (api *API) Action(ctx *gin.Context) {
-	cmd := &ActionOptions{
-		UseCases: api.useCases, // Inject use cases from the API struct
+// @Router /<entities>/<action> [post]
+func (api *API) <Action>(ctx *gin.Context) {
+	cmd := &<Action>Options{
+		UseCases: api.<entities>UseCases,
 	}
 	utils.RunCommand(ctx, cmd)
 }
