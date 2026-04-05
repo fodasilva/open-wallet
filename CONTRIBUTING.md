@@ -56,11 +56,13 @@ The standard workflow for adding a new feature involves:
 4.  **Create Handlers**: Use the command pattern to implement your API endpoints.
 5.  **Register Routes**: Add your handler to `internal/routes/`.
 
-### 4. Code Quality & Standards
+### 4. Code Quality & Testing
 
-- **Linting**: Always run `make lint` before committing your changes.
-- **Testing**: We use E2E tests for core flows. Run `make test` locally.
-- **Conventional Commits**: While not strictly enforced by hooks, please use descriptive prefixes like `feat:`, `fix:`, `refactor:`, `docs:`, or `chore:`.
+-   **Linting**: Always run `make lint` before committing your changes.
+-   **Testing Strategy**: We prioritize **E2E tests** over unit and integration tests, as they provide more value by validating the entire request/response lifecycle and real database interactions.
+    -   **E2E Tests**: Use these for all API endpoints and core business flows. Run `make test` to execute them.
+    -   **Unit or Integration Tests**: Should only be used for small, isolated internal helpers (e.g., complex calculations, formatting, or utility functions).
+-   **Conventional Commits**: While not strictly enforced by hooks, please use descriptive prefixes like `feat:`, `fix:`, `refactor:`, `docs:`, or `chore:`.
 
 ## Getting Help
 
