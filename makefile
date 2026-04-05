@@ -19,6 +19,9 @@ gen-repos:
 gen-docs:
 	swag init -g cmd/api/main.go --parseDependency --parseInternal
 
+gen-docs-install:
+	go install github.com/swaggo/swag/cmd/swag@v1.16.4
+
 lint:
 	golangci-lint run ./...
 
