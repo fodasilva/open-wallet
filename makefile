@@ -13,6 +13,9 @@ db-migrate:
 db-migrate-create:
 	migrate create -ext sql -dir migrations -seq $(name)
 
+db-migrate-install:
+	go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
+
 gen-repos:
 	bash scripts/repository/gen-repos.sh
 

@@ -32,7 +32,19 @@ make lint-install
 
 # Install documentation tools
 make gen-docs-install
+
+# Install migration tools
+make db-migrate-install
 ```
+
+### 3. Database Migrations
+
+All schema changes must be implemented via migrations.
+
+- **Creating a migration**: `make db-migrate-create name=my_migration_name`
+- **Applying migrations**: `make db-migrate`
+
+Running these commands requires the `migrate` CLI tool, which you can install using `make db-migrate-install`.
 
 ### 3. Adding a New Resource
 
