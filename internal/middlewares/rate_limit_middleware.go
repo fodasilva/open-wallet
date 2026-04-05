@@ -6,10 +6,11 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/felipe1496/open-wallet/infra"
-	"github.com/felipe1496/open-wallet/internal/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
+
+	"github.com/felipe1496/open-wallet/infra"
+	"github.com/felipe1496/open-wallet/internal/utils"
 )
 
 func rateLimit(redisClient *redis.Client, maxRequests int, windowMilliseconds int, prefix string) gin.HandlerFunc {

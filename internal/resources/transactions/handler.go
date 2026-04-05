@@ -4,12 +4,12 @@ import (
 	"net/http"
 	"slices"
 
-	"github.com/felipe1496/open-wallet/internal/resources/transactions/usecases"
-	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/gin-gonic/gin"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 
-	"github.com/gin-gonic/gin"
+	"github.com/felipe1496/open-wallet/internal/resources/transactions/usecases"
+	"github.com/felipe1496/open-wallet/internal/utils"
 )
 
 type API struct {
@@ -150,12 +150,12 @@ func (api *API) CreateTransaction(ctx *gin.Context) {
 	}
 
 	transaction, err := api.transactionsUseCases.CreateTransaction(usecases.CreateTransactionDTO{
-		UserID:       userID,
-		Name:         body.Name,
-		CategoryID:   utils.OptionalNullable[string]{Set: body.CategoryID != nil, Value: body.CategoryID},
-		Note:         utils.OptionalNullable[string]{Set: body.Note != nil, Value: body.Note},
-		Type:         body.Type,
-		Entries:      entriesDTO,
+		UserID:     userID,
+		Name:       body.Name,
+		CategoryID: utils.OptionalNullable[string]{Set: body.CategoryID != nil, Value: body.CategoryID},
+		Note:       utils.OptionalNullable[string]{Set: body.Note != nil, Value: body.Note},
+		Type:       body.Type,
+		Entries:    entriesDTO,
 	})
 
 	if err != nil {

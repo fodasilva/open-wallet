@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/oklog/ulid/v2"
+
 	"github.com/felipe1496/open-wallet/internal/resources/users/repository"
 	"github.com/felipe1496/open-wallet/internal/utils"
-
-	"github.com/oklog/ulid/v2"
 )
 
 func (uc *AuthUseCasesImpl) LoginWithGoogle(code string) (repository.User, error) {

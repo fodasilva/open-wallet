@@ -6,12 +6,13 @@ import (
 	"reflect"
 	"slices"
 
-	"github.com/felipe1496/open-wallet/internal/resources/recurrences/repository"
-	"github.com/felipe1496/open-wallet/internal/resources/recurrences/usecases"
-	"github.com/felipe1496/open-wallet/internal/utils"
 	"github.com/gin-gonic/gin"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
+
+	"github.com/felipe1496/open-wallet/internal/resources/recurrences/repository"
+	"github.com/felipe1496/open-wallet/internal/resources/recurrences/usecases"
+	"github.com/felipe1496/open-wallet/internal/utils"
 )
 
 type API struct {

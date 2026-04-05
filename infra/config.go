@@ -8,8 +8,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/felipe1496/open-wallet/internal/utils"
 	"github.com/joho/godotenv"
+
+	"github.com/felipe1496/open-wallet/internal/utils"
 )
 
 type Config struct {

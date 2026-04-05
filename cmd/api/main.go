@@ -6,17 +6,16 @@ import (
 	"fmt"
 	"log"
 
+	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
+	swaggerfiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
 	docs "github.com/felipe1496/open-wallet/docs"
 	"github.com/felipe1496/open-wallet/infra"
-	"github.com/redis/go-redis/v9"
-
 	"github.com/felipe1496/open-wallet/internal/factory"
 	"github.com/felipe1496/open-wallet/internal/middlewares"
 	"github.com/felipe1496/open-wallet/internal/routes"
-
-	"github.com/gin-gonic/gin"
-	swaggerfiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 // @title Open Wallet API

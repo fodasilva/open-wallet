@@ -4,10 +4,10 @@ import (
 	"net/http"
 	"strings"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/felipe1496/open-wallet/internal/services"
 	"github.com/felipe1496/open-wallet/internal/utils"
-
-	"github.com/gin-gonic/gin"
 )
 
 func RequireAuthMiddleware(JWTService services.JWTService) gin.HandlerFunc {

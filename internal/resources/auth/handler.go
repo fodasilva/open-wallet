@@ -3,13 +3,12 @@ package auth
 import (
 	"net/http"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/felipe1496/open-wallet/internal/resources/auth/usecases"
 	usersUseCases "github.com/felipe1496/open-wallet/internal/resources/users/usecases"
-
 	"github.com/felipe1496/open-wallet/internal/services"
 	"github.com/felipe1496/open-wallet/internal/utils"
-
-	"github.com/gin-gonic/gin"
 )
 
 type API struct {

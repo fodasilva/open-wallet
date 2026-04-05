@@ -32,6 +32,7 @@ func NewRecurrencesUseCases(
 	transactionsUseCase transactionsUseCases.TransactionsUseCases,
 	db *sql.DB,
 ) RecurrencesUseCases {
+
 	return &RecurrencesUseCasesImpl{
 		repo:                repo,
 		categoriesUseCase:   categoriesUseCase,

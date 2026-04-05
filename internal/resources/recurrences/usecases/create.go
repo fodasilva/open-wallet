@@ -3,9 +3,10 @@ package usecases
 import (
 	"net/http"
 
+	"github.com/oklog/ulid/v2"
+
 	"github.com/felipe1496/open-wallet/internal/resources/recurrences/repository"
 	"github.com/felipe1496/open-wallet/internal/utils"
-	"github.com/oklog/ulid/v2"
 )
 
 func (uc *RecurrencesUseCasesImpl) Create(payload repository.CreateRecurrenceDTO) (repository.Recurrence, error) {

@@ -2,6 +2,7 @@ package repository
 
 import (
 	"github.com/Masterminds/squirrel"
+
 	"github.com/felipe1496/open-wallet/internal/utils"
 )
 
@@ -76,7 +77,6 @@ func (r *CategoriesRepoImpl) ListCategoryAmountPerPeriod(db utils.Executer, peri
 
 	result := make([]CategoryAmountPerPeriod, 0)
 	for rows.Next() {
-
 		var category CategoryAmountPerPeriod
 
 		err = rows.Scan(

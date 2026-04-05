@@ -4,9 +4,10 @@ import (
 	"context"
 	"net/http"
 
+	"go.opentelemetry.io/otel"
+
 	transactionRepo "github.com/felipe1496/open-wallet/internal/resources/transactions/repository"
 	"github.com/felipe1496/open-wallet/internal/utils"
-	"go.opentelemetry.io/otel"
 )
 
 func (uc *TransactionsUseCasesImpl) ListEntries(ctx context.Context, filter *utils.QueryOptsBuilder) ([]transactionRepo.ViewEntry, error) {

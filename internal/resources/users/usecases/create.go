@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/oklog/ulid/v2"
+
 	"github.com/felipe1496/open-wallet/internal/resources/users/repository"
 	"github.com/felipe1496/open-wallet/internal/utils"
-	"github.com/oklog/ulid/v2"
 )
 
 func (uc *UsersUseCasesImpl) Create(input repository.CreateUserDTO) (repository.User, error) {

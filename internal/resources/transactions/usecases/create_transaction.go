@@ -4,9 +4,10 @@ import (
 	"database/sql"
 	"net/http"
 
+	"github.com/oklog/ulid/v2"
+
 	transactionRepo "github.com/felipe1496/open-wallet/internal/resources/transactions/repository"
 	"github.com/felipe1496/open-wallet/internal/utils"
-	"github.com/oklog/ulid/v2"
 )
 
 func (uc *TransactionsUseCasesImpl) CreateTransaction(payload CreateTransactionDTO) (transactionRepo.Transaction, error) {

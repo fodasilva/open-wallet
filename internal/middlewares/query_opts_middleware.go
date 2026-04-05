@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/felipe1496/open-wallet/internal/utils"
-
 	"github.com/gin-gonic/gin"
+
+	"github.com/felipe1496/open-wallet/internal/utils"
 )
 
 func QueryOptsMiddleware() gin.HandlerFunc {
@@ -88,7 +88,6 @@ func QueryOptsMiddleware() gin.HandlerFunc {
 }
 
 func parseFilter(filter string, query *utils.QueryOptsBuilder) (*utils.QueryOptsBuilder, error) {
-
 	splitted := strings.Split(filter, " and ")
 
 	allowedOperators := map[string]bool{
@@ -135,9 +134,7 @@ func parseFilter(filter string, query *utils.QueryOptsBuilder) (*utils.QueryOpts
 			}
 
 			orQuery.EndOr()
-
 		} else {
-
 			splittedFilter, err := splitFilter(filter)
 
 			if err != nil {
@@ -164,7 +161,6 @@ func parseFilter(filter string, query *utils.QueryOptsBuilder) (*utils.QueryOpts
 
 			query.And(splittedFilter[0], splittedFilter[1], condValue)
 		}
-
 	}
 
 	return query, nil

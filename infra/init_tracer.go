@@ -27,7 +27,6 @@ func InitTracer(cfg *Config) (*trace.TracerProvider, error) {
 			otlptracehttp.WithInsecure())
 	case "prod":
 		exporter, err = texporter.New(texporter.WithProjectID(*cfg.GcpProjectID))
-
 	}
 
 	if err != nil {

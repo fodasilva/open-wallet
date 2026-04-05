@@ -9,17 +9,17 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/felipe1496/open-wallet/internal/resources/auth"
-	authUseCases "github.com/felipe1496/open-wallet/internal/resources/auth/usecases"
-	usersUseCases "github.com/felipe1496/open-wallet/internal/resources/users/usecases"
-	"github.com/felipe1496/open-wallet/internal/resources/users/repository"
-	"github.com/felipe1496/open-wallet/internal/services"
-	"github.com/felipe1496/open-wallet/internal/services/mocks"
-
 	"github.com/gin-gonic/gin"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+
+	"github.com/felipe1496/open-wallet/internal/resources/auth"
+	authUseCases "github.com/felipe1496/open-wallet/internal/resources/auth/usecases"
+	"github.com/felipe1496/open-wallet/internal/resources/users/repository"
+	usersUseCases "github.com/felipe1496/open-wallet/internal/resources/users/usecases"
+	"github.com/felipe1496/open-wallet/internal/services"
+	"github.com/felipe1496/open-wallet/internal/services/mocks"
 )
 
 func setupTestServer(db *sql.DB, googleService services.GoogleService, jwtService services.JWTService) *gin.Engine {

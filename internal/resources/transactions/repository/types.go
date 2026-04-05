@@ -16,14 +16,14 @@ import (
 // @method: Delete
 
 type Transaction struct {
-	ID           string                    `json:"id"`
-	UserID       string                    `json:"user_id"`
+	ID           string          `json:"id"`
+	UserID       string          `json:"user_id"`
 	Type         TransactionType `json:"type"`
-	Name         string                    `json:"name"`
-	Description  *string                   `json:"description"`
-	CreatedAt    time.Time                 `json:"created_at"`
-	CategoryID   *string                   `json:"category_id"`
-	RecurrenceID *string                   `json:"recurrence_id"`
+	Name         string          `json:"name"`
+	Description  *string         `json:"description"`
+	CreatedAt    time.Time       `json:"created_at"`
+	CategoryID   *string         `json:"category_id"`
+	RecurrenceID *string         `json:"recurrence_id"`
 }
 
 type CreateTransactionDTO struct {
@@ -78,30 +78,30 @@ type UpdateEntryDTO struct {
 // @method: Count
 
 type ViewEntry struct {
-	ID                string                    `json:"id"`
-	TransactionID     string                    `json:"transaction_id"`
-	Name              string                    `json:"name"`
-	Description       *string                   `json:"description"`
-	Amount            float64                   `json:"amount"`
-	Period            string                    `json:"period"`
-	UserID            string                    `json:"user_id"`
+	ID                string          `json:"id"`
+	TransactionID     string          `json:"transaction_id"`
+	Name              string          `json:"name"`
+	Description       *string         `json:"description"`
+	Amount            float64         `json:"amount"`
+	Period            string          `json:"period"`
+	UserID            string          `json:"user_id"`
 	Type              TransactionType `json:"type"`
-	TotalAmount       float64                   `json:"total_amount"`
-	Installment       int                       `json:"installment"`
-	TotalInstallments int                       `json:"total_installments"`
-	CreatedAt         time.Time                 `json:"created_at"`
-	ReferenceDate     string                    `json:"reference_date"`
-	CategoryID        *string                   `json:"category_id,omitempty"`
-	CategoryName      *string                   `json:"category_name,omitempty"`
-	CategoryColor     *string                   `json:"category_color,omitempty"`
-	RecurrenceID      *string                   `json:"recurrence_id,omitempty"`
+	TotalAmount       float64         `json:"total_amount"`
+	Installment       int             `json:"installment"`
+	TotalInstallments int             `json:"total_installments"`
+	CreatedAt         time.Time       `json:"created_at"`
+	ReferenceDate     string          `json:"reference_date"`
+	CategoryID        *string         `json:"category_id,omitempty"`
+	CategoryName      *string         `json:"category_name,omitempty"`
+	CategoryColor     *string         `json:"category_color,omitempty"`
+	RecurrenceID      *string         `json:"recurrence_id,omitempty"`
 }
 
 type TransactionType string
 
 const (
-SimpleExpense TransactionType = "simple_expense"
-Income        TransactionType = "income"
-Installment   TransactionType = "installment"
-Recurrence    TransactionType = "recurrence"
+	SimpleExpense TransactionType = "simple_expense"
+	Income        TransactionType = "income"
+	Installment   TransactionType = "installment"
+	Recurrence    TransactionType = "recurrence"
 )

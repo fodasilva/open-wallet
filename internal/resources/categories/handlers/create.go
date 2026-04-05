@@ -3,10 +3,11 @@ package handlers
 import (
 	"net/http"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/felipe1496/open-wallet/internal/resources/categories/repository"
 	"github.com/felipe1496/open-wallet/internal/resources/categories/usecases"
 	"github.com/felipe1496/open-wallet/internal/utils"
-	"github.com/gin-gonic/gin"
 )
 
 type CreateOptions struct {
