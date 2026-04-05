@@ -4,6 +4,9 @@ run-dev:
 test:
 	go test -v ./...
 
+test-migrations:
+	go test -v -tags migrations tests/e2e/migrations_test.go
+
 compose:
 	docker compose	up -d
 
