@@ -1,0 +1,29 @@
+linters:
+  enable:
+    - unused
+    - gocyclo
+    - misspell
+    - errcheck
+    - gosimple
+    - staticcheck
+    - revive
+
+linters-settings:
+  unused: {}
+  gocyclo:
+    min-complexity: 15
+  revive:
+    rules:
+      - name: exported
+        disabled: true
+      - name: package-comments
+        disabled: true
+
+run:
+  timeout: 5m
+  tests: true
+
+issues:
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0
