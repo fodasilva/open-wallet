@@ -6,9 +6,10 @@ import (
 
 	"github.com/felipe1496/open-wallet/internal/resources/categories/repository"
 	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
-func (uc *CategoriesUseCasesImpl) ListCategoryAmountPerPeriod(period string, filter *utils.QueryOptsBuilder) ([]repository.CategoryAmountPerPeriod, error) {
+func (uc *CategoriesUseCasesImpl) ListCategoryAmountPerPeriod(period string, filter *querybuilder.Builder) ([]repository.CategoryAmountPerPeriod, error) {
 	amounts, err := uc.repo.ListCategoryAmountPerPeriod(uc.db, period, filter)
 	if err != nil {
 		fmt.Println("err: ", err)

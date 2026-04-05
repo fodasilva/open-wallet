@@ -8,6 +8,7 @@ import (
 
 	transactionRepo "github.com/felipe1496/open-wallet/internal/resources/transactions/repository"
 	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
 func (uc *TransactionsUseCasesImpl) CreateTransaction(payload CreateTransactionDTO) (transactionRepo.Transaction, error) {
@@ -57,7 +58,7 @@ func (uc *TransactionsUseCasesImpl) validateCategory(userID string, categoryID u
 		return nil
 	}
 
-	exists, err := uc.categoriesUseCase.List(utils.QueryOpts().
+	exists, err := uc.categoriesUseCase.List(querybuilder.New().
 		And("id", "eq", *categoryID.Value).
 		And("user_id", "eq", userID))
 	if err != nil {
@@ -103,7 +104,7 @@ func (uc *TransactionsUseCasesImpl) persistEntries(tx *sql.Tx, transactionID str
 }
 
 func (uc *TransactionsUseCasesImpl) fetchCreatedTransaction(id string) (transactionRepo.Transaction, error) {
-	created, err := uc.transactionsRepo.Select(uc.db, utils.QueryOpts().And("id", "eq", id))
+	created, err := uc.transactionsRepo.Select(uc.db, querybuilder.New().And("id", "eq", id))
 	if err != nil || len(created) == 0 {
 		return transactionRepo.Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to fetch created transaction")
 	}

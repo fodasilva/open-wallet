@@ -7,9 +7,10 @@ import (
 	"go.opentelemetry.io/otel"
 
 	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
-func (uc *TransactionsUseCasesImpl) CountEntries(ctx context.Context, filter *utils.QueryOptsBuilder) (int, error) {
+func (uc *TransactionsUseCasesImpl) CountEntries(ctx context.Context, filter *querybuilder.Builder) (int, error) {
 	tracer := otel.Tracer("usecase")
 	_, span := tracer.Start(ctx, "TransactionsUseCase.CountEntries")
 	defer span.End()

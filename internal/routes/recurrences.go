@@ -17,7 +17,7 @@ func SetupRecurrencesRoutes(r *gin.Engine, f *factory.Factory, redisClient *redi
 	{
 		recurrencesGroup.GET("",
 			middlewares.RequireAuthMiddleware(jwtService),
-			middlewares.QueryOptsMiddleware(),
+			middlewares.QueryBuilderMiddleware(nil),
 			recurrencesHandler.List)
 		recurrencesGroup.DELETE("/:id",
 			middlewares.RequireAuthMiddleware(jwtService),

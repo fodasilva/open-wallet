@@ -7,7 +7,7 @@ import (
 	"github.com/oklog/ulid/v2"
 
 	"github.com/felipe1496/open-wallet/internal/resources/users/repository"
-	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
 func (uc *AuthUseCasesImpl) LoginWithGoogle(code string) (repository.User, error) {
@@ -31,7 +31,7 @@ func (uc *AuthUseCasesImpl) LoginWithGoogle(code string) (repository.User, error
 		return repository.User{}, GoogleDintProvideEmailErr
 	}
 
-	userExists, err := uc.usersUseCase.List(utils.QueryOpts().And("email", "eq", *userInfo.Email))
+	userExists, err := uc.usersUseCase.List(querybuilder.New().And("email", "eq", *userInfo.Email))
 
 	if err != nil {
 		return repository.User{}, err

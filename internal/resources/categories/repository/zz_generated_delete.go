@@ -5,13 +5,14 @@ package repository
 import (
 	"github.com/Masterminds/squirrel"
 	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
-func (r *CategoriesRepoImpl) Delete(db utils.Executer, filter *utils.QueryOptsBuilder) error {
+func (r *CategoriesRepoImpl) Delete(db utils.Executer, filter *querybuilder.Builder) error {
 	query := squirrel.Delete("categories").
 		PlaceholderFormat(squirrel.Dollar)
 
-	query = utils.DeleteOptsToSquirrel(query, filter)
+	query = querybuilder.ToDeleteSquirrel(query, filter)
 
 	sql, args, err := query.ToSql()
 

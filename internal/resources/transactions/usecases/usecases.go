@@ -6,12 +6,12 @@ import (
 
 	categories "github.com/felipe1496/open-wallet/internal/resources/categories/usecases"
 	transactionRepo "github.com/felipe1496/open-wallet/internal/resources/transactions/repository"
-	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
 type TransactionsUseCases interface {
-	ListEntries(ctx context.Context, filter *utils.QueryOptsBuilder) ([]transactionRepo.ViewEntry, error)
-	CountEntries(ctx context.Context, filter *utils.QueryOptsBuilder) (int, error)
+	ListEntries(ctx context.Context, filter *querybuilder.Builder) ([]transactionRepo.ViewEntry, error)
+	CountEntries(ctx context.Context, filter *querybuilder.Builder) (int, error)
 	DeleteTransactionById(id string) error
 	CreateTransaction(payload CreateTransactionDTO) (transactionRepo.Transaction, error)
 	UpdateTransaction(transactionID string, userID string, payload UpdateTransactionDTO) (transactionRepo.Transaction, error)

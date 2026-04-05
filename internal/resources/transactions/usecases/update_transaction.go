@@ -8,6 +8,7 @@ import (
 
 	transactionRepo "github.com/felipe1496/open-wallet/internal/resources/transactions/repository"
 	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
 func (uc *TransactionsUseCasesImpl) UpdateTransaction(transactionID string, userID string, payload UpdateTransactionDTO) (t transactionRepo.Transaction, err error) {
@@ -24,7 +25,7 @@ func (uc *TransactionsUseCasesImpl) UpdateTransaction(transactionID string, user
 		}
 	}()
 
-	exists, err := uc.entriesRepo.Select(tx, utils.QueryOpts().
+	exists, err := uc.entriesRepo.Select(tx, querybuilder.New().
 		And("transaction_id", "eq", transactionID).
 		And("user_id", "eq", userID))
 	if err != nil {
@@ -47,7 +48,7 @@ func (uc *TransactionsUseCasesImpl) UpdateTransaction(transactionID string, user
 		return transactionRepo.Transaction{}, err
 	}
 
-	created, err := uc.transactionsRepo.Select(tx, utils.QueryOpts().And("id", "eq", transactionID))
+	created, err := uc.transactionsRepo.Select(tx, querybuilder.New().And("id", "eq", transactionID))
 	if err != nil || len(created) == 0 {
 		return transactionRepo.Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to fetch updated transaction")
 	}
@@ -65,7 +66,7 @@ func (uc *TransactionsUseCasesImpl) updateTransactionMetadata(tx *sql.Tx, transa
 		Note:         payload.Note,
 		CategoryID:   payload.CategoryID,
 		RecurrenceID: payload.RecurrenceID,
-	}, utils.QueryOpts().And("id", "eq", transactionID))
+	}, querybuilder.New().And("id", "eq", transactionID))
 
 	if err != nil {
 		return utils.NewHTTPError(http.StatusInternalServerError, "failed to update transaction")
@@ -89,7 +90,7 @@ func (uc *TransactionsUseCasesImpl) syncTransactionEntries(tx *sql.Tx, transacti
 		return err
 	}
 
-	err := uc.entriesRepo.Delete(tx, utils.QueryOpts().And("transaction_id", "eq", transactionID))
+	err := uc.entriesRepo.Delete(tx, querybuilder.New().And("transaction_id", "eq", transactionID))
 	if err != nil {
 		return utils.NewHTTPError(http.StatusInternalServerError, "failed to delete previous entries")
 	}

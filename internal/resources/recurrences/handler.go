@@ -13,6 +13,7 @@ import (
 	"github.com/felipe1496/open-wallet/internal/resources/recurrences/repository"
 	"github.com/felipe1496/open-wallet/internal/resources/recurrences/usecases"
 	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
 type API struct {
@@ -101,9 +102,9 @@ func (api *API) List(ctx *gin.Context) {
 	span.SetAttributes(attribute.String("user.id", userID))
 	page := ctx.GetInt("page")
 	perPage := ctx.GetInt("per_page")
-	queryOpts := ctx.MustGet("query_opts").(*utils.QueryOptsBuilder).And("user_id", "eq", userID)
+	builder := ctx.MustGet("query_builder").(*querybuilder.Builder).And("user_id", "eq", userID)
 
-	items, err := api.recurrencesUseCases.List(tCtx, queryOpts)
+	items, err := api.recurrencesUseCases.List(tCtx, builder)
 	if err != nil {
 		span.RecordError(err)
 		apiErr := err.(*utils.HTTPError)
@@ -111,7 +112,7 @@ func (api *API) List(ctx *gin.Context) {
 		return
 	}
 
-	count, err := api.recurrencesUseCases.Count(tCtx, utils.QueryOpts().And("user_id", "eq", userID))
+	count, err := api.recurrencesUseCases.Count(tCtx, querybuilder.New().And("user_id", "eq", userID))
 	if err != nil {
 		span.RecordError(err)
 		apiErr := err.(*utils.HTTPError)

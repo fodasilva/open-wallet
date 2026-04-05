@@ -17,7 +17,7 @@ func SetupTransactionsRoutes(r *gin.Engine, f *factory.Factory, redisClient *red
 	{
 		transactionsGroup.GET("/entries",
 			middlewares.RequireAuthMiddleware(jwtService),
-			middlewares.QueryOptsMiddleware(),
+			middlewares.QueryBuilderMiddleware(nil),
 			transactionsHandler.ListEntries)
 		transactionsGroup.DELETE("/:transaction_id",
 			middlewares.RequireAuthMiddleware(jwtService),

@@ -5,9 +5,10 @@ import (
 
 	"github.com/felipe1496/open-wallet/internal/resources/users/repository"
 	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
-func (uc *UsersUseCasesImpl) List(filter *utils.QueryOptsBuilder) ([]repository.User, error) {
+func (uc *UsersUseCasesImpl) List(filter *querybuilder.Builder) ([]repository.User, error) {
 	users, err := uc.repo.Select(uc.db, filter)
 
 	if err != nil {

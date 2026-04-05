@@ -5,14 +5,15 @@ package repository
 import (
 	"github.com/Masterminds/squirrel"
 	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
-func (r *TransactionsRepoImpl) Select(db utils.Executer, filter *utils.QueryOptsBuilder) ([]Transaction, error) {
+func (r *TransactionsRepoImpl) Select(db utils.Executer, filter *querybuilder.Builder) ([]Transaction, error) {
 	query := squirrel.Select("id", "user_id", "category", "name", "description", "created_at", "category_id", "recurrence_id").
 		From("transactions").
 		PlaceholderFormat(squirrel.Dollar)
 
-	query = utils.QueryOptsToSquirrel(query, filter)
+	query = querybuilder.ToSquirrel(query, filter)
 
 	sql, args, err := query.ToSql()
 
@@ -46,12 +47,12 @@ func (r *TransactionsRepoImpl) Select(db utils.Executer, filter *utils.QueryOpts
 
 	return results, nil
 }
-func (r *EntriesRepoImpl) Select(db utils.Executer, filter *utils.QueryOptsBuilder) ([]ViewEntry, error) {
+func (r *EntriesRepoImpl) Select(db utils.Executer, filter *querybuilder.Builder) ([]ViewEntry, error) {
 	query := squirrel.Select("id", "transaction_id", "name", "description", "amount", "period", "user_id", "category", "total_amount", "installment", "total_installments", "created_at", "reference_date", "category_id", "category_name", "category_color", "recurrence_id").
 		From("v_entries").
 		PlaceholderFormat(squirrel.Dollar)
 
-	query = utils.QueryOptsToSquirrel(query, filter)
+	query = querybuilder.ToSquirrel(query, filter)
 
 	sql, args, err := query.ToSql()
 

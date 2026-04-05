@@ -5,14 +5,15 @@ package repository
 import (
 	"github.com/Masterminds/squirrel"
 	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
-func (r *EntriesRepoImpl) Count(db utils.Executer, filter *utils.QueryOptsBuilder) (int, error) {
+func (r *EntriesRepoImpl) Count(db utils.Executer, filter *querybuilder.Builder) (int, error) {
 	query := squirrel.Select("COUNT(*)").
 		From("v_entries").
 		PlaceholderFormat(squirrel.Dollar)
 
-	query = utils.QueryOptsToSquirrel(query, filter)
+	query = querybuilder.ToSquirrel(query, filter)
 
 	sql, args, err := query.ToSql()
 

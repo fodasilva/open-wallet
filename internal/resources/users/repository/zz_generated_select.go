@@ -5,14 +5,15 @@ package repository
 import (
 	"github.com/Masterminds/squirrel"
 	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
-func (r *UsersRepoImpl) Select(db utils.Executer, filter *utils.QueryOptsBuilder) ([]User, error) {
+func (r *UsersRepoImpl) Select(db utils.Executer, filter *querybuilder.Builder) ([]User, error) {
 	query := squirrel.Select("id", "name", "email", "avatar_url", "created_at", "username").
 		From("users").
 		PlaceholderFormat(squirrel.Dollar)
 
-	query = utils.QueryOptsToSquirrel(query, filter)
+	query = querybuilder.ToSquirrel(query, filter)
 
 	sql, args, err := query.ToSql()
 
