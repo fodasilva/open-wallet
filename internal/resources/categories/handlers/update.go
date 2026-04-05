@@ -15,6 +15,7 @@ type UpdateOptions struct {
 	UseCases usecases.CategoriesUseCases
 
 	ID         string
+	UserID     string
 	PassedKeys []string
 	Body       UpdateCategoryRequest
 	Payload    repository.UpdateCategoryDTO
@@ -23,6 +24,7 @@ type UpdateOptions struct {
 func (o *UpdateOptions) Complete(ctx *gin.Context) error {
 	o.Ctx = ctx
 	o.ID = ctx.Param("category_id")
+	o.UserID = ctx.GetString("user_id")
 
 	passedKeys, err := utils.GetJSONKeys(ctx)
 	if err != nil {
@@ -60,7 +62,7 @@ func (o *UpdateOptions) Validate() error {
 }
 
 func (o *UpdateOptions) Run() error {
-	category, err := o.UseCases.Update(o.ID, o.Payload)
+	category, err := o.UseCases.Update(o.ID, o.UserID, o.Payload)
 	if err != nil {
 		return err
 	}

@@ -6,8 +6,9 @@ import (
 	"github.com/felipe1496/open-wallet/internal/utils"
 )
 
-func (uc *CategoriesUseCasesImpl) DeleteByID(id string) error {
-	exists, err := uc.repo.Count(uc.db, utils.QueryOpts().And("id", "eq", id))
+func (uc *CategoriesUseCasesImpl) DeleteByID(id string, userID string) error {
+	filter := utils.QueryOpts().And("id", "eq", id).And("user_id", "eq", userID)
+	exists, err := uc.repo.Count(uc.db, filter)
 
 	if err != nil {
 		return utils.NewHTTPError(http.StatusInternalServerError, "failed to delete category")
@@ -17,7 +18,7 @@ func (uc *CategoriesUseCasesImpl) DeleteByID(id string) error {
 		return utils.NewHTTPError(http.StatusNotFound, "category not found")
 	}
 
-	err = uc.repo.Delete(uc.db, utils.QueryOpts().And("id", "eq", id))
+	err = uc.repo.Delete(uc.db, filter)
 
 	if err != nil {
 		return utils.NewHTTPError(http.StatusInternalServerError, "failed to delete category")

@@ -12,12 +12,14 @@ type DeleteOptions struct {
 	Ctx      *gin.Context
 	UseCases usecases.CategoriesUseCases
 
-	ID string
+	ID     string
+	UserID string
 }
 
 func (o *DeleteOptions) Complete(ctx *gin.Context) error {
 	o.Ctx = ctx
 	o.ID = ctx.Param("category_id")
+	o.UserID = ctx.GetString("user_id")
 
 	return nil
 }
@@ -27,7 +29,7 @@ func (o *DeleteOptions) Validate() error {
 }
 
 func (o *DeleteOptions) Run() error {
-	err := o.UseCases.DeleteByID(o.ID)
+	err := o.UseCases.DeleteByID(o.ID, o.UserID)
 	if err != nil {
 		return err
 	}

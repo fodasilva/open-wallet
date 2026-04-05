@@ -10,11 +10,11 @@ import (
 type CategoriesUseCases interface {
 	Create(payload repository.CreateCategoryDTO) (repository.Category, error)
 	List(filter *utils.QueryOptsBuilder) ([]repository.Category, error)
-	DeleteByID(id string) error
+	DeleteByID(id string, userID string) error
 	Count(filter *utils.QueryOptsBuilder) (int, error)
 	ListCategoryAmountPerPeriod(period string, filter *utils.QueryOptsBuilder) ([]repository.CategoryAmountPerPeriod, error)
 	CountCategoryAmountPerPeriod(period string, filter *utils.QueryOptsBuilder) (int, error)
-	Update(id string, payload repository.UpdateCategoryDTO) (repository.Category, error)
+	Update(id string, userID string, payload repository.UpdateCategoryDTO) (repository.Category, error)
 }
 
 type CategoriesUseCasesImpl struct {
