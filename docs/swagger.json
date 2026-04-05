@@ -108,7 +108,7 @@
                     "200": {
                         "description": "List of categories",
                         "schema": {
-                            "$ref": "#/definitions/internal_resources_categories.ListCategoriesResponse"
+                            "$ref": "#/definitions/internal_resources_categories_handlers.ListCategoriesResponse"
                         }
                     },
                     "401": {
@@ -149,7 +149,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_resources_categories.CreateCategoryRequest"
+                            "$ref": "#/definitions/internal_resources_categories_handlers.CreateCategoryRequest"
                         }
                     }
                 ],
@@ -157,7 +157,7 @@
                     "201": {
                         "description": "Category created",
                         "schema": {
-                            "$ref": "#/definitions/internal_resources_categories.CreateCategoryResponse"
+                            "$ref": "#/definitions/internal_resources_categories_handlers.CreateCategoryResponse"
                         }
                     },
                     "401": {
@@ -257,7 +257,7 @@
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_resources_categories.UpdateCategoryRequest"
+                            "$ref": "#/definitions/internal_resources_categories_handlers.UpdateCategoryRequest"
                         }
                     }
                 ],
@@ -265,7 +265,7 @@
                     "200": {
                         "description": "Category updated",
                         "schema": {
-                            "$ref": "#/definitions/internal_resources_categories.UpdateCategoryResponse"
+                            "$ref": "#/definitions/internal_resources_categories_handlers.UpdateCategoryResponse"
                         }
                     },
                     "401": {
@@ -347,7 +347,7 @@
                     "200": {
                         "description": "List of categories with amount per period",
                         "schema": {
-                            "$ref": "#/definitions/internal_resources_categories.ListCategoryAmountPerPeriodResponse"
+                            "$ref": "#/definitions/internal_resources_categories_handlers.ListCategoryAmountPerPeriodResponse"
                         }
                     },
                     "401": {
@@ -1154,7 +1154,7 @@
                 }
             }
         },
-        "internal_resources_categories.CreateCategoryRequest": {
+        "internal_resources_categories_handlers.CreateCategoryRequest": {
             "type": "object",
             "required": [
                 "color",
@@ -1169,15 +1169,15 @@
                 }
             }
         },
-        "internal_resources_categories.CreateCategoryResponse": {
+        "internal_resources_categories_handlers.CreateCategoryResponse": {
             "type": "object",
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/internal_resources_categories.CreateCategoryResponseData"
+                    "$ref": "#/definitions/internal_resources_categories_handlers.CreateCategoryResponseData"
                 }
             }
         },
-        "internal_resources_categories.CreateCategoryResponseData": {
+        "internal_resources_categories_handlers.CreateCategoryResponseData": {
             "type": "object",
             "properties": {
                 "category": {
@@ -1185,18 +1185,18 @@
                 }
             }
         },
-        "internal_resources_categories.ListCategoriesResponse": {
+        "internal_resources_categories_handlers.ListCategoriesResponse": {
             "type": "object",
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/internal_resources_categories.ListCategoriesResponseData"
+                    "$ref": "#/definitions/internal_resources_categories_handlers.ListCategoriesResponseData"
                 },
                 "query": {
                     "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.QueryMeta"
                 }
             }
         },
-        "internal_resources_categories.ListCategoriesResponseData": {
+        "internal_resources_categories_handlers.ListCategoriesResponseData": {
             "type": "object",
             "properties": {
                 "categories": {
@@ -1207,18 +1207,18 @@
                 }
             }
         },
-        "internal_resources_categories.ListCategoryAmountPerPeriodResponse": {
+        "internal_resources_categories_handlers.ListCategoryAmountPerPeriodResponse": {
             "type": "object",
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/internal_resources_categories.ListCategoryAmountPerPeriodResponseData"
+                    "$ref": "#/definitions/internal_resources_categories_handlers.ListCategoryAmountPerPeriodResponseData"
                 },
                 "query": {
                     "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.QueryMeta"
                 }
             }
         },
-        "internal_resources_categories.ListCategoryAmountPerPeriodResponseData": {
+        "internal_resources_categories_handlers.ListCategoryAmountPerPeriodResponseData": {
             "type": "object",
             "properties": {
                 "categories": {
@@ -1229,7 +1229,7 @@
                 }
             }
         },
-        "internal_resources_categories.UpdateCategoryRequest": {
+        "internal_resources_categories_handlers.UpdateCategoryRequest": {
             "type": "object",
             "properties": {
                 "color": {
@@ -1242,15 +1242,15 @@
                 }
             }
         },
-        "internal_resources_categories.UpdateCategoryResponse": {
+        "internal_resources_categories_handlers.UpdateCategoryResponse": {
             "type": "object",
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/internal_resources_categories.UpdateCategoryResponseData"
+                    "$ref": "#/definitions/internal_resources_categories_handlers.UpdateCategoryResponseData"
                 }
             }
         },
-        "internal_resources_categories.UpdateCategoryResponseData": {
+        "internal_resources_categories_handlers.UpdateCategoryResponseData": {
             "type": "object",
             "properties": {
                 "category": {
