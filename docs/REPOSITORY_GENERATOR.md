@@ -23,16 +23,17 @@ package repository
 
 import (
     "github.com/felipe1496/open-wallet/internal/utils"
+    "github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
 // Repository interface. Make sure to include methods
 // that you defined with @method tags in types.go and any other methods you need.
 type <Entities>Repo interface {
-    Select(db utils.Executer, filter *utils.QueryOptsBuilder) ([]<Entity>, error)
+    Select(db utils.Executer, filter *querybuilder.Builder) ([]<Entity>, error)
     Insert(db utils.Executer, data Create<Entity>DTO) error
-    Update(db utils.Executer, data Update<Entity>DTO, filter *utils.QueryOptsBuilder) error
-    Delete(db utils.Executer, filter *utils.QueryOptsBuilder) error
-    Count(db utils.Executer, filter *utils.QueryOptsBuilder) (int, error)
+    Update(db utils.Executer, data Update<Entity>DTO, filter *querybuilder.Builder) error
+    Delete(db utils.Executer, filter *querybuilder.Builder) error
+    Count(db utils.Executer, filter *querybuilder.Builder) (int, error)
 }
 
 // Implementation struct. Name must match @name tag in types.go
