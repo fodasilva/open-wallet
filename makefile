@@ -19,6 +19,12 @@ gen-repos:
 gen-docs:
 	swag init -g cmd/api/main.go --parseDependency --parseInternal
 
+lint:
+	golangci-lint run ./...
+
+lint-install:
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+
 check-docs:
 	@swag init -g cmd/api/main.go --parseDependency --parseInternal
 	@if [ -n "$$(git status -s docs/)" ]; then \
