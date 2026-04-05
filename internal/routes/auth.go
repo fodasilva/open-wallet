@@ -7,15 +7,15 @@ import (
 	"github.com/felipe1496/open-wallet/infra"
 	"github.com/felipe1496/open-wallet/internal/factory"
 	"github.com/felipe1496/open-wallet/internal/middlewares"
-	"github.com/felipe1496/open-wallet/internal/resources/auth"
+	"github.com/felipe1496/open-wallet/internal/resources/auth/handlers"
 )
 
 func SetupAuthRoutes(r *gin.Engine, f *factory.Factory, redisClient *redis.Client, cfg *infra.Config) {
-	authHandler := auth.NewHandler(f.GoogleService(), f.JWTService(), f.UsersUseCases(), f.AuthUseCases())
+	authHandler := handlers.NewHandler(f.AuthUseCases(), f.JWTService())
 	authGroup := r.Group("/api/v1/auth")
 	{
 		authGroup.POST("/login/google",
 			middlewares.RouteRateLimitMiddleware(redisClient, 5, 300000, "POST:/api/v1/auth/login/google"),
-			authHandler.LoginGoogle)
+			authHandler.CreateLoginWithGoogle)
 	}
 }

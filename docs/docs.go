@@ -35,7 +35,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_resources_auth.LoginGoogleRequest"
+                            "$ref": "#/definitions/internal_resources_auth_handlers.LoginGoogleRequest"
                         }
                     }
                 ],
@@ -43,7 +43,7 @@ const docTemplate = `{
                     "200": {
                         "description": "User logged in",
                         "schema": {
-                            "$ref": "#/definitions/internal_resources_auth.LoginGoogleResponse"
+                            "$ref": "#/definitions/internal_resources_auth_handlers.LoginGoogleResponse"
                         }
                     },
                     "400": {
@@ -1137,7 +1137,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_resources_auth.LoginGoogleRequest": {
+        "internal_resources_auth_handlers.LoginGoogleRequest": {
             "type": "object",
             "properties": {
                 "code": {
@@ -1145,15 +1145,15 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_resources_auth.LoginGoogleResponse": {
+        "internal_resources_auth_handlers.LoginGoogleResponse": {
             "type": "object",
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/internal_resources_auth.LoginGoogleResponseData"
+                    "$ref": "#/definitions/internal_resources_auth_handlers.LoginGoogleResponseData"
                 }
             }
         },
-        "internal_resources_auth.LoginGoogleResponseData": {
+        "internal_resources_auth_handlers.LoginGoogleResponseData": {
             "type": "object",
             "properties": {
                 "access_token": {

@@ -1,13 +1,8 @@
-package auth
+package handlers
 
 import (
 	"github.com/felipe1496/open-wallet/internal/resources/users/repository"
 )
-
-// ==============================================================================
-// 1. HTTP MODELS
-//    Models that represents request or response objects
-// ==============================================================================
 
 type LoginGoogleRequest struct {
 	Code string `json:"code"`
