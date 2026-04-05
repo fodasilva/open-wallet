@@ -5,9 +5,10 @@ package repository
 import (
 	"github.com/Masterminds/squirrel"
 	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
-func (r *CategoriesRepoImpl) Update(db utils.Executer, data UpdateCategoryDTO, filter *utils.QueryOptsBuilder) error {
+func (r *CategoriesRepoImpl) Update(db utils.Executer, data UpdateCategoryDTO, filter *querybuilder.Builder) error {
 	query := squirrel.Update("categories").
 		PlaceholderFormat(squirrel.Dollar)
 
@@ -18,7 +19,7 @@ func (r *CategoriesRepoImpl) Update(db utils.Executer, data UpdateCategoryDTO, f
 		query = query.Set("color", data.Color.Value)
 	}
 
-	query = utils.UpdateOptsToSquirrel(query, filter)
+	query = querybuilder.ToUpdateSquirrel(query, filter)
 
 	sql, args, err := query.ToSql()
 

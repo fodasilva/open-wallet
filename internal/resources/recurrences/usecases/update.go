@@ -7,10 +7,11 @@ import (
 	"github.com/felipe1496/open-wallet/internal/resources/recurrences/repository"
 	"github.com/felipe1496/open-wallet/internal/resources/transactions/usecases"
 	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
 func (uc *RecurrencesUseCasesImpl) Update(id string, userID string, payload repository.UpdateRecurrenceDTO) (repository.Recurrence, error) {
-	exists, err := uc.repo.Select(uc.db, utils.QueryOpts().
+	exists, err := uc.repo.Select(uc.db, querybuilder.New().
 		And("id", "eq", id).
 		And("user_id", "eq", userID))
 
@@ -26,7 +27,7 @@ func (uc *RecurrencesUseCasesImpl) Update(id string, userID string, payload repo
 		return repository.Recurrence{}, err
 	}
 
-	err = uc.repo.Update(uc.db, payload, utils.QueryOpts().And("id", "eq", id))
+	err = uc.repo.Update(uc.db, payload, querybuilder.New().And("id", "eq", id))
 	if err != nil {
 		return repository.Recurrence{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to update recurrence")
 	}
@@ -50,7 +51,7 @@ func (uc *RecurrencesUseCasesImpl) validateCategory(userID string, categoryID ut
 		return nil
 	}
 
-	exists, err := uc.categoriesUseCase.List(utils.QueryOpts().
+	exists, err := uc.categoriesUseCase.List(querybuilder.New().
 		And("id", "eq", *categoryID.Value).
 		And("user_id", "eq", userID))
 	if err != nil {
@@ -65,7 +66,7 @@ func (uc *RecurrencesUseCasesImpl) validateCategory(userID string, categoryID ut
 }
 
 func (uc *RecurrencesUseCasesImpl) fetchRecurrence(id string) (repository.Recurrence, error) {
-	recs, err := uc.repo.Select(uc.db, utils.QueryOpts().And("id", "eq", id))
+	recs, err := uc.repo.Select(uc.db, querybuilder.New().And("id", "eq", id))
 	if err != nil || len(recs) == 0 {
 		return repository.Recurrence{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to fetch recurrence")
 	}
@@ -73,7 +74,7 @@ func (uc *RecurrencesUseCasesImpl) fetchRecurrence(id string) (repository.Recurr
 }
 
 func (uc *RecurrencesUseCasesImpl) syncLinkedTransactions(id string, userID string, amount float64) error {
-	txs, err := uc.transactionsUseCase.ListEntries(context.TODO(), utils.QueryOpts().
+	txs, err := uc.transactionsUseCase.ListEntries(context.TODO(), querybuilder.New().
 		And("user_id", "eq", userID).
 		And("recurrence_id", "eq", id))
 	if err != nil {

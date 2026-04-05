@@ -10,7 +10,7 @@ import (
 	"github.com/felipe1496/open-wallet/internal/resources/users/mocks"
 	"github.com/felipe1496/open-wallet/internal/resources/users/repository"
 	usersUseCases "github.com/felipe1496/open-wallet/internal/resources/users/usecases"
-	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
 func TestUsersUseCase_List(t *testing.T) {
@@ -28,7 +28,7 @@ func TestUsersUseCase_List(t *testing.T) {
 			On("Select", mock.Anything, mock.Anything).
 			Return(expectedUsers, nil)
 
-		result, err := uc.List(utils.QueryOpts().And("username", "eq", "alice"))
+		result, err := uc.List(querybuilder.New().And("username", "eq", "alice"))
 
 		assert.NoError(t, err)
 		assert.Equal(t, expectedUsers, result)
@@ -43,7 +43,7 @@ func TestUsersUseCase_List(t *testing.T) {
 			On("Select", mock.Anything, mock.Anything).
 			Return(nil, errors.New("db exploded"))
 
-		result, err := uc.List(utils.QueryOpts().And("email", "eq", "john@gmail.com"))
+		result, err := uc.List(querybuilder.New().And("email", "eq", "john@gmail.com"))
 
 		assert.Nil(t, result)
 		assert.Contains(t, err.Error(), "failed to fetch users")
@@ -59,7 +59,7 @@ func TestUsersUseCase_Create(t *testing.T) {
 		input := repository.CreateUserDTO{Username: "johndoethegreat", Name: "John", Email: "john@gmail.com"}
 
 		mockRepo.
-			On("Select", mock.Anything, mock.MatchedBy(func(filter *utils.QueryOptsBuilder) bool {
+			On("Select", mock.Anything, mock.MatchedBy(func(filter *querybuilder.Builder) bool {
 				// Very simple check to identify which Select call this is
 				return filter != nil
 			})).

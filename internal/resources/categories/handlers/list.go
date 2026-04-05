@@ -7,28 +7,29 @@ import (
 
 	"github.com/felipe1496/open-wallet/internal/resources/categories/usecases"
 	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
 type ListOptions struct {
-	Ctx       *gin.Context
-	UseCases  usecases.CategoriesUseCases
-	UserID    string
-	QueryOpts *utils.QueryOptsBuilder
-	Page      int
-	PerPage   int
+	Ctx      *gin.Context
+	UseCases usecases.CategoriesUseCases
+	UserID   string
+	Builder  *querybuilder.Builder
+	Page     int
+	PerPage  int
 }
 
 func (o *ListOptions) Complete(ctx *gin.Context) error {
 	o.Ctx = ctx
 	o.UserID = ctx.GetString("user_id")
 	nameFilter := ctx.Query("name")
-	o.QueryOpts = ctx.MustGet("query_opts").(*utils.QueryOptsBuilder).
+	o.Builder = ctx.MustGet("query_builder").(*querybuilder.Builder).
 		And("user_id", "eq", o.UserID)
 	o.Page = o.Ctx.GetInt("page")
 	o.PerPage = o.Ctx.GetInt("per_page")
 
 	if nameFilter != "" {
-		o.QueryOpts.And("name", "like", nameFilter)
+		o.Builder.And("name", "like", nameFilter)
 	}
 
 	return nil
@@ -39,12 +40,12 @@ func (o *ListOptions) Validate() error {
 }
 
 func (o *ListOptions) Run() error {
-	categoriesList, err := o.UseCases.List(o.QueryOpts)
+	categoriesList, err := o.UseCases.List(o.Builder)
 	if err != nil {
 		return err
 	}
 
-	count, err := o.UseCases.Count(utils.ForCount(o.QueryOpts))
+	count, err := o.UseCases.Count(querybuilder.ForCount(o.Builder))
 	if err != nil {
 		return err
 	}

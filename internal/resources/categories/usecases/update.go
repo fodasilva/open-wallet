@@ -5,10 +5,11 @@ import (
 
 	"github.com/felipe1496/open-wallet/internal/resources/categories/repository"
 	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
 func (uc *CategoriesUseCasesImpl) Update(id string, userID string, payload repository.UpdateCategoryDTO) (repository.Category, error) {
-	filter := utils.QueryOpts().And("id", "eq", id).And("user_id", "eq", userID)
+	filter := querybuilder.New().And("id", "eq", id).And("user_id", "eq", userID)
 	exists, err := uc.repo.Count(uc.db, filter)
 
 	if err != nil {

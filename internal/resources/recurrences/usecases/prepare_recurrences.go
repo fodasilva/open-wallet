@@ -9,16 +9,17 @@ import (
 	transactionRepo "github.com/felipe1496/open-wallet/internal/resources/transactions/repository"
 	"github.com/felipe1496/open-wallet/internal/resources/transactions/usecases"
 	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
 func (uc *RecurrencesUseCasesImpl) PrepareRecurrences(ctx context.Context, userID string, targetPeriod string) error {
-	recurrences, err := uc.repo.Select(uc.db, utils.QueryOpts().And("user_id", "eq", userID))
+	recurrences, err := uc.repo.Select(uc.db, querybuilder.New().And("user_id", "eq", userID))
 	if err != nil {
 		return utils.NewHTTPError(http.StatusInternalServerError, "failed to fetch recurrences")
 	}
 
 	for _, rec := range recurrences {
-		existingTxs, err := uc.transactionsUseCase.ListEntries(ctx, utils.QueryOpts().
+		existingTxs, err := uc.transactionsUseCase.ListEntries(ctx, querybuilder.New().
 			And("user_id", "eq", userID).
 			And("recurrence_id", "eq", rec.ID))
 		if err != nil {

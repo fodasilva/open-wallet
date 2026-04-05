@@ -5,9 +5,10 @@ package repository
 import (
 	"github.com/Masterminds/squirrel"
 	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
-func (r *RecurrencesRepoImpl) Update(db utils.Executer, data UpdateRecurrenceDTO, filter *utils.QueryOptsBuilder) error {
+func (r *RecurrencesRepoImpl) Update(db utils.Executer, data UpdateRecurrenceDTO, filter *querybuilder.Builder) error {
 	query := squirrel.Update("recurrences").
 		PlaceholderFormat(squirrel.Dollar)
 
@@ -33,7 +34,7 @@ func (r *RecurrencesRepoImpl) Update(db utils.Executer, data UpdateRecurrenceDTO
 		query = query.Set("end_period", data.EndPeriod.Value)
 	}
 
-	query = utils.UpdateOptsToSquirrel(query, filter)
+	query = querybuilder.ToUpdateSquirrel(query, filter)
 
 	sql, args, err := query.ToSql()
 

@@ -7,23 +7,24 @@ import (
 
 	"github.com/felipe1496/open-wallet/internal/resources/categories/usecases"
 	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
 type ListAmountPerPeriodOptions struct {
-	Ctx       *gin.Context
-	UseCases  usecases.CategoriesUseCases
-	UserID    string
-	Period    string
-	QueryOpts *utils.QueryOptsBuilder
-	Page      int
-	PerPage   int
+	Ctx      *gin.Context
+	UseCases usecases.CategoriesUseCases
+	UserID   string
+	Period   string
+	Builder  *querybuilder.Builder
+	Page     int
+	PerPage  int
 }
 
 func (o *ListAmountPerPeriodOptions) Complete(ctx *gin.Context) error {
 	o.Ctx = ctx
 	o.UserID = ctx.GetString("user_id")
 	o.Period = ctx.Param("period")
-	o.QueryOpts = ctx.MustGet("query_opts").(*utils.QueryOptsBuilder).
+	o.Builder = ctx.MustGet("query_builder").(*querybuilder.Builder).
 		And("user_id", "eq", o.UserID)
 	o.Page = o.Ctx.GetInt("page")
 	o.PerPage = o.Ctx.GetInt("per_page")
@@ -36,12 +37,12 @@ func (o *ListAmountPerPeriodOptions) Validate() error {
 }
 
 func (o *ListAmountPerPeriodOptions) Run() error {
-	categories, err := o.UseCases.ListCategoryAmountPerPeriod(o.Period, o.QueryOpts)
+	categories, err := o.UseCases.ListCategoryAmountPerPeriod(o.Period, o.Builder)
 	if err != nil {
 		return err
 	}
 
-	count, err := o.UseCases.CountCategoryAmountPerPeriod(o.Period, utils.ForCount(o.QueryOpts))
+	count, err := o.UseCases.CountCategoryAmountPerPeriod(o.Period, querybuilder.ForCount(o.Builder))
 	if err != nil {
 		return err
 	}

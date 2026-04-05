@@ -10,6 +10,7 @@ import (
 
 	"github.com/felipe1496/open-wallet/internal/resources/transactions/usecases"
 	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
 type API struct {
@@ -44,9 +45,9 @@ func (api *API) ListEntries(ctx *gin.Context) {
 	span.SetAttributes(attribute.String("user.id", userID))
 	page := ctx.GetInt("page")
 	perPage := ctx.GetInt("per_page")
-	queryOpts := ctx.MustGet("query_opts").(*utils.QueryOptsBuilder).And("user_id", "eq", userID)
+	builder := ctx.MustGet("query_builder").(*querybuilder.Builder).And("user_id", "eq", userID)
 
-	entries, err := api.transactionsUseCases.ListEntries(tCtx, queryOpts)
+	entries, err := api.transactionsUseCases.ListEntries(tCtx, builder)
 
 	if err != nil {
 		span.RecordError(err)
@@ -55,7 +56,7 @@ func (api *API) ListEntries(ctx *gin.Context) {
 		return
 	}
 
-	count, err := api.transactionsUseCases.CountEntries(tCtx, utils.QueryOpts().
+	count, err := api.transactionsUseCases.CountEntries(tCtx, querybuilder.New().
 		And("user_id", "eq", userID))
 
 	if err != nil {

@@ -190,6 +190,7 @@ package $PACKAGE
 import (
 	"github.com/Masterminds/squirrel"
 	"github.com/felipe1496/open-wallet/internal/utils"
+$( [[ "$METHOD_LOWER" != "insert" ]] && echo "	\"github.com/felipe1496/open-wallet/internal/utils/querybuilder\"" )
 )
 
 EOF

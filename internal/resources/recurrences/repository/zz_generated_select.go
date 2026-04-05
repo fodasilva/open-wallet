@@ -5,14 +5,15 @@ package repository
 import (
 	"github.com/Masterminds/squirrel"
 	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
-func (r *RecurrencesRepoImpl) Select(db utils.Executer, filter *utils.QueryOptsBuilder) ([]Recurrence, error) {
+func (r *RecurrencesRepoImpl) Select(db utils.Executer, filter *querybuilder.Builder) ([]Recurrence, error) {
 	query := squirrel.Select("id", "user_id", "name", "note", "amount", "day_of_month", "category_id", "category_name", "category_color", "start_period", "end_period", "created_at").
 		From("v_recurrences").
 		PlaceholderFormat(squirrel.Dollar)
 
-	query = utils.QueryOptsToSquirrel(query, filter)
+	query = querybuilder.ToSquirrel(query, filter)
 
 	sql, args, err := query.ToSql()
 

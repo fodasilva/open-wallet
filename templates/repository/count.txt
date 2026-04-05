@@ -1,9 +1,9 @@
-func (r *{{RepoName}}) {{MethodName}}(db utils.Executer, filter *utils.QueryOptsBuilder) ({{ReturnType}}, error) {
+func (r *{{RepoName}}) {{MethodName}}(db utils.Executer, filter *querybuilder.Builder) ({{ReturnType}}, error) {
 	query := squirrel.Select("COUNT(*)").
 		From("{{TableName}}").
 		PlaceholderFormat(squirrel.Dollar)
 
-	query = utils.QueryOptsToSquirrel(query, filter)
+	query = querybuilder.ToSquirrel(query, filter)
 
 	sql, args, err := query.ToSql()
 

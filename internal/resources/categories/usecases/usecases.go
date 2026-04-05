@@ -4,16 +4,16 @@ import (
 	"database/sql"
 
 	"github.com/felipe1496/open-wallet/internal/resources/categories/repository"
-	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
 type CategoriesUseCases interface {
 	Create(payload repository.CreateCategoryDTO) (repository.Category, error)
-	List(filter *utils.QueryOptsBuilder) ([]repository.Category, error)
+	List(filter *querybuilder.Builder) ([]repository.Category, error)
 	DeleteByID(id string, userID string) error
-	Count(filter *utils.QueryOptsBuilder) (int, error)
-	ListCategoryAmountPerPeriod(period string, filter *utils.QueryOptsBuilder) ([]repository.CategoryAmountPerPeriod, error)
-	CountCategoryAmountPerPeriod(period string, filter *utils.QueryOptsBuilder) (int, error)
+	Count(filter *querybuilder.Builder) (int, error)
+	ListCategoryAmountPerPeriod(period string, filter *querybuilder.Builder) ([]repository.CategoryAmountPerPeriod, error)
+	CountCategoryAmountPerPeriod(period string, filter *querybuilder.Builder) (int, error)
 	Update(id string, userID string, payload repository.UpdateCategoryDTO) (repository.Category, error)
 }
 

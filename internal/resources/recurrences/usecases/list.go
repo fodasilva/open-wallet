@@ -8,9 +8,10 @@ import (
 
 	"github.com/felipe1496/open-wallet/internal/resources/recurrences/repository"
 	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
-func (uc *RecurrencesUseCasesImpl) List(ctx context.Context, filter *utils.QueryOptsBuilder) ([]repository.Recurrence, error) {
+func (uc *RecurrencesUseCasesImpl) List(ctx context.Context, filter *querybuilder.Builder) ([]repository.Recurrence, error) {
 	tracer := otel.Tracer("usecase")
 	_, span := tracer.Start(ctx, "RecurrencesUseCase.List")
 	defer span.End()
