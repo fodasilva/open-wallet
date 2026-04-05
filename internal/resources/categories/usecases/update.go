@@ -7,8 +7,9 @@ import (
 	"github.com/felipe1496/open-wallet/internal/utils"
 )
 
-func (uc *CategoriesUseCasesImpl) Update(id string, payload repository.UpdateCategoryDTO) (repository.Category, error) {
-	exists, err := uc.repo.Count(uc.db, utils.QueryOpts().And("id", "eq", id))
+func (uc *CategoriesUseCasesImpl) Update(id string, userID string, payload repository.UpdateCategoryDTO) (repository.Category, error) {
+	filter := utils.QueryOpts().And("id", "eq", id).And("user_id", "eq", userID)
+	exists, err := uc.repo.Count(uc.db, filter)
 
 	if err != nil {
 		return repository.Category{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to check if category exists")
@@ -18,13 +19,13 @@ func (uc *CategoriesUseCasesImpl) Update(id string, payload repository.UpdateCat
 		return repository.Category{}, utils.NewHTTPError(http.StatusNotFound, "category not found")
 	}
 
-	err = uc.repo.Update(uc.db, payload, utils.QueryOpts().And("id", "eq", id))
+	err = uc.repo.Update(uc.db, payload, filter)
 
 	if err != nil {
 		return repository.Category{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to update category")
 	}
 
-	category, err := uc.repo.Select(uc.db, utils.QueryOpts().And("id", "eq", id))
+	category, err := uc.repo.Select(uc.db, filter)
 
 	if err != nil {
 		return repository.Category{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to get updated category")
