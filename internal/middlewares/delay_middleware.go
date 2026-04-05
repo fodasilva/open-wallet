@@ -3,8 +3,9 @@ package middlewares
 import (
 	"time"
 
-	"github.com/felipe1496/open-wallet/infra"
 	"github.com/gin-gonic/gin"
+
+	"github.com/felipe1496/open-wallet/infra"
 )
 
 func DelayMiddleware(cfg *infra.Config) gin.HandlerFunc {

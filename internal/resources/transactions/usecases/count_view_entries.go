@@ -4,8 +4,9 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/felipe1496/open-wallet/internal/utils"
 	"go.opentelemetry.io/otel"
+
+	"github.com/felipe1496/open-wallet/internal/utils"
 )
 
 func (uc *TransactionsUseCasesImpl) CountEntries(ctx context.Context, filter *utils.QueryOptsBuilder) (int, error) {

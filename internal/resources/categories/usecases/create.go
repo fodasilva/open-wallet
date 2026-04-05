@@ -3,9 +3,10 @@ package usecases
 import (
 	"net/http"
 
+	"github.com/oklog/ulid/v2"
+
 	"github.com/felipe1496/open-wallet/internal/resources/categories/repository"
 	"github.com/felipe1496/open-wallet/internal/utils"
-	"github.com/oklog/ulid/v2"
 )
 
 func (uc *CategoriesUseCasesImpl) Create(payload repository.CreateCategoryDTO) (repository.Category, error) {

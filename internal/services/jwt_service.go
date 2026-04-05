@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/golang-jwt/jwt/v5"
+
 	"github.com/felipe1496/open-wallet/infra"
 	"github.com/felipe1496/open-wallet/internal/utils"
-
-	"github.com/golang-jwt/jwt/v5"
 )
 
 type JWTService interface {

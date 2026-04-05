@@ -11,11 +11,11 @@ import (
 //
 // ==============================================================================
 type CreateTransactionRequest struct {
-	Name       string                    `json:"name" binding:"required,min=1,max=100"`
-	CategoryID *string                   `json:"category_id" binding:"omitempty"`
-	Note       *string                   `json:"note" binding:"omitempty,min=0,max=400"`
+	Name       string                          `json:"name" binding:"required,min=1,max=100"`
+	CategoryID *string                         `json:"category_id" binding:"omitempty"`
+	Note       *string                         `json:"note" binding:"omitempty,min=0,max=400"`
 	Type       transactionRepo.TransactionType `json:"type" binding:"required,oneof=installment simple_expense income"`
-	Entries    []CreateEntryRequest      `json:"entries" binding:"required,min=1,max=100,dive"`
+	Entries    []CreateEntryRequest            `json:"entries" binding:"required,min=1,max=100,dive"`
 }
 
 type CreateEntryRequest struct {

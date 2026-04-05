@@ -30,6 +30,7 @@ func NewTransactionsUseCases(
 	categoriesUseCase categories.CategoriesUseCases,
 	db *sql.DB,
 ) TransactionsUseCases {
+
 	return &TransactionsUseCasesImpl{
 		transactionsRepo:  transactionsRepo,
 		entriesRepo:       entriesRepo,

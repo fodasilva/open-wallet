@@ -10,15 +10,15 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/gin-gonic/gin"
+	"github.com/oklog/ulid/v2"
+	"github.com/redis/go-redis/v9"
+	"github.com/stretchr/testify/assert"
+
 	"github.com/felipe1496/open-wallet/infra"
 	"github.com/felipe1496/open-wallet/internal/factory"
 	"github.com/felipe1496/open-wallet/internal/resources/categories/handlers"
 	"github.com/felipe1496/open-wallet/internal/routes"
-	"github.com/oklog/ulid/v2"
-
-	"github.com/gin-gonic/gin"
-	"github.com/redis/go-redis/v9"
-	"github.com/stretchr/testify/assert"
 )
 
 func setupCategoryTestServer(pg *sql.DB, redisClient *redis.Client, cfg *infra.Config) (*gin.Engine, *factory.Factory) {
@@ -224,8 +224,8 @@ func TestE2eCategories(t *testing.T) {
 
 		cases := []testCase{
 			{
-				name: "should update successfully",
-				id:   categoryID,
+				name:  "should update successfully",
+				id:    categoryID,
 				token: token,
 				payload: map[string]interface{}{
 					"name": "New Name",
@@ -233,8 +233,8 @@ func TestE2eCategories(t *testing.T) {
 				expectedStatus: http.StatusOK,
 			},
 			{
-				name: "should fail when updating non-existent category",
-				id:   ulid.Make().String(),
+				name:  "should fail when updating non-existent category",
+				id:    ulid.Make().String(),
 				token: token,
 				payload: map[string]interface{}{
 					"name": "Whatever",
@@ -242,8 +242,8 @@ func TestE2eCategories(t *testing.T) {
 				expectedStatus: http.StatusNotFound,
 			},
 			{
-				name: "should fail when updating category of another user",
-				id:   categoryID,
+				name:  "should fail when updating category of another user",
+				id:    categoryID,
 				token: tokenB,
 				payload: map[string]interface{}{
 					"name": "Hacked",

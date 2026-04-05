@@ -4,10 +4,11 @@ import (
 	"net/http"
 	"slices"
 
+	"github.com/gin-gonic/gin"
+
 	"github.com/felipe1496/open-wallet/internal/resources/categories/repository"
 	"github.com/felipe1496/open-wallet/internal/resources/categories/usecases"
 	"github.com/felipe1496/open-wallet/internal/utils"
-	"github.com/gin-gonic/gin"
 )
 
 type UpdateOptions struct {

@@ -4,9 +4,10 @@ import (
 	"context"
 	"net/http"
 
+	"go.opentelemetry.io/otel"
+
 	"github.com/felipe1496/open-wallet/internal/resources/recurrences/repository"
 	"github.com/felipe1496/open-wallet/internal/utils"
-	"go.opentelemetry.io/otel"
 )
 
 func (uc *RecurrencesUseCasesImpl) List(ctx context.Context, filter *utils.QueryOptsBuilder) ([]repository.Recurrence, error) {

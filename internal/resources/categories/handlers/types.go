@@ -48,4 +48,3 @@ type ListCategoryAmountPerPeriodResponse struct {
 type ListCategoryAmountPerPeriodResponseData struct {
 	Categories []repository.CategoryAmountPerPeriod `json:"categories"`
 }
-

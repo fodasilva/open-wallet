@@ -1,10 +1,10 @@
 package mocks
 
 import (
+	"github.com/stretchr/testify/mock"
+
 	"github.com/felipe1496/open-wallet/internal/resources/users/repository"
 	"github.com/felipe1496/open-wallet/internal/utils"
-
-	"github.com/stretchr/testify/mock"
 )
 
 type MockUsersRepo struct {

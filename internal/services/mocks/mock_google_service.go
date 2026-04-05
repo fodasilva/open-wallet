@@ -1,9 +1,9 @@
 package mocks
 
 import (
-	"github.com/felipe1496/open-wallet/internal/services"
-
 	"github.com/stretchr/testify/mock"
+
+	"github.com/felipe1496/open-wallet/internal/services"
 )
 
 type MockGoogleService struct {

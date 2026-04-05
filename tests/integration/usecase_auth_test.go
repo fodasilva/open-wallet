@@ -4,15 +4,15 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/felipe1496/open-wallet/internal/resources/auth/usecases"
-	usersUseCases "github.com/felipe1496/open-wallet/internal/resources/users/usecases"
-	mockUsers "github.com/felipe1496/open-wallet/internal/resources/users/mocks"
-	"github.com/felipe1496/open-wallet/internal/resources/users/repository"
-	"github.com/felipe1496/open-wallet/internal/services"
-	mockServices "github.com/felipe1496/open-wallet/internal/services/mocks"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+
+	"github.com/felipe1496/open-wallet/internal/resources/auth/usecases"
+	mockUsers "github.com/felipe1496/open-wallet/internal/resources/users/mocks"
+	"github.com/felipe1496/open-wallet/internal/resources/users/repository"
+	usersUseCases "github.com/felipe1496/open-wallet/internal/resources/users/usecases"
+	"github.com/felipe1496/open-wallet/internal/services"
+	mockServices "github.com/felipe1496/open-wallet/internal/services/mocks"
 )
 
 func TestAuthUseCase_LoginWithGoogle(t *testing.T) {

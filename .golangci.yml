@@ -6,9 +6,20 @@ linters:
     - gosimple
     - staticcheck
     - revive
+    - gofmt
+    - gci
+    - whitespace
 
 linters-settings:
   unused: {}
+  gci:
+    sections:
+      - standard
+      - default
+      - prefix(github.com/felipe1496/open-wallet)
+  whitespace:
+    multi-if: true
+    multi-func: true
   revive:
     rules:
       - name: exported

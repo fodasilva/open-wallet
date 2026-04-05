@@ -11,9 +11,6 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/felipe1496/open-wallet/infra"
-	"github.com/felipe1496/open-wallet/internal/services"
-
 	"github.com/docker/go-connections/nat"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-migrate/migrate/v4"
@@ -23,6 +20,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
+
+	"github.com/felipe1496/open-wallet/infra"
+	"github.com/felipe1496/open-wallet/internal/services"
 )
 
 type TestResources struct {

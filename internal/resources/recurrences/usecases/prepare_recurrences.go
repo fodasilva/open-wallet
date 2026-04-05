@@ -3,11 +3,11 @@ package usecases
 import (
 	"context"
 	"fmt"
-	"github.com/felipe1496/open-wallet/internal/resources/transactions/usecases"
 	"net/http"
 	"time"
 
 	transactionRepo "github.com/felipe1496/open-wallet/internal/resources/transactions/repository"
+	"github.com/felipe1496/open-wallet/internal/resources/transactions/usecases"
 	"github.com/felipe1496/open-wallet/internal/utils"
 )
 

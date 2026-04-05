@@ -4,13 +4,13 @@ import (
 	"errors"
 	"testing"
 
-	usersUseCases "github.com/felipe1496/open-wallet/internal/resources/users/usecases"
-	"github.com/felipe1496/open-wallet/internal/resources/users/mocks"
-	"github.com/felipe1496/open-wallet/internal/resources/users/repository"
-	"github.com/felipe1496/open-wallet/internal/utils"
-
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
+
+	"github.com/felipe1496/open-wallet/internal/resources/users/mocks"
+	"github.com/felipe1496/open-wallet/internal/resources/users/repository"
+	usersUseCases "github.com/felipe1496/open-wallet/internal/resources/users/usecases"
+	"github.com/felipe1496/open-wallet/internal/utils"
 )
 
 func TestUsersUseCase_List(t *testing.T) {
@@ -145,5 +145,4 @@ func TestUsersUseCase_Create(t *testing.T) {
 		assert.Equal(t, expectedUser, result)
 		mockRepo.AssertExpectations(t)
 	})
-
 }
