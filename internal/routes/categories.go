@@ -4,14 +4,14 @@ import (
 	"github.com/felipe1496/open-wallet/infra"
 	"github.com/felipe1496/open-wallet/internal/factory"
 	"github.com/felipe1496/open-wallet/internal/middlewares"
-	"github.com/felipe1496/open-wallet/internal/resources/categories"
+	"github.com/felipe1496/open-wallet/internal/resources/categories/handlers"
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
 )
 
 func SetupCategoriesRoutes(r *gin.Engine, f *factory.Factory, redisClient *redis.Client, cfg *infra.Config) {
 	jwtService := f.JWTService()
-	categoriesHandler := categories.NewHandler(f.CategoriesUseCases())
+	categoriesHandler := handlers.NewHandler(f.CategoriesUseCases())
 	categoriesGroup := r.Group("/api/v1/categories")
 	{
 		categoriesGroup.POST("",
