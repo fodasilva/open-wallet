@@ -164,17 +164,17 @@ definitions:
       total_pages:
         type: integer
     type: object
-  internal_resources_auth.LoginGoogleRequest:
+  internal_resources_auth_handlers.LoginGoogleRequest:
     properties:
       code:
         type: string
     type: object
-  internal_resources_auth.LoginGoogleResponse:
+  internal_resources_auth_handlers.LoginGoogleResponse:
     properties:
       data:
-        $ref: '#/definitions/internal_resources_auth.LoginGoogleResponseData'
+        $ref: '#/definitions/internal_resources_auth_handlers.LoginGoogleResponseData'
     type: object
-  internal_resources_auth.LoginGoogleResponseData:
+  internal_resources_auth_handlers.LoginGoogleResponseData:
     properties:
       access_token:
         type: string
@@ -455,14 +455,14 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/internal_resources_auth.LoginGoogleRequest'
+          $ref: '#/definitions/internal_resources_auth_handlers.LoginGoogleRequest'
       produces:
       - application/json
       responses:
         "200":
           description: User logged in
           schema:
-            $ref: '#/definitions/internal_resources_auth.LoginGoogleResponse'
+            $ref: '#/definitions/internal_resources_auth_handlers.LoginGoogleResponse'
         "400":
           description: Bad request
           schema:

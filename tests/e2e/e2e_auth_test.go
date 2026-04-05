@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/felipe1496/open-wallet/internal/resources/auth"
+	"github.com/felipe1496/open-wallet/internal/resources/auth/handlers"
 	authUseCases "github.com/felipe1496/open-wallet/internal/resources/auth/usecases"
 	"github.com/felipe1496/open-wallet/internal/resources/users/repository"
 	usersUseCases "github.com/felipe1496/open-wallet/internal/resources/users/usecases"
@@ -29,10 +29,10 @@ func setupTestServer(db *sql.DB, googleService services.GoogleService, jwtServic
 	usersRepo := repository.NewUsersRepo()
 	usersUseCase := usersUseCases.NewUsersUseCases(usersRepo, db)
 	authUseCase := authUseCases.NewAuthUseCases(googleService, usersUseCase)
-	handler := auth.NewHandler(googleService, jwtService, usersUseCase, authUseCase)
+	handler := handlers.NewHandler(authUseCase, jwtService)
 	authGroup := router.Group("/api/v1/auth")
 	{
-		authGroup.POST("/login/google", handler.LoginGoogle)
+		authGroup.POST("/login/google", handler.CreateLoginWithGoogle)
 	}
 
 	return router
@@ -74,7 +74,7 @@ func TestE2eAuth(t *testing.T) {
 
 		router := setupTestServer(res.DB, mockGoogleService, mockJWTService)
 
-		body := auth.LoginGoogleRequest{Code: "valid-code"}
+		body := handlers.LoginGoogleRequest{Code: "valid-code"}
 		bodyJSON, _ := json.Marshal(body)
 		req := httptest.NewRequest(http.MethodPost, "/api/v1/auth/login/google", bytes.NewBuffer(bodyJSON))
 		req.Header.Set("Content-Type", "application/json")
@@ -149,7 +149,7 @@ func TestE2eAuth(t *testing.T) {
 
 		router := setupTestServer(res.DB, mockGoogleService, mockJWTService)
 
-		body := auth.LoginGoogleRequest{Code: "valid-code"}
+		body := handlers.LoginGoogleRequest{Code: "valid-code"}
 		bodyJSON, _ := json.Marshal(body)
 		req := httptest.NewRequest(http.MethodPost, "/api/v1/auth/login/google", bytes.NewBuffer(bodyJSON))
 		req.Header.Set("Content-Type", "application/json")
@@ -204,7 +204,7 @@ func TestE2eAuth(t *testing.T) {
 
 		router := setupTestServer(res.DB, mockGoogleService, mockJWTService)
 
-		body := auth.LoginGoogleRequest{Code: "invalid-code"}
+		body := handlers.LoginGoogleRequest{Code: "invalid-code"}
 		bodyJSON, _ := json.Marshal(body)
 		req := httptest.NewRequest(http.MethodPost, "/api/v1/auth/login/google", bytes.NewBuffer(bodyJSON))
 		req.Header.Set("Content-Type", "application/json")
