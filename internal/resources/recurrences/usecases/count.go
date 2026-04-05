@@ -10,7 +10,7 @@ import (
 
 func (uc *RecurrencesUseCasesImpl) Count(ctx context.Context, filter *utils.QueryOptsBuilder) (int, error) {
 	tracer := otel.Tracer("usecase")
-	ctx, span := tracer.Start(ctx, "RecurrencesUseCase.Count")
+	_, span := tracer.Start(ctx, "RecurrencesUseCase.Count")
 	defer span.End()
 
 	count, err := uc.repo.Count(uc.db, filter)

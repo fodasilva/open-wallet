@@ -72,7 +72,7 @@ func (r *CategoriesRepoImpl) ListCategoryAmountPerPeriod(db utils.Executer, peri
 		return nil, err
 	}
 
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	result := make([]CategoryAmountPerPeriod, 0)
 	for rows.Next() {

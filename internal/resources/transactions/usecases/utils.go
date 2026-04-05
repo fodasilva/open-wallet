@@ -1,10 +1,11 @@
 package usecases
 
 import (
-	transactionRepo "github.com/felipe1496/open-wallet/internal/resources/transactions/repository"
+	"fmt"
 	"net/http"
 	"time"
 
+	transactionRepo "github.com/felipe1496/open-wallet/internal/resources/transactions/repository"
 	"github.com/felipe1496/open-wallet/internal/utils"
 )
 
@@ -14,11 +15,23 @@ type validateTransactionPropsEntry struct {
 }
 
 func validateTransaction(entries []validateTransactionPropsEntry, transactionType transactionRepo.TransactionType) error {
-	switch transactionType {
+	if err := validateEntriesCount(entries, transactionType); err != nil {
+		return err
+	}
+
+	if err := validatePeriodsUniqueness(entries); err != nil {
+		return err
+	}
+
+	return validateAmountsSigns(entries, transactionType)
+}
+
+func validateEntriesCount(entries []validateTransactionPropsEntry, tType transactionRepo.TransactionType) error {
+	switch tType {
 	case transactionRepo.SimpleExpense, transactionRepo.Income:
 		if len(entries) > 1 {
 			msg := "expense must have only one entry"
-			if transactionType == transactionRepo.Income {
+			if tType == transactionRepo.Income {
 				msg = "income must have only one entry"
 			}
 			return utils.NewHTTPError(http.StatusBadRequest, msg)
@@ -28,33 +41,40 @@ func validateTransaction(entries []validateTransactionPropsEntry, transactionTyp
 			return utils.NewHTTPError(http.StatusBadRequest, "installment must have at least two entries")
 		}
 	}
+	return nil
+}
 
-	for i, refEntry := range entries {
-		iRefDate, _ := time.Parse("2006-01-02", refEntry.ReferenceDate)
-		iPeriod := iRefDate.Format("200601")
-		for j, currEntry := range entries {
-			if i != j {
-				jRefDate, _ := time.Parse("2006-01-02", currEntry.ReferenceDate)
-				jPeriod := jRefDate.Format("200601")
-				if iPeriod == jPeriod {
-					return utils.NewHTTPError(http.StatusBadRequest, "entries must be in different periods")
-				}
-			}
+func validatePeriodsUniqueness(entries []validateTransactionPropsEntry) error {
+	periods := make(map[string]bool)
+	for _, entry := range entries {
+		t, err := time.Parse("2006-01-02", entry.ReferenceDate)
+		if err != nil {
+			return utils.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("invalid date format: %s", entry.ReferenceDate))
 		}
+		period := t.Format("200601")
+		if periods[period] {
+			return utils.NewHTTPError(http.StatusBadRequest, "entries must be in different periods")
+		}
+		periods[period] = true
+	}
+	return nil
+}
 
-		switch transactionType {
+func validateAmountsSigns(entries []validateTransactionPropsEntry, tType transactionRepo.TransactionType) error {
+	for _, entry := range entries {
+		switch tType {
 		case transactionRepo.Installment, transactionRepo.SimpleExpense, transactionRepo.Recurrence:
-			if refEntry.Amount >= 0 {
+			if entry.Amount >= 0 {
 				msg := "installment entries must have amount lower than zero"
-				if transactionType == transactionRepo.SimpleExpense {
+				if tType == transactionRepo.SimpleExpense {
 					msg = "expense entry must have amount lower than zero"
-				} else if transactionType == transactionRepo.Recurrence {
+				} else if tType == transactionRepo.Recurrence {
 					msg = "recurrence entries must have amount lower than zero"
 				}
 				return utils.NewHTTPError(http.StatusBadRequest, msg)
 			}
 		case transactionRepo.Income:
-			if refEntry.Amount <= 0 {
+			if entry.Amount <= 0 {
 				return utils.NewHTTPError(http.StatusBadRequest, "income entry must have amount greater than zero")
 			}
 		}

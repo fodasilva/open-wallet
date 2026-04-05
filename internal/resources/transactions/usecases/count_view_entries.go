@@ -10,7 +10,7 @@ import (
 
 func (uc *TransactionsUseCasesImpl) CountEntries(ctx context.Context, filter *utils.QueryOptsBuilder) (int, error) {
 	tracer := otel.Tracer("usecase")
-	ctx, span := tracer.Start(ctx, "TransactionsUseCase.CountEntries")
+	_, span := tracer.Start(ctx, "TransactionsUseCase.CountEntries")
 	defer span.End()
 
 	count, err := uc.entriesRepo.Count(uc.db, filter)

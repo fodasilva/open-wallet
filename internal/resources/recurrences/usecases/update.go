@@ -22,17 +22,8 @@ func (uc *RecurrencesUseCasesImpl) Update(id string, userID string, payload repo
 		return repository.Recurrence{}, utils.NewHTTPError(http.StatusNotFound, "recurrence not found")
 	}
 
-	if payload.CategoryID.Set && payload.CategoryID.Value != nil {
-		categoryExists, err := uc.categoriesUseCase.List(utils.QueryOpts().
-			And("id", "eq", *payload.CategoryID.Value).
-			And("user_id", "eq", userID))
-		if err != nil {
-			return repository.Recurrence{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to check if category exists")
-		}
-
-		if len(categoryExists) == 0 {
-			return repository.Recurrence{}, utils.NewHTTPError(http.StatusNotFound, "category not found")
-		}
+	if err := uc.validateCategory(userID, payload.CategoryID); err != nil {
+		return repository.Recurrence{}, err
 	}
 
 	err = uc.repo.Update(uc.db, payload, utils.QueryOpts().And("id", "eq", id))
@@ -40,38 +31,74 @@ func (uc *RecurrencesUseCasesImpl) Update(id string, userID string, payload repo
 		return repository.Recurrence{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to update recurrence")
 	}
 
-	updatedRecs, err := uc.repo.Select(uc.db, utils.QueryOpts().And("id", "eq", id))
-	if err != nil || len(updatedRecs) == 0 {
-		return repository.Recurrence{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to fetch updated recurrence")
+	rec, err := uc.fetchRecurrence(id)
+	if err != nil {
+		return repository.Recurrence{}, err
 	}
-	rec := updatedRecs[0]
 
 	if payload.Amount.Set && payload.Amount.Value != nil {
-		txs, err := uc.transactionsUseCase.ListEntries(context.TODO(), utils.QueryOpts().
-			And("user_id", "eq", userID).
-			And("recurrence_id", "eq", id))
-		if err != nil {
-			return rec, utils.NewHTTPError(http.StatusInternalServerError, "failed to fetch linked transactions for sync")
-		}
-
-		if len(txs) > 0 {
-			transactionID := txs[0].TransactionID
-			var updatedEntries []usecases.UpdateEntryDTO
-			for _, entry := range txs {
-				updatedEntries = append(updatedEntries, usecases.UpdateEntryDTO{
-					Amount:        *payload.Amount.Value,
-					ReferenceDate: entry.ReferenceDate,
-				})
-			}
-
-			_, err = uc.transactionsUseCase.UpdateTransaction(transactionID, userID, usecases.UpdateTransactionDTO{
-				Entries: utils.OptionalNullable[[]usecases.UpdateEntryDTO]{Set: true, Value: &updatedEntries},
-			})
-			if err != nil {
-				return rec, utils.NewHTTPError(http.StatusInternalServerError, "failed to sync transaction entries")
-			}
+		if err := uc.syncLinkedTransactions(id, userID, *payload.Amount.Value); err != nil {
+			return rec, err
 		}
 	}
 
 	return rec, nil
+}
+
+func (uc *RecurrencesUseCasesImpl) validateCategory(userID string, categoryID utils.OptionalNullable[string]) error {
+	if !categoryID.Set || categoryID.Value == nil {
+		return nil
+	}
+
+	exists, err := uc.categoriesUseCase.List(utils.QueryOpts().
+		And("id", "eq", *categoryID.Value).
+		And("user_id", "eq", userID))
+	if err != nil {
+		return utils.NewHTTPError(http.StatusInternalServerError, "failed to check if category exists")
+	}
+
+	if len(exists) == 0 {
+		return utils.NewHTTPError(http.StatusNotFound, "category not found")
+	}
+
+	return nil
+}
+
+func (uc *RecurrencesUseCasesImpl) fetchRecurrence(id string) (repository.Recurrence, error) {
+	recs, err := uc.repo.Select(uc.db, utils.QueryOpts().And("id", "eq", id))
+	if err != nil || len(recs) == 0 {
+		return repository.Recurrence{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to fetch recurrence")
+	}
+	return recs[0], nil
+}
+
+func (uc *RecurrencesUseCasesImpl) syncLinkedTransactions(id string, userID string, amount float64) error {
+	txs, err := uc.transactionsUseCase.ListEntries(context.TODO(), utils.QueryOpts().
+		And("user_id", "eq", userID).
+		And("recurrence_id", "eq", id))
+	if err != nil {
+		return utils.NewHTTPError(http.StatusInternalServerError, "failed to fetch linked transactions for sync")
+	}
+
+	if len(txs) == 0 {
+		return nil
+	}
+
+	transactionID := txs[0].TransactionID
+	updatedEntries := make([]usecases.UpdateEntryDTO, len(txs))
+	for i, entry := range txs {
+		updatedEntries[i] = usecases.UpdateEntryDTO{
+			Amount:        amount,
+			ReferenceDate: entry.ReferenceDate,
+		}
+	}
+
+	_, err = uc.transactionsUseCase.UpdateTransaction(transactionID, userID, usecases.UpdateTransactionDTO{
+		Entries: utils.OptionalNullable[[]usecases.UpdateEntryDTO]{Set: true, Value: &updatedEntries},
+	})
+	if err != nil {
+		return utils.NewHTTPError(http.StatusInternalServerError, "failed to sync transaction entries")
+	}
+
+	return nil
 }

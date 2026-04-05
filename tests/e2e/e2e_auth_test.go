@@ -40,8 +40,8 @@ func setupTestServer(db *sql.DB, googleService services.GoogleService, jwtServic
 
 func TestE2eAuth(t *testing.T) {
 	pg := SetupTestDB(t)
-	defer pg.Container.Terminate(context.Background())
-	defer pg.DB.Close()
+	defer func() { _ = pg.Container.Terminate(context.Background()) }()
+	defer func() { _ = pg.DB.Close() }()
 
 	t.Log("postgres started with:", pg.ConnString)
 
