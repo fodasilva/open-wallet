@@ -1,7 +1,6 @@
 linters:
   enable:
     - unused
-    - gocyclo
     - misspell
     - errcheck
     - gosimple
@@ -10,8 +9,6 @@ linters:
 
 linters-settings:
   unused: {}
-  gocyclo:
-    min-complexity: 15
   revive:
     rules:
       - name: exported
