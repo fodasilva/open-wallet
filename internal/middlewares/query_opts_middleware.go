@@ -145,10 +145,6 @@ func parseFilter(filter string, query *utils.QueryOptsBuilder) (*utils.QueryOpts
 				return nil, utils.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("filter sintax error at '%s'", filter))
 			}
 
-			if len(splittedFilter) != 3 {
-				return nil, utils.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("filter sintax error at '%s'", filter))
-			}
-
 			if !allowedOperators[splittedFilter[1]] {
 				return nil, utils.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("operator not '%s' not allowed at '%s'", splittedFilter[1], filter))
 			}
