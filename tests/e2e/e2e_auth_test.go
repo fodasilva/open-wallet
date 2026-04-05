@@ -39,19 +39,14 @@ func setupTestServer(db *sql.DB, googleService services.GoogleService, jwtServic
 }
 
 func TestE2eAuth(t *testing.T) {
-	pg := SetupTestDB(t)
-	defer func() { _ = pg.Container.Terminate(context.Background()) }()
-	defer func() { _ = pg.DB.Close() }()
+	res := SetupTestResources(t)
+	defer func() { _ = res.PostgresContainer.Terminate(context.Background()) }()
+	defer func() { _ = res.RedisContainer.Terminate(context.Background()) }()
+	defer func() { _ = res.DB.Close() }()
 
-	t.Log("postgres started with:", pg.ConnString)
+	t.Log("postgres started with:", res.PostgresConnStr)
 
-	t.Run("should verify database is empty initially", func(t *testing.T) {
-		var count int
-		err := pg.DB.QueryRow("SELECT COUNT(*) FROM users").Scan(&count)
-
-		assert.NoError(t, err)
-		assert.Equal(t, 0, count)
-	})
+	AssertTableIsEmpty(t, res.DB, "users")
 
 	t.Run("should create user when login with Google for the first time", func(t *testing.T) {
 		mockGoogleService := new(mocks.MockGoogleService)
@@ -77,7 +72,7 @@ func TestE2eAuth(t *testing.T) {
 			}, nil)
 		mockJWTService.On("GenerateToken", mock.Anything).Return("mock-token", nil)
 
-		router := setupTestServer(pg.DB, mockGoogleService, mockJWTService)
+		router := setupTestServer(res.DB, mockGoogleService, mockJWTService)
 
 		body := auth.LoginGoogleRequest{Code: "valid-code"}
 		bodyJSON, _ := json.Marshal(body)
@@ -97,7 +92,7 @@ func TestE2eAuth(t *testing.T) {
 		assert.NotEmpty(t, response["data"]["access_token"])
 
 		var count int
-		err = pg.DB.QueryRow("SELECT COUNT(*) FROM users WHERE email = $1", email).Scan(&count)
+		err = res.DB.QueryRow("SELECT COUNT(*) FROM users WHERE email = $1", email).Scan(&count)
 		assert.NoError(t, err)
 		assert.Equal(t, 1, count, "should have exactly one user with this email")
 
@@ -108,7 +103,7 @@ func TestE2eAuth(t *testing.T) {
 			AvatarURL string
 			Username  string
 		}
-		err = pg.DB.QueryRow(
+		err = res.DB.QueryRow(
 			"SELECT id, name, email, avatar_url, username FROM users WHERE email = $1",
 			email,
 		).Scan(&dbUser.ID, &dbUser.Name, &dbUser.Email, &dbUser.AvatarURL, &dbUser.Username)
@@ -126,7 +121,7 @@ func TestE2eAuth(t *testing.T) {
 	t.Run("should return existing user when login with Google for second time", func(t *testing.T) {
 		email := "test@example.com"
 		var count int
-		err := pg.DB.QueryRow("SELECT COUNT(*) FROM users WHERE email = $1", email).Scan(&count)
+		err := res.DB.QueryRow("SELECT COUNT(*) FROM users WHERE email = $1", email).Scan(&count)
 		assert.NoError(t, err)
 		assert.Equal(t, 1, count, "user should already exist before testing second login")
 
@@ -152,7 +147,7 @@ func TestE2eAuth(t *testing.T) {
 
 		mockJWTService.On("GenerateToken", mock.Anything).Return("mock-token", nil)
 
-		router := setupTestServer(pg.DB, mockGoogleService, mockJWTService)
+		router := setupTestServer(res.DB, mockGoogleService, mockJWTService)
 
 		body := auth.LoginGoogleRequest{Code: "valid-code"}
 		bodyJSON, _ := json.Marshal(body)
@@ -171,7 +166,7 @@ func TestE2eAuth(t *testing.T) {
 		assert.NotNil(t, response["data"]["user"])
 		assert.NotEmpty(t, response["data"]["access_token"])
 
-		err = pg.DB.QueryRow("SELECT COUNT(*) FROM users WHERE email = $1", email).Scan(&count)
+		err = res.DB.QueryRow("SELECT COUNT(*) FROM users WHERE email = $1", email).Scan(&count)
 		assert.NoError(t, err)
 		assert.Equal(t, 1, count, "should have exactly one user with this email")
 
@@ -182,7 +177,7 @@ func TestE2eAuth(t *testing.T) {
 			AvatarURL string
 			Username  string
 		}
-		err = pg.DB.QueryRow(
+		err = res.DB.QueryRow(
 			"SELECT id, name, email, avatar_url, username FROM users WHERE email = $1",
 			email,
 		).Scan(&dbUser.ID, &dbUser.Name, &dbUser.Email, &dbUser.AvatarURL, &dbUser.Username)
@@ -207,7 +202,7 @@ func TestE2eAuth(t *testing.T) {
 			On("GetUserAccessToken", "invalid-code").
 			Return(&emptyAccessToken, services.FailedGoogleAuthenticationErr)
 
-		router := setupTestServer(pg.DB, mockGoogleService, mockJWTService)
+		router := setupTestServer(res.DB, mockGoogleService, mockJWTService)
 
 		body := auth.LoginGoogleRequest{Code: "invalid-code"}
 		bodyJSON, _ := json.Marshal(body)
@@ -220,7 +215,7 @@ func TestE2eAuth(t *testing.T) {
 		assert.Equal(t, http.StatusUnauthorized, w.Code)
 
 		var count int
-		err := pg.DB.QueryRow("SELECT COUNT(*) FROM users").Scan(&count)
+		err := res.DB.QueryRow("SELECT COUNT(*) FROM users").Scan(&count)
 		assert.NoError(t, err)
 		assert.Equal(t, 1, count, "no new user should be created on invalid code")
 
