@@ -11,7 +11,7 @@ import (
 
 func (uc *TransactionsUseCasesImpl) ListEntries(ctx context.Context, filter *utils.QueryOptsBuilder) ([]transactionRepo.ViewEntry, error) {
 	tracer := otel.Tracer("usecase")
-	ctx, span := tracer.Start(ctx, "TransactionsUseCase.ListEntries")
+	_, span := tracer.Start(ctx, "TransactionsUseCase.ListEntries")
 	defer span.End()
 
 	entries, err := uc.entriesRepo.Select(uc.db, filter)

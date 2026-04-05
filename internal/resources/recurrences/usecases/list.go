@@ -11,7 +11,7 @@ import (
 
 func (uc *RecurrencesUseCasesImpl) List(ctx context.Context, filter *utils.QueryOptsBuilder) ([]repository.Recurrence, error) {
 	tracer := otel.Tracer("usecase")
-	ctx, span := tracer.Start(ctx, "RecurrencesUseCase.List")
+	_, span := tracer.Start(ctx, "RecurrencesUseCase.List")
 	defer span.End()
 
 	items, err := uc.repo.Select(uc.db, filter)

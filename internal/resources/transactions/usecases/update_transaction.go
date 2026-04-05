@@ -1,6 +1,7 @@
 package usecases
 
 import (
+	"database/sql"
 	"net/http"
 
 	transactionRepo "github.com/felipe1496/open-wallet/internal/resources/transactions/repository"
@@ -10,19 +11,17 @@ import (
 
 func (uc *TransactionsUseCasesImpl) UpdateTransaction(transactionID string, userID string, payload UpdateTransactionDTO) (t transactionRepo.Transaction, err error) {
 	tx, err := uc.db.Begin()
+	if err != nil {
+		return transactionRepo.Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to start transaction")
+	}
+
 	defer func() {
-		if tx == nil {
-			return
-		}
 		if err != nil {
-			tx.Rollback()
+			_ = tx.Rollback()
 		} else {
 			err = tx.Commit()
 		}
 	}()
-	if err != nil {
-		return transactionRepo.Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to start transaction")
-	}
 
 	exists, err := uc.entriesRepo.Select(tx, utils.QueryOpts().
 		And("transaction_id", "eq", transactionID).
@@ -35,69 +34,76 @@ func (uc *TransactionsUseCasesImpl) UpdateTransaction(transactionID string, user
 		return transactionRepo.Transaction{}, utils.NewHTTPError(http.StatusNotFound, "transaction not found")
 	}
 
-	if payload.CategoryID.Set && payload.CategoryID.Value != nil {
-		categoryExists, err := uc.categoriesUseCase.List(utils.QueryOpts().
-			And("id", "eq", *payload.CategoryID.Value).
-			And("user_id", "eq", userID))
-		if err != nil {
-			return transactionRepo.Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to check if category exists")
-		}
+	if err := uc.validateCategory(userID, payload.CategoryID); err != nil {
+		return transactionRepo.Transaction{}, err
+	}
 
-		if len(categoryExists) == 0 {
-			return transactionRepo.Transaction{}, utils.NewHTTPError(http.StatusNotFound, "category not found")
+	if err := uc.updateTransactionMetadata(tx, transactionID, payload); err != nil {
+		return transactionRepo.Transaction{}, err
+	}
+
+	if err := uc.syncTransactionEntries(tx, transactionID, exists[0].Type, payload.Entries); err != nil {
+		return transactionRepo.Transaction{}, err
+	}
+
+	created, err := uc.transactionsRepo.Select(tx, utils.QueryOpts().And("id", "eq", transactionID))
+	if err != nil || len(created) == 0 {
+		return transactionRepo.Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to fetch updated transaction")
+	}
+
+	return created[0], nil
+}
+
+func (uc *TransactionsUseCasesImpl) updateTransactionMetadata(tx *sql.Tx, transactionID string, payload UpdateTransactionDTO) error {
+	if !payload.Name.Set && !payload.Note.Set && !payload.CategoryID.Set && !payload.RecurrenceID.Set {
+		return nil
+	}
+
+	err := uc.transactionsRepo.Update(tx, transactionRepo.UpdateTransactionDTO{
+		Name:         payload.Name,
+		Note:         payload.Note,
+		CategoryID:   payload.CategoryID,
+		RecurrenceID: payload.RecurrenceID,
+	}, utils.QueryOpts().And("id", "eq", transactionID))
+
+	if err != nil {
+		return utils.NewHTTPError(http.StatusInternalServerError, "failed to update transaction")
+	}
+
+	return nil
+}
+
+func (uc *TransactionsUseCasesImpl) syncTransactionEntries(tx *sql.Tx, transactionID string, tType transactionRepo.TransactionType, entriesOpt utils.OptionalNullable[[]UpdateEntryDTO]) error {
+	if !entriesOpt.Set || entriesOpt.Value == nil {
+		return nil
+	}
+
+	entries := *entriesOpt.Value
+	props := make([]validateTransactionPropsEntry, len(entries))
+	for i, entry := range entries {
+		props[i] = validateTransactionPropsEntry(entry)
+	}
+
+	if err := validateTransaction(props, tType); err != nil {
+		return err
+	}
+
+	err := uc.entriesRepo.Delete(tx, utils.QueryOpts().And("transaction_id", "eq", transactionID))
+	if err != nil {
+		return utils.NewHTTPError(http.StatusInternalServerError, "failed to delete previous entries")
+	}
+
+	for _, entry := range entries {
+		err = uc.entriesRepo.Insert(tx, transactionRepo.CreateEntryDTO{
+			ID:            ulid.Make().String(),
+			TransactionID: transactionID,
+			Amount:        entry.Amount,
+			ReferenceDate: entry.ReferenceDate,
+		})
+		if err != nil {
+			return utils.NewHTTPError(http.StatusInternalServerError, "failed to create entry")
 		}
 	}
 
-	if payload.Name.Set || payload.Note.Set || payload.CategoryID.Set || payload.RecurrenceID.Set {
-		err = uc.transactionsRepo.Update(tx, transactionRepo.UpdateTransactionDTO{
-			Name:         payload.Name,
-			Note:         payload.Note,
-			CategoryID:   payload.CategoryID,
-			RecurrenceID: payload.RecurrenceID,
-		}, utils.QueryOpts().And("id", "eq", transactionID))
-		if err != nil {
-			return transactionRepo.Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to update transaction")
-		}
-	}
-
-	if payload.Entries.Set && payload.Entries.Value != nil {
-		err = validateTransaction(func() []validateTransactionPropsEntry {
-			entries := make([]validateTransactionPropsEntry, 0)
-			for _, entry := range *payload.Entries.Value {
-				entries = append(entries, validateTransactionPropsEntry{
-					Amount:        entry.Amount,
-					ReferenceDate: entry.ReferenceDate,
-				})
-			}
-			return entries
-		}(), exists[0].Type)
-
-		if err != nil {
-			return transactionRepo.Transaction{}, err
-		}
-
-		err = uc.entriesRepo.Delete(tx, utils.QueryOpts().And("transaction_id", "eq", exists[0].TransactionID))
-		if err != nil {
-			return transactionRepo.Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to delete previous entries")
-		}
-
-		for _, entry := range *payload.Entries.Value {
-			err = uc.entriesRepo.Insert(tx, transactionRepo.CreateEntryDTO{
-				ID:            ulid.Make().String(),
-				TransactionID: exists[0].TransactionID,
-				Amount:        entry.Amount,
-				ReferenceDate: entry.ReferenceDate,
-			})
-			if err != nil {
-				return transactionRepo.Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to create entry")
-			}
-		}
-	}
-
-	transactions, err := uc.transactionsRepo.Select(tx, utils.QueryOpts().And("id", "eq", transactionID))
-	if err != nil || len(transactions) == 0 {
-		return transactionRepo.Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to list transaction")
-	}
-
-	return transactions[0], nil
+	return nil
 }

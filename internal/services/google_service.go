@@ -45,7 +45,7 @@ func (s *googleServiceImpl) GetUserInfo(accessToken string) (*GoogleUserInfo, er
 	if err != nil {
 		return nil, FailedGoogleAuthenticationErr
 	}
-	defer response.Body.Close()
+	defer func() { _ = response.Body.Close() }()
 
 	if response.StatusCode != http.StatusOK {
 		return nil, FailedGoogleAuthenticationErr
@@ -93,7 +93,7 @@ func (s *googleServiceImpl) GetUserAccessToken(code string) (*string, error) {
 		return nil, FailedGoogleAuthenticationErr
 	}
 
-	defer res.Body.Close()
+	defer func() { _ = res.Body.Close() }()
 
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
