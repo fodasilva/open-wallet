@@ -16,6 +16,30 @@ Finally, you run these steps securely using `utils.RunCommand(ctx, options)`.
 
 ---
 
+## API Documentation (Swagger)
+
+We use **initial/docs** and **swag** to automatically generate OpenAPI/Swagger documentation. This is critical for:
+
+- **API Readability**: Allows anyone to understand the contract without reading the Go source code.
+- **Frontend Synchronization**: Frontend developers can use the Swagger UI to see available endpoints, models, and error codes.
+- **Transparency**: Provides a single source of truth for the API state.
+
+### How to document
+
+Every handler method (`The API Wrapper Hook`) must have the appropriate `@Summary`, `@Description`, `@Tags`, and `@Router` comments as shown in the template above.
+
+### Updating Documentation
+
+After adding or modifying a handler, regenerate the Swagger files:
+
+```bash
+make gen-docs
+```
+
+The updated documentation will be available at `/api-docs/index.html` when running the application.
+
+---
+
 ## Handler Templates
 
 ### Template Parameters
