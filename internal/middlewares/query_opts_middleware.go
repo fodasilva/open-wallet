@@ -91,12 +91,13 @@ func parseFilter(filter string, query *utils.QueryOptsBuilder) (*utils.QueryOpts
 	splitted := strings.Split(filter, " and ")
 
 	allowedOperators := map[string]bool{
-		"eq": true,
-		"ne": true,
-		"gt": true,
-		"ge": true,
-		"lt": true,
-		"le": true,
+		"eq":   true,
+		"ne":   true,
+		"gt":   true,
+		"gte":  true,
+		"lt":   true,
+		"lte":  true,
+		"like": true,
 	}
 
 	for _, filter := range splitted {
