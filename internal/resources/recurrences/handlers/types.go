@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"github.com/felipe1496/open-wallet/internal/resources/recurrences/repository"
+	"github.com/felipe1496/open-wallet/internal/utils"
 )
 
 type CreateRecurrenceRequest struct {
@@ -38,4 +39,13 @@ type UpdateRecurrenceResponse struct {
 
 type UpdateRecurrenceResponseData struct {
 	Recurrence repository.Recurrence `json:"recurrence"`
+}
+
+type ListRecurrencesResponse struct {
+	Data  ListRecurrencesResponseData `json:"data"`
+	Query utils.QueryMeta             `json:"query"`
+}
+
+type ListRecurrencesResponseData struct {
+	Recurrences []repository.Recurrence `json:"recurrences"`
 }
