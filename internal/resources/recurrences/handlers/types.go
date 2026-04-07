@@ -21,3 +21,21 @@ type CreateRecurrenceResponse struct {
 type CreateRecurrenceResponseData struct {
 	Recurrence repository.Recurrence `json:"recurrence"`
 }
+
+type UpdateRecurrenceRequest struct {
+	Name        *string  `json:"name" binding:"omitempty,min=1,max=100"`
+	CategoryID  *string  `json:"category_id" binding:"omitempty"`
+	Note        *string  `json:"note" binding:"omitempty,min=0,max=400"`
+	Amount      *float64 `json:"amount" binding:"omitempty,lt=0"`
+	DayOfMonth  *int     `json:"day_of_month" binding:"omitempty,min=1,max=31"`
+	StartPeriod *string  `json:"start_period" binding:"omitempty,len=6"`
+	EndPeriod   *string  `json:"end_period" binding:"omitempty,len=6"`
+}
+
+type UpdateRecurrenceResponse struct {
+	Data UpdateRecurrenceResponseData `json:"data"`
+}
+
+type UpdateRecurrenceResponseData struct {
+	Recurrence repository.Recurrence `json:"recurrence"`
+}
