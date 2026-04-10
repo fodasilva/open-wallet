@@ -7,12 +7,12 @@ import (
 	"github.com/felipe1496/open-wallet/infra"
 	"github.com/felipe1496/open-wallet/internal/factory"
 	"github.com/felipe1496/open-wallet/internal/middlewares"
-	"github.com/felipe1496/open-wallet/internal/resources/recurrences"
+	"github.com/felipe1496/open-wallet/internal/resources/recurrences/handlers"
 )
 
 func SetupRecurrencesRoutes(r *gin.Engine, f *factory.Factory, redisClient *redis.Client, cfg *infra.Config) {
 	jwtService := f.JWTService()
-	recurrencesHandler := recurrences.NewHandler(f.RecurrencesUseCases())
+	recurrencesHandler := handlers.NewHandler(f.RecurrencesUseCases())
 	recurrencesGroup := r.Group("/api/v1/recurrences")
 	{
 		recurrencesGroup.GET("",
@@ -21,7 +21,7 @@ func SetupRecurrencesRoutes(r *gin.Engine, f *factory.Factory, redisClient *redi
 			recurrencesHandler.List)
 		recurrencesGroup.DELETE("/:id",
 			middlewares.RequireAuthMiddleware(jwtService),
-			recurrencesHandler.DeleteByID)
+			recurrencesHandler.Delete)
 		recurrencesGroup.POST("",
 			middlewares.RequireAuthMiddleware(jwtService),
 			middlewares.RouteRateLimitMiddleware(redisClient, 5, 60000, "POST:/api/v1/recurrences"),
