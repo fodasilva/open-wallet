@@ -14,13 +14,15 @@ type DeleteOptions struct {
 	Ctx      *gin.Context
 	UseCases usecases.RecurrencesUseCases
 
-	ID    string
-	Scope string
+	ID     string
+	UserID string
+	Scope  string
 }
 
 func (o *DeleteOptions) Complete(ctx *gin.Context) error {
 	o.Ctx = ctx
 	o.ID = ctx.Param("id")
+	o.UserID = ctx.GetString("user_id")
 	o.Scope = ctx.DefaultQuery("scope", "all")
 
 	return nil
@@ -35,7 +37,7 @@ func (o *DeleteOptions) Validate() error {
 }
 
 func (o *DeleteOptions) Run() error {
-	err := o.UseCases.DeleteByID(o.ID, o.Scope)
+	err := o.UseCases.DeleteByID(o.ID, o.UserID, o.Scope)
 	if err != nil {
 		return err
 	}

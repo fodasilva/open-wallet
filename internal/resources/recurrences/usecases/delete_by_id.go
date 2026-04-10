@@ -10,8 +10,8 @@ import (
 	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
-func (uc *RecurrencesUseCasesImpl) DeleteByID(id string, scope string) error {
-	exists, err := uc.repo.Select(uc.db, querybuilder.New().And("id", "eq", id))
+func (uc *RecurrencesUseCasesImpl) DeleteByID(id string, userID string, scope string) error {
+	exists, err := uc.repo.Select(uc.db, querybuilder.New().And("id", "eq", id).And("user_id", "eq", userID))
 	if err != nil {
 		return utils.NewHTTPError(http.StatusInternalServerError, "failed to fetch recurrence")
 	}
@@ -61,7 +61,7 @@ func (uc *RecurrencesUseCasesImpl) DeleteByID(id string, scope string) error {
 		}
 	}
 
-	err = uc.repo.Delete(uc.db, querybuilder.New().And("id", "eq", id))
+	err = uc.repo.Delete(uc.db, querybuilder.New().And("id", "eq", id).And("user_id", "eq", userID))
 	if err != nil {
 		return utils.NewHTTPError(http.StatusInternalServerError, "failed to delete recurrence")
 	}
