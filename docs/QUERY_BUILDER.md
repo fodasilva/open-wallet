@@ -22,6 +22,30 @@ This approach provides:
 
 ---
 
+### Conjunctive Normal Form (CNF / NFC) Inspiration
+
+A major dilemma when designing parsing for web query parameters is deciding **how much complexity to allow with parentheses**. Allowing infinitely nested parentheses like `((A and B) or (C and (D or E)))` makes parsing incredibly volatile and complex, while leaving the API vulnerable to slow logic or deep nesting attacks.
+
+To solve this, our QueryBuilder is strictly designed around **Conjunctive Normal Form** (CNF), sometimes referred to as Forma Normal Conjuntiva (FNC) or Normal Form Conjunctive (NFC) depending on the regional academic translation.
+
+**What is CNF?**
+CNF dictates that any boolean logic can be represented strictly as an `AND` of multiple `OR` groups:
+`(A OR B) AND (C OR D) AND E`
+
+**How to make ANY boolean operation with CNF:**
+Because of the rules of Boolean Algebra (specifically, Distributive Law), **any logical expression can be converted into CNF**. 
+
+For example, what if you conceptually want `(A AND B) OR C`? The parser does not support `OR` logic wrapping an `AND`. However, by distributing the `OR` over the `AND`, you convert it natively to CNF:
+`(A OR C) AND (B OR C)`
+
+Translating this to the Web Syntax:
+Instead of `(status eq 'active' and age gt 20) or category eq 1`, you write:
+`(status eq 'active' or category eq 1) and (age gt 20 or category eq 1)`
+
+This architectural decision means our API remains Turing-complete in logical filter capability, while the parser stays flat, predictable, and extremely performant without needing recursive Abstract Syntax Trees (ASTs) for parameter nesting!
+
+---
+
 ## Web Syntax
 
 The following query parameters are supported in the API:
