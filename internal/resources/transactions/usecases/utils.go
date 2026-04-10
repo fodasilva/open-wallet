@@ -1,7 +1,6 @@
 package usecases
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
@@ -11,7 +10,7 @@ import (
 
 type validateTransactionPropsEntry struct {
 	Amount        float64
-	ReferenceDate string
+	ReferenceDate time.Time
 }
 
 func validateTransaction(entries []validateTransactionPropsEntry, transactionType transactionRepo.TransactionType) error {
@@ -47,11 +46,7 @@ func validateEntriesCount(entries []validateTransactionPropsEntry, tType transac
 func validatePeriodsUniqueness(entries []validateTransactionPropsEntry) error {
 	periods := make(map[string]bool)
 	for _, entry := range entries {
-		t, err := time.Parse("2006-01-02", entry.ReferenceDate)
-		if err != nil {
-			return utils.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("invalid date format: %s", entry.ReferenceDate))
-		}
-		period := t.Format("200601")
+		period := entry.ReferenceDate.Format("200601")
 		if periods[period] {
 			return utils.NewHTTPError(http.StatusBadRequest, "entries must be in different periods")
 		}

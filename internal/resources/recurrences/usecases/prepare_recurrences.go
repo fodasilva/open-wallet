@@ -29,8 +29,9 @@ func (uc *RecurrencesUseCasesImpl) PrepareRecurrences(ctx context.Context, userI
 		var targetTxID string
 
 		newDateStr := fmt.Sprintf("%s-%s-%02d", targetPeriod[:4], targetPeriod[4:], rec.DayOfMonth)
-		if _, err := time.Parse("2006-01-02", newDateStr); err != nil {
-			newDateStr = fmt.Sprintf("%s-%s-01", targetPeriod[:4], targetPeriod[4:])
+		newDate, err := time.Parse("2006-01-02", newDateStr)
+		if err != nil {
+			newDate, _ = time.Parse("2006-01-02", fmt.Sprintf("%s-%s-01", targetPeriod[:4], targetPeriod[4:]))
 		}
 
 		if len(existingTxs) == 0 {
@@ -43,7 +44,7 @@ func (uc *RecurrencesUseCasesImpl) PrepareRecurrences(ctx context.Context, userI
 				RecurrenceID: utils.OptionalNullable[string]{Set: true, Value: &rec.ID},
 				Entries: []usecases.CreateEntryDTO{{
 					Amount:        rec.Amount,
-					ReferenceDate: newDateStr,
+					ReferenceDate: newDate,
 				}},
 			})
 			if err != nil {
@@ -74,7 +75,7 @@ func (uc *RecurrencesUseCasesImpl) PrepareRecurrences(ctx context.Context, userI
 
 			payloadEntries = append(payloadEntries, usecases.UpdateEntryDTO{
 				Amount:        rec.Amount,
-				ReferenceDate: newDateStr,
+				ReferenceDate: newDate,
 			})
 
 			_, err = uc.transactionsUseCase.UpdateTransaction(targetTxID, userID, usecases.UpdateTransactionDTO{
