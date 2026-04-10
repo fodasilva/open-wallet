@@ -19,6 +19,13 @@ func (uc *RecurrencesUseCasesImpl) PrepareRecurrences(ctx context.Context, userI
 	}
 
 	for _, rec := range recurrences {
+		if rec.StartPeriod > targetPeriod {
+			continue
+		}
+		if rec.EndPeriod != nil && *rec.EndPeriod < targetPeriod {
+			continue
+		}
+
 		existingTxs, err := uc.transactionsUseCase.ListEntries(ctx, querybuilder.New().
 			And("user_id", "eq", userID).
 			And("recurrence_id", "eq", rec.ID))
