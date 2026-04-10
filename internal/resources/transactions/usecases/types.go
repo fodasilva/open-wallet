@@ -1,6 +1,8 @@
 package usecases
 
 import (
+	"time"
+
 	transactionRepo "github.com/felipe1496/open-wallet/internal/resources/transactions/repository"
 	"github.com/felipe1496/open-wallet/internal/utils"
 )
@@ -17,7 +19,7 @@ type CreateTransactionDTO struct {
 
 type CreateEntryDTO struct {
 	Amount        float64
-	ReferenceDate string
+	ReferenceDate time.Time
 }
 
 type UpdateTransactionDTO struct {
@@ -30,11 +32,11 @@ type UpdateTransactionDTO struct {
 
 type UpdateEntryDTO struct {
 	Amount        float64
-	ReferenceDate string
+	ReferenceDate time.Time
 }
 
 type PersistEntryDTO struct {
 	TransactionID string
 	Amount        float64
-	ReferenceDate string
+	ReferenceDate time.Time
 }

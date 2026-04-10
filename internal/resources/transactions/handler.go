@@ -3,6 +3,7 @@ package transactions
 import (
 	"net/http"
 	"slices"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"go.opentelemetry.io/otel"
@@ -141,10 +142,11 @@ func (api *API) CreateTransaction(ctx *gin.Context) {
 	var entriesDTO []usecases.CreateEntryDTO
 	if body.Entries != nil {
 		entries := make([]usecases.CreateEntryDTO, len(body.Entries))
-		for i, entry := range body.Entries {
+		for i, e := range body.Entries {
+			t, _ := time.Parse("2006-01-02", e.ReferenceDate)
 			entries[i] = usecases.CreateEntryDTO{
-				Amount:        entry.Amount,
-				ReferenceDate: entry.ReferenceDate,
+				Amount:        e.Amount,
+				ReferenceDate: t,
 			}
 		}
 		entriesDTO = entries
@@ -235,14 +237,15 @@ func (api *API) UpdateTransaction(ctx *gin.Context) {
 			return
 		}
 
-		entries := make([]usecases.UpdateEntryDTO, len(*body.Entries))
-		for i, entry := range *body.Entries {
-			entries[i] = usecases.UpdateEntryDTO{
-				Amount:        entry.Amount,
-				ReferenceDate: entry.ReferenceDate,
+		updatedEntries := make([]usecases.UpdateEntryDTO, len(*body.Entries))
+		for i, e := range *body.Entries {
+			t, _ := time.Parse("2006-01-02", e.ReferenceDate)
+			updatedEntries[i] = usecases.UpdateEntryDTO{
+				Amount:        e.Amount,
+				ReferenceDate: t,
 			}
 		}
-		payload.Entries = utils.OptionalNullable[[]usecases.UpdateEntryDTO]{Set: true, Value: &entries}
+		payload.Entries = utils.OptionalNullable[[]usecases.UpdateEntryDTO]{Set: true, Value: &updatedEntries}
 	}
 
 	transaction, err := api.transactionsUseCases.UpdateTransaction(id, userID, payload)

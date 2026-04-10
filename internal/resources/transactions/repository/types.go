@@ -54,7 +54,7 @@ type Entry struct {
 	ID            string
 	TransactionID string
 	Amount        float64
-	ReferenceDate string
+	ReferenceDate time.Time
 	CreatedAt     time.Time
 }
 
@@ -62,12 +62,12 @@ type CreateEntryDTO struct {
 	ID            string
 	TransactionID string
 	Amount        float64
-	ReferenceDate string
+	ReferenceDate time.Time
 }
 
 type UpdateEntryDTO struct {
 	Amount        utils.OptionalNullable[float64]
-	ReferenceDate utils.OptionalNullable[string]
+	ReferenceDate utils.OptionalNullable[time.Time]
 }
 
 // @gen_repo
@@ -90,7 +90,7 @@ type ViewEntry struct {
 	Installment       int             `json:"installment"`
 	TotalInstallments int             `json:"total_installments"`
 	CreatedAt         time.Time       `json:"created_at"`
-	ReferenceDate     string          `json:"reference_date"`
+	ReferenceDate     time.Time       `json:"reference_date"`
 	CategoryID        *string         `json:"category_id,omitempty"`
 	CategoryName      *string         `json:"category_name,omitempty"`
 	CategoryColor     *string         `json:"category_color,omitempty"`
