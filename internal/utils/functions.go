@@ -69,24 +69,6 @@ func GetJSONKeys(c *gin.Context) ([]string, error) {
 	return keys, nil
 }
 
-func Contains(slice []string, item string) bool {
-	for _, s := range slice {
-		if s == item {
-			return true
-		}
-	}
-	return false
-}
-
-func ContainsSome(slice []string, items []string) bool {
-	for _, item := range items {
-		if Contains(slice, item) {
-			return true
-		}
-	}
-	return false
-}
-
 func IsValidURL(str string) bool {
 	u, err := url.ParseRequestURI(str)
 	return err == nil && u.Scheme != "" && u.Host != ""
