@@ -413,7 +413,7 @@ const docTemplate = `{
                     "200": {
                         "description": "List of recurrences",
                         "schema": {
-                            "$ref": "#/definitions/internal_resources_recurrences.ListRecurrencesResponse"
+                            "$ref": "#/definitions/internal_resources_recurrences_handlers.ListRecurrencesResponse"
                         }
                     },
                     "401": {
@@ -454,7 +454,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_resources_recurrences.CreateRecurrenceRequest"
+                            "$ref": "#/definitions/internal_resources_recurrences_handlers.CreateRecurrenceRequest"
                         }
                     }
                 ],
@@ -462,7 +462,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Recurrence created",
                         "schema": {
-                            "$ref": "#/definitions/internal_resources_recurrences.CreateRecurrenceResponse"
+                            "$ref": "#/definitions/internal_resources_recurrences_handlers.CreateRecurrenceResponse"
                         }
                     },
                     "400": {
@@ -511,6 +511,17 @@ const docTemplate = `{
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "enum": [
+                            "all",
+                            "until_current"
+                        ],
+                        "type": "string",
+                        "default": "all",
+                        "description": "Handling of linked transactions: 'all' (default) deletes the recurrence and all related transactions (past/future); 'until_current' preserves past history but removes future recurrences.",
+                        "name": "scope",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -568,7 +579,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_resources_recurrences.UpdateRecurrenceRequest"
+                            "$ref": "#/definitions/internal_resources_recurrences_handlers.UpdateRecurrenceRequest"
                         }
                     }
                 ],
@@ -576,7 +587,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Recurrence updated",
                         "schema": {
-                            "$ref": "#/definitions/internal_resources_recurrences.UpdateRecurrenceResponse"
+                            "$ref": "#/definitions/internal_resources_recurrences_handlers.UpdateRecurrenceResponse"
                         }
                     },
                     "400": {
@@ -628,7 +639,7 @@ const docTemplate = `{
                     }
                 ],
                 "responses": {
-                    "200": {
+                    "204": {
                         "description": "Recurrences prepared"
                     },
                     "400": {
@@ -1268,7 +1279,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_resources_recurrences.CreateRecurrenceRequest": {
+        "internal_resources_recurrences_handlers.CreateRecurrenceRequest": {
             "type": "object",
             "required": [
                 "amount",
@@ -1306,15 +1317,15 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_resources_recurrences.CreateRecurrenceResponse": {
+        "internal_resources_recurrences_handlers.CreateRecurrenceResponse": {
             "type": "object",
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/internal_resources_recurrences.CreateRecurrenceResponseData"
+                    "$ref": "#/definitions/internal_resources_recurrences_handlers.CreateRecurrenceResponseData"
                 }
             }
         },
-        "internal_resources_recurrences.CreateRecurrenceResponseData": {
+        "internal_resources_recurrences_handlers.CreateRecurrenceResponseData": {
             "type": "object",
             "properties": {
                 "recurrence": {
@@ -1322,18 +1333,18 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_resources_recurrences.ListRecurrencesResponse": {
+        "internal_resources_recurrences_handlers.ListRecurrencesResponse": {
             "type": "object",
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/internal_resources_recurrences.ListRecurrencesResponseData"
+                    "$ref": "#/definitions/internal_resources_recurrences_handlers.ListRecurrencesResponseData"
                 },
                 "query": {
                     "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.QueryMeta"
                 }
             }
         },
-        "internal_resources_recurrences.ListRecurrencesResponseData": {
+        "internal_resources_recurrences_handlers.ListRecurrencesResponseData": {
             "type": "object",
             "properties": {
                 "recurrences": {
@@ -1344,7 +1355,7 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_resources_recurrences.UpdateRecurrenceRequest": {
+        "internal_resources_recurrences_handlers.UpdateRecurrenceRequest": {
             "type": "object",
             "properties": {
                 "amount": {
@@ -1376,15 +1387,15 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_resources_recurrences.UpdateRecurrenceResponse": {
+        "internal_resources_recurrences_handlers.UpdateRecurrenceResponse": {
             "type": "object",
             "properties": {
                 "data": {
-                    "$ref": "#/definitions/internal_resources_recurrences.UpdateRecurrenceResponseData"
+                    "$ref": "#/definitions/internal_resources_recurrences_handlers.UpdateRecurrenceResponseData"
                 }
             }
         },
-        "internal_resources_recurrences.UpdateRecurrenceResponseData": {
+        "internal_resources_recurrences_handlers.UpdateRecurrenceResponseData": {
             "type": "object",
             "properties": {
                 "recurrence": {

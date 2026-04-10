@@ -248,7 +248,7 @@ definitions:
       category:
         $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_categories_repository.Category'
     type: object
-  internal_resources_recurrences.CreateRecurrenceRequest:
+  internal_resources_recurrences_handlers.CreateRecurrenceRequest:
     properties:
       amount:
         type: number
@@ -276,31 +276,31 @@ definitions:
     - name
     - start_period
     type: object
-  internal_resources_recurrences.CreateRecurrenceResponse:
+  internal_resources_recurrences_handlers.CreateRecurrenceResponse:
     properties:
       data:
-        $ref: '#/definitions/internal_resources_recurrences.CreateRecurrenceResponseData'
+        $ref: '#/definitions/internal_resources_recurrences_handlers.CreateRecurrenceResponseData'
     type: object
-  internal_resources_recurrences.CreateRecurrenceResponseData:
+  internal_resources_recurrences_handlers.CreateRecurrenceResponseData:
     properties:
       recurrence:
         $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_recurrences_repository.Recurrence'
     type: object
-  internal_resources_recurrences.ListRecurrencesResponse:
+  internal_resources_recurrences_handlers.ListRecurrencesResponse:
     properties:
       data:
-        $ref: '#/definitions/internal_resources_recurrences.ListRecurrencesResponseData'
+        $ref: '#/definitions/internal_resources_recurrences_handlers.ListRecurrencesResponseData'
       query:
         $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.QueryMeta'
     type: object
-  internal_resources_recurrences.ListRecurrencesResponseData:
+  internal_resources_recurrences_handlers.ListRecurrencesResponseData:
     properties:
       recurrences:
         items:
           $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_recurrences_repository.Recurrence'
         type: array
     type: object
-  internal_resources_recurrences.UpdateRecurrenceRequest:
+  internal_resources_recurrences_handlers.UpdateRecurrenceRequest:
     properties:
       amount:
         type: number
@@ -323,12 +323,12 @@ definitions:
       start_period:
         type: string
     type: object
-  internal_resources_recurrences.UpdateRecurrenceResponse:
+  internal_resources_recurrences_handlers.UpdateRecurrenceResponse:
     properties:
       data:
-        $ref: '#/definitions/internal_resources_recurrences.UpdateRecurrenceResponseData'
+        $ref: '#/definitions/internal_resources_recurrences_handlers.UpdateRecurrenceResponseData'
     type: object
-  internal_resources_recurrences.UpdateRecurrenceResponseData:
+  internal_resources_recurrences_handlers.UpdateRecurrenceResponseData:
     properties:
       recurrence:
         $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_recurrences_repository.Recurrence'
@@ -699,7 +699,7 @@ paths:
         "200":
           description: List of recurrences
           schema:
-            $ref: '#/definitions/internal_resources_recurrences.ListRecurrencesResponse'
+            $ref: '#/definitions/internal_resources_recurrences_handlers.ListRecurrencesResponse'
         "401":
           description: Unauthorized
           schema:
@@ -723,14 +723,14 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/internal_resources_recurrences.CreateRecurrenceRequest'
+          $ref: '#/definitions/internal_resources_recurrences_handlers.CreateRecurrenceRequest'
       produces:
       - application/json
       responses:
         "201":
           description: Recurrence created
           schema:
-            $ref: '#/definitions/internal_resources_recurrences.CreateRecurrenceResponse'
+            $ref: '#/definitions/internal_resources_recurrences_handlers.CreateRecurrenceResponse'
         "400":
           description: Bad request
           schema:
@@ -758,6 +758,16 @@ paths:
         in: path
         name: id
         required: true
+        type: string
+      - default: all
+        description: 'Handling of linked transactions: ''all'' (default) deletes the
+          recurrence and all related transactions (past/future); ''until_current''
+          preserves past history but removes future recurrences.'
+        enum:
+        - all
+        - until_current
+        in: query
+        name: scope
         type: string
       produces:
       - application/json
@@ -796,14 +806,14 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/internal_resources_recurrences.UpdateRecurrenceRequest'
+          $ref: '#/definitions/internal_resources_recurrences_handlers.UpdateRecurrenceRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Recurrence updated
           schema:
-            $ref: '#/definitions/internal_resources_recurrences.UpdateRecurrenceResponse'
+            $ref: '#/definitions/internal_resources_recurrences_handlers.UpdateRecurrenceResponse'
         "400":
           description: Bad request
           schema:
@@ -836,7 +846,7 @@ paths:
       produces:
       - application/json
       responses:
-        "200":
+        "204":
           description: Recurrences prepared
         "400":
           description: Bad request
