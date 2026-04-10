@@ -26,12 +26,12 @@ func (o *CreateOptions) Complete(ctx *gin.Context) error {
 
 	keys, err := utils.GetJSONKeys(ctx)
 	if err != nil {
-		return err
+		return utils.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	o.PassedKeys = keys
 
 	if err := ctx.ShouldBindJSON(&o.Body); err != nil {
-		return err
+		return utils.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	return nil
