@@ -31,6 +31,9 @@ gen-docs-install:
 lint:
 	golangci-lint run ./...
 
+lint-fix:
+	golangci-lint run --fix ./...
+
 lint-install:
 	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
 
