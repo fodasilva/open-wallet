@@ -47,7 +47,9 @@ func SetupTestResources(t *testing.T) *TestResources {
 			"POSTGRES_PASSWORD": "test",
 			"POSTGRES_DB":       "testdb",
 		},
-		WaitingFor: wait.ForListeningPort("5432/tcp"),
+		WaitingFor: wait.ForSQL("5432/tcp", "postgres", func(host string, port nat.Port) string {
+			return fmt.Sprintf("postgres://test:test@%s:%s/testdb?sslmode=disable", host, port.Port())
+		}),
 	}
 	pgContainer, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
 		ContainerRequest: postgresReq,
