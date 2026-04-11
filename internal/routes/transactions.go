@@ -7,12 +7,12 @@ import (
 	"github.com/felipe1496/open-wallet/infra"
 	"github.com/felipe1496/open-wallet/internal/factory"
 	"github.com/felipe1496/open-wallet/internal/middlewares"
-	"github.com/felipe1496/open-wallet/internal/resources/transactions"
+	"github.com/felipe1496/open-wallet/internal/resources/transactions/handlers"
 )
 
 func SetupTransactionsRoutes(r *gin.Engine, f *factory.Factory, redisClient *redis.Client, cfg *infra.Config) {
 	jwtService := f.JWTService()
-	transactionsHandler := transactions.NewHandler(f.TransactionsUseCases())
+	transactionsHandler := handlers.NewHandler(f.TransactionsUseCases())
 	transactionsGroup := r.Group("/api/v1/transactions")
 	{
 		transactionsGroup.GET("/entries",

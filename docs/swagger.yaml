@@ -54,6 +54,113 @@ definitions:
       user_id:
         type: string
     type: object
+  github_com_felipe1496_open-wallet_internal_resources_transactions.CreateEntryRequest:
+    properties:
+      amount:
+        maximum: 999999
+        minimum: -999999
+        type: number
+      reference_date:
+        type: string
+    required:
+    - amount
+    - reference_date
+    type: object
+  github_com_felipe1496_open-wallet_internal_resources_transactions.CreateTransactionRequest:
+    properties:
+      category_id:
+        type: string
+      entries:
+        items:
+          $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions.CreateEntryRequest'
+        maxItems: 100
+        minItems: 1
+        type: array
+      name:
+        maxLength: 100
+        minLength: 1
+        type: string
+      note:
+        maxLength: 400
+        minLength: 0
+        type: string
+      type:
+        allOf:
+        - $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions_repository.TransactionType'
+        enum:
+        - installment
+        - simple_expense
+        - income
+    required:
+    - entries
+    - name
+    - type
+    type: object
+  github_com_felipe1496_open-wallet_internal_resources_transactions.CreateTransactionResponse:
+    properties:
+      data:
+        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions.CreateTransactionResponseData'
+    type: object
+  github_com_felipe1496_open-wallet_internal_resources_transactions.CreateTransactionResponseData:
+    properties:
+      transaction:
+        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions_repository.Transaction'
+    type: object
+  github_com_felipe1496_open-wallet_internal_resources_transactions.ListEntriesResponse:
+    properties:
+      data:
+        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions.ListEntriesResponseData'
+      query:
+        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.QueryMeta'
+    type: object
+  github_com_felipe1496_open-wallet_internal_resources_transactions.ListEntriesResponseData:
+    properties:
+      entries:
+        items:
+          $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions_repository.ViewEntry'
+        type: array
+    type: object
+  github_com_felipe1496_open-wallet_internal_resources_transactions.UpdateEntryRequest:
+    properties:
+      amount:
+        maximum: 999999
+        minimum: -999999
+        type: number
+      reference_date:
+        type: string
+    required:
+    - amount
+    - reference_date
+    type: object
+  github_com_felipe1496_open-wallet_internal_resources_transactions.UpdateTransactionRequest:
+    properties:
+      category_id:
+        type: string
+      entries:
+        items:
+          $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions.UpdateEntryRequest'
+        maxItems: 100
+        minItems: 1
+        type: array
+      name:
+        maxLength: 100
+        minLength: 1
+        type: string
+      note:
+        maxLength: 400
+        minLength: 0
+        type: string
+    type: object
+  github_com_felipe1496_open-wallet_internal_resources_transactions.UpdateTransactionResponse:
+    properties:
+      data:
+        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions.UpdateTransactionResponseData'
+    type: object
+  github_com_felipe1496_open-wallet_internal_resources_transactions.UpdateTransactionResponseData:
+    properties:
+      transaction:
+        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions_repository.Transaction'
+    type: object
   github_com_felipe1496_open-wallet_internal_resources_transactions_repository.Transaction:
     properties:
       category_id:
@@ -332,113 +439,6 @@ definitions:
     properties:
       recurrence:
         $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_recurrences_repository.Recurrence'
-    type: object
-  internal_resources_transactions.CreateEntryRequest:
-    properties:
-      amount:
-        maximum: 999999
-        minimum: -999999
-        type: number
-      reference_date:
-        type: string
-    required:
-    - amount
-    - reference_date
-    type: object
-  internal_resources_transactions.CreateTransactionRequest:
-    properties:
-      category_id:
-        type: string
-      entries:
-        items:
-          $ref: '#/definitions/internal_resources_transactions.CreateEntryRequest'
-        maxItems: 100
-        minItems: 1
-        type: array
-      name:
-        maxLength: 100
-        minLength: 1
-        type: string
-      note:
-        maxLength: 400
-        minLength: 0
-        type: string
-      type:
-        allOf:
-        - $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions_repository.TransactionType'
-        enum:
-        - installment
-        - simple_expense
-        - income
-    required:
-    - entries
-    - name
-    - type
-    type: object
-  internal_resources_transactions.CreateTransactionResponse:
-    properties:
-      data:
-        $ref: '#/definitions/internal_resources_transactions.CreateTransactionResponseData'
-    type: object
-  internal_resources_transactions.CreateTransactionResponseData:
-    properties:
-      transaction:
-        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions_repository.Transaction'
-    type: object
-  internal_resources_transactions.ListEntriesResponse:
-    properties:
-      data:
-        $ref: '#/definitions/internal_resources_transactions.ListEntriesResponseData'
-      query:
-        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.QueryMeta'
-    type: object
-  internal_resources_transactions.ListEntriesResponseData:
-    properties:
-      entries:
-        items:
-          $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions_repository.ViewEntry'
-        type: array
-    type: object
-  internal_resources_transactions.UpdateEntryRequest:
-    properties:
-      amount:
-        maximum: 999999
-        minimum: -999999
-        type: number
-      reference_date:
-        type: string
-    required:
-    - amount
-    - reference_date
-    type: object
-  internal_resources_transactions.UpdateTransactionRequest:
-    properties:
-      category_id:
-        type: string
-      entries:
-        items:
-          $ref: '#/definitions/internal_resources_transactions.UpdateEntryRequest'
-        maxItems: 100
-        minItems: 1
-        type: array
-      name:
-        maxLength: 100
-        minLength: 1
-        type: string
-      note:
-        maxLength: 400
-        minLength: 0
-        type: string
-    type: object
-  internal_resources_transactions.UpdateTransactionResponse:
-    properties:
-      data:
-        $ref: '#/definitions/internal_resources_transactions.UpdateTransactionResponseData'
-    type: object
-  internal_resources_transactions.UpdateTransactionResponseData:
-    properties:
-      transaction:
-        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions_repository.Transaction'
     type: object
 info:
   contact: {}
@@ -876,14 +876,14 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/internal_resources_transactions.CreateTransactionRequest'
+          $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions.CreateTransactionRequest'
       produces:
       - application/json
       responses:
-        "200":
+        "201":
           description: Installment updated
           schema:
-            $ref: '#/definitions/internal_resources_transactions.CreateTransactionResponse'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions.CreateTransactionResponse'
         "400":
           description: Bad request
           schema:
@@ -949,14 +949,14 @@ paths:
         name: body
         required: true
         schema:
-          $ref: '#/definitions/internal_resources_transactions.UpdateTransactionRequest'
+          $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions.UpdateTransactionRequest'
       produces:
       - application/json
       responses:
         "200":
           description: Installment updated
           schema:
-            $ref: '#/definitions/internal_resources_transactions.UpdateTransactionResponse'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions.UpdateTransactionResponse'
         "400":
           description: Bad request
           schema:
@@ -1002,7 +1002,7 @@ paths:
         "200":
           description: List of entries
           schema:
-            $ref: '#/definitions/internal_resources_transactions.ListEntriesResponse'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions.ListEntriesResponse'
         "401":
           description: Unauthorized
           schema:

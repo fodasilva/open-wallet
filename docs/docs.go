@@ -688,15 +688,15 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_resources_transactions.CreateTransactionRequest"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions.CreateTransactionRequest"
                         }
                     }
                 ],
                 "responses": {
-                    "200": {
+                    "201": {
                         "description": "Installment updated",
                         "schema": {
-                            "$ref": "#/definitions/internal_resources_transactions.CreateTransactionResponse"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions.CreateTransactionResponse"
                         }
                     },
                     "400": {
@@ -765,7 +765,7 @@ const docTemplate = `{
                     "200": {
                         "description": "List of entries",
                         "schema": {
-                            "$ref": "#/definitions/internal_resources_transactions.ListEntriesResponse"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions.ListEntriesResponse"
                         }
                     },
                     "401": {
@@ -865,7 +865,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/internal_resources_transactions.UpdateTransactionRequest"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions.UpdateTransactionRequest"
                         }
                     }
                 ],
@@ -873,7 +873,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Installment updated",
                         "schema": {
-                            "$ref": "#/definitions/internal_resources_transactions.UpdateTransactionResponse"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions.UpdateTransactionResponse"
                         }
                     },
                     "400": {
@@ -980,6 +980,163 @@ const docTemplate = `{
                 },
                 "user_id": {
                     "type": "string"
+                }
+            }
+        },
+        "github_com_felipe1496_open-wallet_internal_resources_transactions.CreateEntryRequest": {
+            "type": "object",
+            "required": [
+                "amount",
+                "reference_date"
+            ],
+            "properties": {
+                "amount": {
+                    "type": "number",
+                    "maximum": 999999,
+                    "minimum": -999999
+                },
+                "reference_date": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_felipe1496_open-wallet_internal_resources_transactions.CreateTransactionRequest": {
+            "type": "object",
+            "required": [
+                "entries",
+                "name",
+                "type"
+            ],
+            "properties": {
+                "category_id": {
+                    "type": "string"
+                },
+                "entries": {
+                    "type": "array",
+                    "maxItems": 100,
+                    "minItems": 1,
+                    "items": {
+                        "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions.CreateEntryRequest"
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 1
+                },
+                "note": {
+                    "type": "string",
+                    "maxLength": 400,
+                    "minLength": 0
+                },
+                "type": {
+                    "enum": [
+                        "installment",
+                        "simple_expense",
+                        "income"
+                    ],
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions_repository.TransactionType"
+                        }
+                    ]
+                }
+            }
+        },
+        "github_com_felipe1496_open-wallet_internal_resources_transactions.CreateTransactionResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions.CreateTransactionResponseData"
+                }
+            }
+        },
+        "github_com_felipe1496_open-wallet_internal_resources_transactions.CreateTransactionResponseData": {
+            "type": "object",
+            "properties": {
+                "transaction": {
+                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions_repository.Transaction"
+                }
+            }
+        },
+        "github_com_felipe1496_open-wallet_internal_resources_transactions.ListEntriesResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions.ListEntriesResponseData"
+                },
+                "query": {
+                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.QueryMeta"
+                }
+            }
+        },
+        "github_com_felipe1496_open-wallet_internal_resources_transactions.ListEntriesResponseData": {
+            "type": "object",
+            "properties": {
+                "entries": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions_repository.ViewEntry"
+                    }
+                }
+            }
+        },
+        "github_com_felipe1496_open-wallet_internal_resources_transactions.UpdateEntryRequest": {
+            "type": "object",
+            "required": [
+                "amount",
+                "reference_date"
+            ],
+            "properties": {
+                "amount": {
+                    "type": "number",
+                    "maximum": 999999,
+                    "minimum": -999999
+                },
+                "reference_date": {
+                    "type": "string"
+                }
+            }
+        },
+        "github_com_felipe1496_open-wallet_internal_resources_transactions.UpdateTransactionRequest": {
+            "type": "object",
+            "properties": {
+                "category_id": {
+                    "type": "string"
+                },
+                "entries": {
+                    "type": "array",
+                    "maxItems": 100,
+                    "minItems": 1,
+                    "items": {
+                        "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions.UpdateEntryRequest"
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 1
+                },
+                "note": {
+                    "type": "string",
+                    "maxLength": 400,
+                    "minLength": 0
+                }
+            }
+        },
+        "github_com_felipe1496_open-wallet_internal_resources_transactions.UpdateTransactionResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions.UpdateTransactionResponseData"
+                }
+            }
+        },
+        "github_com_felipe1496_open-wallet_internal_resources_transactions.UpdateTransactionResponseData": {
+            "type": "object",
+            "properties": {
+                "transaction": {
+                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions_repository.Transaction"
                 }
             }
         },
@@ -1400,163 +1557,6 @@ const docTemplate = `{
             "properties": {
                 "recurrence": {
                     "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_recurrences_repository.Recurrence"
-                }
-            }
-        },
-        "internal_resources_transactions.CreateEntryRequest": {
-            "type": "object",
-            "required": [
-                "amount",
-                "reference_date"
-            ],
-            "properties": {
-                "amount": {
-                    "type": "number",
-                    "maximum": 999999,
-                    "minimum": -999999
-                },
-                "reference_date": {
-                    "type": "string"
-                }
-            }
-        },
-        "internal_resources_transactions.CreateTransactionRequest": {
-            "type": "object",
-            "required": [
-                "entries",
-                "name",
-                "type"
-            ],
-            "properties": {
-                "category_id": {
-                    "type": "string"
-                },
-                "entries": {
-                    "type": "array",
-                    "maxItems": 100,
-                    "minItems": 1,
-                    "items": {
-                        "$ref": "#/definitions/internal_resources_transactions.CreateEntryRequest"
-                    }
-                },
-                "name": {
-                    "type": "string",
-                    "maxLength": 100,
-                    "minLength": 1
-                },
-                "note": {
-                    "type": "string",
-                    "maxLength": 400,
-                    "minLength": 0
-                },
-                "type": {
-                    "enum": [
-                        "installment",
-                        "simple_expense",
-                        "income"
-                    ],
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions_repository.TransactionType"
-                        }
-                    ]
-                }
-            }
-        },
-        "internal_resources_transactions.CreateTransactionResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "$ref": "#/definitions/internal_resources_transactions.CreateTransactionResponseData"
-                }
-            }
-        },
-        "internal_resources_transactions.CreateTransactionResponseData": {
-            "type": "object",
-            "properties": {
-                "transaction": {
-                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions_repository.Transaction"
-                }
-            }
-        },
-        "internal_resources_transactions.ListEntriesResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "$ref": "#/definitions/internal_resources_transactions.ListEntriesResponseData"
-                },
-                "query": {
-                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.QueryMeta"
-                }
-            }
-        },
-        "internal_resources_transactions.ListEntriesResponseData": {
-            "type": "object",
-            "properties": {
-                "entries": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions_repository.ViewEntry"
-                    }
-                }
-            }
-        },
-        "internal_resources_transactions.UpdateEntryRequest": {
-            "type": "object",
-            "required": [
-                "amount",
-                "reference_date"
-            ],
-            "properties": {
-                "amount": {
-                    "type": "number",
-                    "maximum": 999999,
-                    "minimum": -999999
-                },
-                "reference_date": {
-                    "type": "string"
-                }
-            }
-        },
-        "internal_resources_transactions.UpdateTransactionRequest": {
-            "type": "object",
-            "properties": {
-                "category_id": {
-                    "type": "string"
-                },
-                "entries": {
-                    "type": "array",
-                    "maxItems": 100,
-                    "minItems": 1,
-                    "items": {
-                        "$ref": "#/definitions/internal_resources_transactions.UpdateEntryRequest"
-                    }
-                },
-                "name": {
-                    "type": "string",
-                    "maxLength": 100,
-                    "minLength": 1
-                },
-                "note": {
-                    "type": "string",
-                    "maxLength": 400,
-                    "minLength": 0
-                }
-            }
-        },
-        "internal_resources_transactions.UpdateTransactionResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "$ref": "#/definitions/internal_resources_transactions.UpdateTransactionResponseData"
-                }
-            }
-        },
-        "internal_resources_transactions.UpdateTransactionResponseData": {
-            "type": "object",
-            "properties": {
-                "transaction": {
-                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions_repository.Transaction"
                 }
             }
         }
