@@ -88,7 +88,7 @@ func (o *UpdateOptions) Run() error {
 // @Failure 401 {object} utils.HTTPError "Unauthorized"
 // @Failure 404 {object} utils.HTTPError "Not found"
 // @Failure 500 {object} utils.HTTPError "Internal server error"
-// @Router /categories/{category_id} [patch]
+// @Router /api/v1/categories/{category_id} [patch]
 func (api *API) Update(ctx *gin.Context) {
 	cmd := &UpdateOptions{
 		UseCases: api.categoriesUseCases,

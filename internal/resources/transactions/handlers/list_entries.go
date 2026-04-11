@@ -92,7 +92,7 @@ func (o *ListEntriesOptions) Run() error {
 // @Success 200 {object} transactions.ListEntriesResponse "List of entries"
 // @Failure 401 {object} utils.HTTPError "Unauthorized"
 // @Failure 500 {object} utils.HTTPError "Internal server error"
-// @Router /transactions/entries [get]
+// @Router /api/v1/transactions/entries [get]
 func (api *API) ListEntries(ctx *gin.Context) {
 	cmd := &ListEntriesOptions{
 		UseCases: api.transactionsUseCases,

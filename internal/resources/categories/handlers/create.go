@@ -62,7 +62,7 @@ func (o *CreateOptions) Run() error {
 // @Success 201 {object} CreateCategoryResponse "Category created"
 // @Failure 401 {object} utils.HTTPError "Unauthorized"
 // @Failure 500 {object} utils.HTTPError "Internal server error"
-// @Router /categories [post]
+// @Router /api/v1/categories [post]
 func (api *API) Create(ctx *gin.Context) {
 	cmd := &CreateOptions{
 		UseCases: api.categoriesUseCases,

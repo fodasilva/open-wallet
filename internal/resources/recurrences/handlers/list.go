@@ -88,7 +88,7 @@ func (o *ListOptions) Run() error {
 // @Success 200 {object} ListRecurrencesResponse "List of recurrences"
 // @Failure 401 {object} utils.HTTPError "Unauthorized"
 // @Failure 500 {object} utils.HTTPError "Internal server error"
-// @Router /recurrences [get]
+// @Router /api/v1/recurrences [get]
 func (api *API) List(ctx *gin.Context) {
 	cmd := &ListOptions{
 		UseCases: api.recurrencesUseCases,

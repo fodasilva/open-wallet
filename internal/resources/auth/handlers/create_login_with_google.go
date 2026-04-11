@@ -62,7 +62,7 @@ func (o *CreateLoginWithGoogleOptions) Run() error {
 // @Success 200 {object} LoginGoogleResponse "User logged in"
 // @Failure 400 {object} utils.HTTPError "Bad request"
 // @Failure 401 {object} utils.HTTPError "Unauthorized"
-// @Router /auth/login/google [post]
+// @Router /api/v1/auth/login/google [post]
 func (api *API) CreateLoginWithGoogle(ctx *gin.Context) {
 	cmd := &CreateLoginWithGoogleOptions{
 		UseCases:   api.authUseCases,

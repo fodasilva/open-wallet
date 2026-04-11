@@ -107,7 +107,7 @@ func (o *UpdateTransactionOptions) Run() error {
 // @Failure 400 {object} utils.HTTPError "Bad request"
 // @Failure 401 {object} utils.HTTPError "Unauthorized"
 // @Failure 500 {object} utils.HTTPError "Internal server error"
-// @Router /transactions/{transaction_id} [patch]
+// @Router /api/v1/transactions/{transaction_id} [patch]
 func (api *API) UpdateTransaction(ctx *gin.Context) {
 	cmd := &UpdateTransactionOptions{
 		UseCases: api.transactionsUseCases,

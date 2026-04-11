@@ -1,11 +1,13 @@
 {
     "swagger": "2.0",
     "info": {
+        "description": "This is the Open Wallet API.",
         "title": "Open Wallet API",
-        "contact": {}
+        "contact": {},
+        "version": "1.0"
     },
     "paths": {
-        "/auth/login/google": {
+        "/api/v1/auth/login/google": {
             "post": {
                 "description": "Authenticates user with Google OAuth",
                 "consumes": [
@@ -51,7 +53,7 @@
                 }
             }
         },
-        "/categories": {
+        "/api/v1/categories": {
             "get": {
                 "security": [
                     {
@@ -175,7 +177,7 @@
                 }
             }
         },
-        "/categories/{category_id}": {
+        "/api/v1/categories/{category_id}": {
             "delete": {
                 "security": [
                     {
@@ -289,7 +291,7 @@
                 }
             }
         },
-        "/categories/{period}": {
+        "/api/v1/categories/{period}": {
             "get": {
                 "security": [
                     {
@@ -365,7 +367,7 @@
                 }
             }
         },
-        "/recurrences": {
+        "/api/v1/recurrences": {
             "get": {
                 "security": [
                     {
@@ -476,7 +478,7 @@
                 }
             }
         },
-        "/recurrences/{id}": {
+        "/api/v1/recurrences/{id}": {
             "delete": {
                 "security": [
                     {
@@ -601,7 +603,7 @@
                 }
             }
         },
-        "/recurrences/{period}": {
+        "/api/v1/recurrences/{period}": {
             "post": {
                 "security": [
                     {
@@ -653,7 +655,7 @@
                 }
             }
         },
-        "/transactions": {
+        "/api/v1/transactions": {
             "post": {
                 "security": [
                     {
@@ -710,7 +712,7 @@
                 }
             }
         },
-        "/transactions/entries": {
+        "/api/v1/transactions/entries": {
             "get": {
                 "security": [
                     {
@@ -773,7 +775,7 @@
                 }
             }
         },
-        "/transactions/{transaction_id}": {
+        "/api/v1/transactions/{transaction_id}": {
             "delete": {
                 "security": [
                     {

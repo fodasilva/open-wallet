@@ -80,7 +80,7 @@ func (o *CreateTransactionOptions) Run() error {
 // @Failure 400 {object} utils.HTTPError "Bad request"
 // @Failure 401 {object} utils.HTTPError "Unauthorized"
 // @Failure 500 {object} utils.HTTPError "Internal server error"
-// @Router /transactions [post]
+// @Router /api/v1/transactions [post]
 func (api *API) CreateTransaction(ctx *gin.Context) {
 	cmd := &CreateTransactionOptions{
 		UseCases: api.transactionsUseCases,

@@ -78,7 +78,7 @@ func (o *CreateOptions) Run() error {
 // @Failure 400 {object} utils.HTTPError "Bad request"
 // @Failure 401 {object} utils.HTTPError "Unauthorized"
 // @Failure 500 {object} utils.HTTPError "Internal server error"
-// @Router /recurrences [post]
+// @Router /api/v1/recurrences [post]
 func (api *API) Create(ctx *gin.Context) {
 	cmd := &CreateOptions{
 		UseCases: api.recurrencesUseCases,
