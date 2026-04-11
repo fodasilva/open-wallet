@@ -24,10 +24,10 @@ type CreateEntryRequest struct {
 }
 
 type UpdateTransactionRequest struct {
-	Name       *string               `json:"name" binding:"omitempty,min=1,max=100"`
-	CategoryID *string               `json:"category_id" binding:"omitempty"`
-	Note       *string               `json:"note" binding:"omitempty,min=0,max=400"`
-	Entries    *[]UpdateEntryRequest `json:"entries" binding:"omitempty,min=1,max=100,dive"`
+	Name       *string               `json:"name,omitempty" binding:"omitempty,min=1,max=100"`
+	CategoryID *string               `json:"category_id,omitempty" binding:"omitempty"`
+	Note       *string               `json:"note,omitempty" binding:"omitempty,min=0,max=400"`
+	Entries    *[]UpdateEntryRequest `json:"entries,omitempty" binding:"omitempty,min=1,max=100,dive"`
 }
 
 type UpdateEntryRequest struct {
