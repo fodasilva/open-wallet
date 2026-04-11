@@ -15,7 +15,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/auth/login/google": {
+        "/api/v1/auth/login/google": {
             "post": {
                 "description": "Authenticates user with Google OAuth",
                 "consumes": [
@@ -61,7 +61,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/categories": {
+        "/api/v1/categories": {
             "get": {
                 "security": [
                     {
@@ -185,7 +185,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/categories/{category_id}": {
+        "/api/v1/categories/{category_id}": {
             "delete": {
                 "security": [
                     {
@@ -299,7 +299,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/categories/{period}": {
+        "/api/v1/categories/{period}": {
             "get": {
                 "security": [
                     {
@@ -375,7 +375,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/recurrences": {
+        "/api/v1/recurrences": {
             "get": {
                 "security": [
                     {
@@ -486,7 +486,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/recurrences/{id}": {
+        "/api/v1/recurrences/{id}": {
             "delete": {
                 "security": [
                     {
@@ -611,7 +611,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/recurrences/{period}": {
+        "/api/v1/recurrences/{period}": {
             "post": {
                 "security": [
                     {
@@ -663,7 +663,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/transactions": {
+        "/api/v1/transactions": {
             "post": {
                 "security": [
                     {
@@ -720,7 +720,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/transactions/entries": {
+        "/api/v1/transactions/entries": {
             "get": {
                 "security": [
                     {
@@ -783,7 +783,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/transactions/{transaction_id}": {
+        "/api/v1/transactions/{transaction_id}": {
             "delete": {
                 "security": [
                     {
@@ -1572,12 +1572,12 @@ const docTemplate = `{
 
 // SwaggerInfo holds exported Swagger Info so clients can modify it
 var SwaggerInfo = &swag.Spec{
-	Version:          "",
+	Version:          "1.0",
 	Host:             "",
 	BasePath:         "",
 	Schemes:          []string{},
 	Title:            "Open Wallet API",
-	Description:      "",
+	Description:      "This is the Open Wallet API.",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 	LeftDelim:        "{{",

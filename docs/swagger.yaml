@@ -442,9 +442,11 @@ definitions:
     type: object
 info:
   contact: {}
+  description: This is the Open Wallet API.
   title: Open Wallet API
+  version: "1.0"
 paths:
-  /auth/login/google:
+  /api/v1/auth/login/google:
     post:
       consumes:
       - application/json
@@ -474,7 +476,7 @@ paths:
       summary: Login with Google
       tags:
       - auth
-  /categories:
+  /api/v1/categories:
     get:
       consumes:
       - application/json
@@ -554,7 +556,7 @@ paths:
       summary: Create a category
       tags:
       - categories
-  /categories/{category_id}:
+  /api/v1/categories/{category_id}:
     delete:
       consumes:
       - application/json
@@ -627,7 +629,7 @@ paths:
       summary: Update Category By ID
       tags:
       - categories
-  /categories/{period}:
+  /api/v1/categories/{period}:
     get:
       consumes:
       - application/json
@@ -677,7 +679,7 @@ paths:
       summary: List categories with amount per period
       tags:
       - categories
-  /recurrences:
+  /api/v1/recurrences:
     get:
       consumes:
       - application/json
@@ -748,7 +750,7 @@ paths:
       summary: Create a recurrence
       tags:
       - recurrences
-  /recurrences/{id}:
+  /api/v1/recurrences/{id}:
     delete:
       consumes:
       - application/json
@@ -831,7 +833,7 @@ paths:
       summary: Update a recurrence
       tags:
       - recurrences
-  /recurrences/{period}:
+  /api/v1/recurrences/{period}:
     post:
       consumes:
       - application/json
@@ -865,7 +867,7 @@ paths:
       summary: Prepare recurrences for a period
       tags:
       - recurrences
-  /transactions:
+  /api/v1/transactions:
     post:
       consumes:
       - application/json
@@ -901,7 +903,7 @@ paths:
       summary: Create a transaction
       tags:
       - transactions
-  /transactions/{transaction_id}:
+  /api/v1/transactions/{transaction_id}:
     delete:
       consumes:
       - application/json
@@ -974,7 +976,7 @@ paths:
       summary: Update a transaction
       tags:
       - transactions
-  /transactions/entries:
+  /api/v1/transactions/entries:
     get:
       consumes:
       - application/json

@@ -87,7 +87,7 @@ func (o *ListOptions) Run() error {
 // @Success 200 {object} ListCategoriesResponse "List of categories"
 // @Failure 401 {object} utils.HTTPError "Unauthorized"
 // @Failure 500 {object} utils.HTTPError "Internal server error"
-// @Router /categories [get]
+// @Router /api/v1/categories [get]
 func (api *API) List(ctx *gin.Context) {
 	cmd := &ListOptions{
 		UseCases: api.categoriesUseCases,

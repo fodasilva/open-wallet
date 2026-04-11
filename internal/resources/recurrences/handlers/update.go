@@ -98,7 +98,7 @@ func (o *UpdateOptions) Run() error {
 // @Failure 400 {object} utils.HTTPError "Bad request"
 // @Failure 401 {object} utils.HTTPError "Unauthorized"
 // @Failure 500 {object} utils.HTTPError "Internal server error"
-// @Router /recurrences/{id} [patch]
+// @Router /api/v1/recurrences/{id} [patch]
 func (api *API) Update(ctx *gin.Context) {
 	cmd := &UpdateOptions{
 		UseCases: api.recurrencesUseCases,

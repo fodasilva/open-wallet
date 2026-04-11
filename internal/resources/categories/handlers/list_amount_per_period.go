@@ -83,7 +83,7 @@ func (o *ListAmountPerPeriodOptions) Run() error {
 // @Success 200 {object} ListCategoryAmountPerPeriodResponse "List of categories with amount per period"
 // @Failure 401 {object} utils.HTTPError "Unauthorized"
 // @Failure 500 {object} utils.HTTPError "Internal server error"
-// @Router /categories/{period} [get]
+// @Router /api/v1/categories/{period} [get]
 func (api *API) ListCategoryAmountPerPeriod(ctx *gin.Context) {
 	cmd := &ListAmountPerPeriodOptions{
 		UseCases: api.categoriesUseCases,

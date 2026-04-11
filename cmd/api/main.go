@@ -11,7 +11,7 @@ import (
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
-	docs "github.com/felipe1496/open-wallet/docs"
+	_ "github.com/felipe1496/open-wallet/docs"
 	"github.com/felipe1496/open-wallet/infra"
 	"github.com/felipe1496/open-wallet/internal/factory"
 	"github.com/felipe1496/open-wallet/internal/middlewares"
@@ -19,6 +19,8 @@ import (
 )
 
 // @title Open Wallet API
+// @version 1.0
+// @description This is the Open Wallet API.
 // @securityDefinitions.apikey BearerAuth
 // @in header
 // @name Authorization
@@ -45,8 +47,9 @@ func main() {
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 
-	docs.SwaggerInfo.BasePath = "/api/v1"
-	r.GET("/api-docs/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+	if cfg.Environment == "dev" {
+		r.GET("/api-docs/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+	}
 
 	f := factory.NewFactory(dbConn, cfg)
 	routes.SetupRoutes(r, f, redisClient, cfg)

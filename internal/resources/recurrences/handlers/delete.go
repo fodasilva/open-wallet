@@ -58,7 +58,7 @@ func (o *DeleteOptions) Run() error {
 // @Failure 401 {object} utils.HTTPError "Unauthorized"
 // @Failure 404 {object} utils.HTTPError "Not found"
 // @Failure 500 {object} utils.HTTPError "Internal server error"
-// @Router /recurrences/{id} [delete]
+// @Router /api/v1/recurrences/{id} [delete]
 func (api *API) Delete(ctx *gin.Context) {
 	cmd := &DeleteOptions{
 		UseCases: api.recurrencesUseCases,

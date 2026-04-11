@@ -62,7 +62,7 @@ func (o *PrepareOptions) Run() error {
 // @Failure 400 {object} utils.HTTPError "Bad request"
 // @Failure 401 {object} utils.HTTPError "Unauthorized"
 // @Failure 500 {object} utils.HTTPError "Internal server error"
-// @Router /recurrences/{period} [post]
+// @Router /api/v1/recurrences/{period} [post]
 func (api *API) Prepare(ctx *gin.Context) {
 	cmd := &PrepareOptions{
 		UseCases: api.recurrencesUseCases,
