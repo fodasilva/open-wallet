@@ -97,6 +97,10 @@ Use the following template when creating a new endpoint in a `/handlers` package
 // - <Entities>  → PascalCase plural resource name (e.g. Categories)
 // - <Action>    → PascalCase handler action name  (e.g. Create, List)
 // - <action>    → lowercase action name           (e.g. create, list)
+// - <endpoint>  → HTTP endpoint path              (e.g. /categories)
+// - <method>    → HTTP method                     (e.g. POST, GET, PUT, DELETE)
+// - <status>    → HTTP status code                (e.g. 200, 201, 400, 401, 404, 500)
+// - <response>  → HTTP response type              (e.g. interface{}, transactions.ListEntriesResponse)
 
 package handlers
 
@@ -179,10 +183,10 @@ func (o *<Action>Options) Run() error {
 // @Security BearerAuth
 // @Accept json
 // @Produce json
-// @Success 200 {object} interface{} "Success"
+// @Success <status> {object} <response> "Success"
 // @Failure 401 {object} utils.HTTPError "Unauthorized"
 // @Failure 500 {object} utils.HTTPError "Internal server error"
-// @Router /<entities>/<action> [post]
+// @Router <endpoint> [<method>]
 func (api *API) <Action>(ctx *gin.Context) {
 	cmd := &<Action>Options{
 		UseCases: api.<entities>UseCases,

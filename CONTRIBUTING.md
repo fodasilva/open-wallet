@@ -21,6 +21,7 @@ Before starting any development, please read the documentation for each layer:
 - [**Usecase Pattern**](docs/USECASE_PATTERN.md): Service layer and business logic.
 - [**Repository Generator**](docs/REPOSITORY_GENERATOR.md): Automation for database operations.
 - [**Query Builder**](docs/QUERY_BUILDER.md): Standardized filtering for repositories.
+- [**E2E Testing**](docs/E2E_TESTING_DIRECTIVES.md): Patterns and conventions for writing E2E tests.
 
 ### 2. Local Development
 
@@ -59,7 +60,7 @@ The standard workflow for adding a new feature involves:
 ### 4. Code Quality & Testing
 
 -   **Linting**: Always run `make lint` before committing your changes.
--   **Testing Strategy**: We prioritize **E2E tests** over unit and integration tests, as they provide more value by validating the entire request/response lifecycle and real database interactions.
+-   **Testing Strategy**: We prioritize **E2E tests** over unit and integration tests, as they provide more value by validating the entire request/response lifecycle and real database interactions. Please read our [**E2E Testing Directives**](docs/E2E_TESTING_DIRECTIVES.md) before writing tests.
     -   **E2E Tests**: Use these for all API endpoints and core business flows. Run `make test` to execute them.
     -   **Unit or Integration Tests**: Should only be used for small, isolated internal helpers (e.g., complex calculations, formatting, or utility functions).
 -   **Conventional Commits**: While not strictly enforced by hooks, please use descriptive prefixes like `feat:`, `fix:`, `refactor:`, `docs:`, or `chore:`.
