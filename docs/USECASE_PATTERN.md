@@ -4,7 +4,7 @@ This project follows a clean architecture approach by separating business logic 
 
 ## Pattern Rules
 
-1. **Interface Driven**: All usecases are defined as interfaces to allow for easy mocking in tests.
+1. **Interface Driven**: All usecases are defined as interfaces to allow for easy mocking in tests when necessary (see our [E2E Testing Directives](E2E_TESTING_DIRECTIVES.md) for actual test implementation strategies).
 2. **Implementation Decoupling**: The implementation struct (`<Entities>UseCasesImpl`) is private to the package.
 3. **Dependency Injection**: Use cases must receive their dependencies (repositories, services, or other use cases) via their constructor.
 4. **Error Handling**: Use cases should return domain-specific errors or `utils.HTTPError` if the error should be propagated directly to the API.
