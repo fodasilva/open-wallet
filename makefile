@@ -2,7 +2,7 @@ run-dev:
 	go run cmd/api/main.go
 
 test:
-	go test -v ./...
+	go test -v ./... -count=1
 
 test-migrations:
 	go test -v -tags migrations tests/e2e/migrations_test.go
