@@ -11,7 +11,7 @@ import (
 type TransactionsUseCases interface {
 	ListEntries(ctx context.Context) ([]transactionRepo.ViewEntry, error)
 	CountEntries(ctx context.Context) (int, error)
-	DeleteTransactionById(ctx context.Context, id string) error
+	DeleteTransactionById(ctx context.Context, id string, userID string) error
 	CreateTransaction(ctx context.Context, payload CreateTransactionDTO) (transactionRepo.Transaction, error)
 	UpdateTransaction(ctx context.Context, transactionID string, userID string, payload UpdateTransactionDTO) (transactionRepo.Transaction, error)
 }

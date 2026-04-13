@@ -37,7 +37,7 @@ func (uc *RecurrencesUseCasesImpl) DeleteByID(ctx context.Context, id string, us
 		transactionID := txs[0].TransactionID
 		switch scope {
 		case "all":
-			err = uc.transactionsUseCase.DeleteTransactionById(ctx, transactionID)
+			err = uc.transactionsUseCase.DeleteTransactionById(ctx, transactionID, rec.UserID)
 			if err != nil {
 				return utils.NewHTTPError(http.StatusInternalServerError, "failed to delete linked transaction")
 			}
