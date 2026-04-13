@@ -9,7 +9,7 @@ import (
 	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
-func QueryBuilderMiddleware(config *querybuilder.ParseConfig) gin.HandlerFunc {
+func QueryBuilderMiddleware(config querybuilder.ParseConfig) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		results, err := querybuilder.ParseRequest(
 			ctx.Query("filter"),
