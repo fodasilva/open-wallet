@@ -37,13 +37,13 @@ func (o *ListAmountPerPeriodOptions) Validate() error {
 }
 
 func (o *ListAmountPerPeriodOptions) Run() error {
-	reqCtx := querybuilder.WithBuilder(o.Ctx, o.Builder)
+	reqCtx := querybuilder.WithBuilder(o.Ctx.Request.Context(), o.Builder)
 	categories, err := o.UseCases.ListCategoryAmountPerPeriod(reqCtx, o.Period)
 	if err != nil {
 		return err
 	}
 
-	countCtx := querybuilder.WithBuilder(o.Ctx, querybuilder.ForCount(o.Builder))
+	countCtx := querybuilder.WithBuilder(o.Ctx.Request.Context(), querybuilder.ForCount(o.Builder))
 	count, err := o.UseCases.CountCategoryAmountPerPeriod(countCtx, o.Period)
 	if err != nil {
 		return err
