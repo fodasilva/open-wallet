@@ -3,12 +3,14 @@
 package repository
 
 import (
+	"context"
 	"github.com/Masterminds/squirrel"
 	"github.com/felipe1496/open-wallet/internal/utils"
 	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
-func (r *UsersRepoImpl) Delete(db utils.Executer, filter *querybuilder.Builder) error {
+func (r *UsersRepoImpl) Delete(ctx context.Context, db utils.Executer) error {
+	filter := querybuilder.FromContext(ctx)
 	query := squirrel.Delete("users").
 		PlaceholderFormat(squirrel.Dollar)
 
@@ -20,7 +22,7 @@ func (r *UsersRepoImpl) Delete(db utils.Executer, filter *querybuilder.Builder) 
 		return err
 	}
 
-	_, err = db.Exec(sql, args...)
+	_, err = db.ExecContext(ctx, sql, args...)
 
 	return err
 }

@@ -10,8 +10,9 @@ import (
 	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
-func (uc *RecurrencesUseCasesImpl) DeleteByID(id string, userID string, scope string) error {
-	exists, err := uc.repo.Select(uc.db, querybuilder.New().And("id", "eq", id).And("user_id", "eq", userID))
+func (uc *RecurrencesUseCasesImpl) DeleteByID(ctx context.Context, id string, userID string, scope string) error {
+	filterCtx := querybuilder.WithBuilder(ctx, querybuilder.New().And("id", "eq", id).And("user_id", "eq", userID))
+	exists, err := uc.repo.Select(filterCtx, uc.db)
 	if err != nil {
 		return utils.NewHTTPError(http.StatusInternalServerError, "failed to fetch recurrence")
 	}
@@ -23,9 +24,10 @@ func (uc *RecurrencesUseCasesImpl) DeleteByID(id string, userID string, scope st
 	rec := exists[0]
 
 	// Find linked transaction
-	txs, err := uc.transactionsUseCase.ListEntries(context.TODO(), querybuilder.New().
+	txFilterCtx := querybuilder.WithBuilder(ctx, querybuilder.New().
 		And("user_id", "eq", rec.UserID).
 		And("recurrence_id", "eq", rec.ID))
+	txs, err := uc.transactionsUseCase.ListEntries(txFilterCtx)
 
 	if err != nil {
 		return utils.NewHTTPError(http.StatusInternalServerError, "failed to fetch linked transactions")
@@ -35,7 +37,7 @@ func (uc *RecurrencesUseCasesImpl) DeleteByID(id string, userID string, scope st
 		transactionID := txs[0].TransactionID
 		switch scope {
 		case "all":
-			err = uc.transactionsUseCase.DeleteTransactionById(transactionID)
+			err = uc.transactionsUseCase.DeleteTransactionById(ctx, transactionID)
 			if err != nil {
 				return utils.NewHTTPError(http.StatusInternalServerError, "failed to delete linked transaction")
 			}
@@ -51,7 +53,7 @@ func (uc *RecurrencesUseCasesImpl) DeleteByID(id string, userID string, scope st
 				}
 			}
 
-			_, err = uc.transactionsUseCase.UpdateTransaction(transactionID, rec.UserID, usecases.UpdateTransactionDTO{
+			_, err = uc.transactionsUseCase.UpdateTransaction(ctx, transactionID, rec.UserID, usecases.UpdateTransactionDTO{
 				Entries:      utils.OptionalNullable[[]usecases.UpdateEntryDTO]{Set: true, Value: &filteredEntries},
 				RecurrenceID: utils.OptionalNullable[string]{Set: true, Value: nil},
 			})
@@ -61,7 +63,7 @@ func (uc *RecurrencesUseCasesImpl) DeleteByID(id string, userID string, scope st
 		}
 	}
 
-	err = uc.repo.Delete(uc.db, querybuilder.New().And("id", "eq", id).And("user_id", "eq", userID))
+	err = uc.repo.Delete(filterCtx, uc.db)
 	if err != nil {
 		return utils.NewHTTPError(http.StatusInternalServerError, "failed to delete recurrence")
 	}

@@ -1,4 +1,5 @@
-func (r *{{RepoName}}) {{MethodName}}(db utils.Executer, data {{PayloadType}}, filter *querybuilder.Builder) error {
+func (r *{{RepoName}}) {{MethodName}}(ctx context.Context, db utils.Executer, data {{PayloadType}}) error {
+	filter := querybuilder.FromContext(ctx)
 	query := squirrel.Update("{{TableName}}").
 		PlaceholderFormat(squirrel.Dollar)
 
@@ -12,7 +13,7 @@ func (r *{{RepoName}}) {{MethodName}}(db utils.Executer, data {{PayloadType}}, f
 		return err
 	}
 
-	_, err = db.Exec(sql, args...)
+	_, err = db.ExecContext(ctx, sql, args...)
 
 	return err
 }

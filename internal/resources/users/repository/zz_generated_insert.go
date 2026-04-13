@@ -3,11 +3,12 @@
 package repository
 
 import (
+	"context"
 	"github.com/Masterminds/squirrel"
 	"github.com/felipe1496/open-wallet/internal/utils"
 )
 
-func (r *UsersRepoImpl) Insert(db utils.Executer, data CreateUserDTO) error {
+func (r *UsersRepoImpl) Insert(ctx context.Context, db utils.Executer, data CreateUserDTO) error {
 	query := squirrel.Insert("users").
 		PlaceholderFormat(squirrel.Dollar)
 
@@ -30,7 +31,7 @@ func (r *UsersRepoImpl) Insert(db utils.Executer, data CreateUserDTO) error {
 		return err
 	}
 
-	_, err = db.Exec(sql, args...)
+	_, err = db.ExecContext(ctx, sql, args...)
 
 	return err
 }

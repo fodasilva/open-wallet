@@ -1,6 +1,7 @@
 package usecases
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -10,7 +11,7 @@ import (
 	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
-func (uc *AuthUseCasesImpl) LoginWithGoogle(code string) (repository.User, error) {
+func (uc *AuthUseCasesImpl) LoginWithGoogle(ctx context.Context, code string) (repository.User, error) {
 	userAccessToken, err := uc.googleService.GetUserAccessToken(code)
 
 	if err != nil {
@@ -31,7 +32,8 @@ func (uc *AuthUseCasesImpl) LoginWithGoogle(code string) (repository.User, error
 		return repository.User{}, GoogleDintProvideEmailErr
 	}
 
-	userExists, err := uc.usersUseCase.List(querybuilder.New().And("email", "eq", *userInfo.Email))
+	filterCtx := querybuilder.WithBuilder(ctx, querybuilder.New().And("email", "eq", *userInfo.Email))
+	userExists, err := uc.usersUseCase.List(filterCtx)
 
 	if err != nil {
 		return repository.User{}, err
@@ -52,7 +54,7 @@ func (uc *AuthUseCasesImpl) LoginWithGoogle(code string) (repository.User, error
 
 		createUserInput.Username = fmt.Sprintf("%s_%s", strings.ToLower(strings.ReplaceAll(userInfo.Name, " ", "_")), ulid.Make().String())
 
-		createdUser, err := uc.usersUseCase.Create(createUserInput)
+		createdUser, err := uc.usersUseCase.Create(ctx, createUserInput)
 
 		if err != nil {
 			return repository.User{}, err

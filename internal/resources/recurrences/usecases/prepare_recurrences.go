@@ -13,7 +13,8 @@ import (
 )
 
 func (uc *RecurrencesUseCasesImpl) PrepareRecurrences(ctx context.Context, userID string, targetPeriod string) error {
-	recurrences, err := uc.repo.Select(uc.db, querybuilder.New().And("user_id", "eq", userID))
+	filterCtx := querybuilder.WithBuilder(ctx, querybuilder.New().And("user_id", "eq", userID))
+	recurrences, err := uc.repo.Select(filterCtx, uc.db)
 	if err != nil {
 		return utils.NewHTTPError(http.StatusInternalServerError, "failed to fetch recurrences")
 	}
@@ -26,9 +27,10 @@ func (uc *RecurrencesUseCasesImpl) PrepareRecurrences(ctx context.Context, userI
 			continue
 		}
 
-		existingTxs, err := uc.transactionsUseCase.ListEntries(ctx, querybuilder.New().
+		txFilterCtx := querybuilder.WithBuilder(ctx, querybuilder.New().
 			And("user_id", "eq", userID).
 			And("recurrence_id", "eq", rec.ID))
+		existingTxs, err := uc.transactionsUseCase.ListEntries(txFilterCtx)
 		if err != nil {
 			return utils.NewHTTPError(http.StatusInternalServerError, "failed to check existing transactions")
 		}
@@ -42,7 +44,7 @@ func (uc *RecurrencesUseCasesImpl) PrepareRecurrences(ctx context.Context, userI
 		}
 
 		if len(existingTxs) == 0 {
-			_, err := uc.transactionsUseCase.CreateTransaction(usecases.CreateTransactionDTO{
+			_, err := uc.transactionsUseCase.CreateTransaction(ctx, usecases.CreateTransactionDTO{
 				UserID:       userID,
 				Name:         rec.Name,
 				CategoryID:   utils.OptionalNullable[string]{Set: rec.CategoryID != nil, Value: rec.CategoryID},
@@ -85,7 +87,7 @@ func (uc *RecurrencesUseCasesImpl) PrepareRecurrences(ctx context.Context, userI
 				ReferenceDate: newDate,
 			})
 
-			_, err = uc.transactionsUseCase.UpdateTransaction(targetTxID, userID, usecases.UpdateTransactionDTO{
+			_, err = uc.transactionsUseCase.UpdateTransaction(ctx, targetTxID, userID, usecases.UpdateTransactionDTO{
 				Entries: utils.OptionalNullable[[]usecases.UpdateEntryDTO]{Set: true, Value: &payloadEntries},
 			})
 

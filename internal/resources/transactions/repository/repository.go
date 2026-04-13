@@ -1,17 +1,18 @@
 package repository
 
 import (
+	"context"
+
 	"github.com/felipe1496/open-wallet/internal/utils"
-	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
 // Repository interface. Make sure to include methods
 // that you defined with @method tags in types.go and any other methods you need.
 type TransactionsRepo interface {
-	Select(db utils.Executer, filter *querybuilder.Builder) ([]Transaction, error)
-	Insert(db utils.Executer, data CreateTransactionDTO) error
-	Update(db utils.Executer, data UpdateTransactionDTO, filter *querybuilder.Builder) error
-	Delete(db utils.Executer, filter *querybuilder.Builder) error
+	Select(ctx context.Context, db utils.Executer) ([]Transaction, error)
+	Insert(ctx context.Context, db utils.Executer, data CreateTransactionDTO) error
+	Update(ctx context.Context, db utils.Executer, data UpdateTransactionDTO) error
+	Delete(ctx context.Context, db utils.Executer) error
 }
 
 // Implementation struct. Name must match @name tag in types.go
@@ -25,10 +26,10 @@ func NewTransactionsRepo() TransactionsRepo {
 // Repository interface. Make sure to include methods
 // that you defined with @method tags in types.go and any other methods you need.
 type EntriesRepo interface {
-	Select(db utils.Executer, filter *querybuilder.Builder) ([]ViewEntry, error)
-	Insert(db utils.Executer, data CreateEntryDTO) error
-	Delete(db utils.Executer, filter *querybuilder.Builder) error
-	Count(db utils.Executer, filter *querybuilder.Builder) (int, error)
+	Select(ctx context.Context, db utils.Executer) ([]ViewEntry, error)
+	Insert(ctx context.Context, db utils.Executer, data CreateEntryDTO) error
+	Delete(ctx context.Context, db utils.Executer) error
+	Count(ctx context.Context, db utils.Executer) (int, error)
 }
 
 // Implementation struct. Name must match @name tag in types.go

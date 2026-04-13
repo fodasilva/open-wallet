@@ -1,6 +1,7 @@
 package usecases
 
 import (
+	"context"
 	"database/sql"
 	"net/http"
 
@@ -11,8 +12,8 @@ import (
 	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
-func (uc *TransactionsUseCasesImpl) CreateTransaction(payload CreateTransactionDTO) (transactionRepo.Transaction, error) {
-	if err := uc.validateCategory(payload.UserID, payload.CategoryID); err != nil {
+func (uc *TransactionsUseCasesImpl) CreateTransaction(ctx context.Context, payload CreateTransactionDTO) (transactionRepo.Transaction, error) {
+	if err := uc.validateCategory(ctx, payload.UserID, payload.CategoryID); err != nil {
 		return transactionRepo.Transaction{}, err
 	}
 
@@ -26,7 +27,7 @@ func (uc *TransactionsUseCasesImpl) CreateTransaction(payload CreateTransactionD
 	}
 
 	transactionID := ulid.Make().String()
-	err = uc.transactionsRepo.Insert(tx, transactionRepo.CreateTransactionDTO{
+	err = uc.transactionsRepo.Insert(ctx, tx, transactionRepo.CreateTransactionDTO{
 		ID:           transactionID,
 		UserID:       payload.UserID,
 		Type:         payload.Type,
@@ -41,7 +42,7 @@ func (uc *TransactionsUseCasesImpl) CreateTransaction(payload CreateTransactionD
 		return transactionRepo.Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to create transaction")
 	}
 
-	if err := uc.persistEntries(tx, transactionID, payload.Entries, payload.Type); err != nil {
+	if err := uc.persistEntries(ctx, tx, transactionID, payload.Entries, payload.Type); err != nil {
 		_ = tx.Rollback()
 		return transactionRepo.Transaction{}, err
 	}
@@ -50,17 +51,18 @@ func (uc *TransactionsUseCasesImpl) CreateTransaction(payload CreateTransactionD
 		return transactionRepo.Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to commit transaction")
 	}
 
-	return uc.fetchCreatedTransaction(transactionID)
+	return uc.fetchCreatedTransaction(ctx, transactionID)
 }
 
-func (uc *TransactionsUseCasesImpl) validateCategory(userID string, categoryID utils.OptionalNullable[string]) error {
+func (uc *TransactionsUseCasesImpl) validateCategory(ctx context.Context, userID string, categoryID utils.OptionalNullable[string]) error {
 	if !categoryID.Set || categoryID.Value == nil {
 		return nil
 	}
 
-	exists, err := uc.categoriesUseCase.List(querybuilder.New().
+	filterCtx := querybuilder.WithBuilder(ctx, querybuilder.New().
 		And("id", "eq", *categoryID.Value).
 		And("user_id", "eq", userID))
+	exists, err := uc.categoriesUseCase.List(filterCtx)
 	if err != nil {
 		return utils.NewHTTPError(http.StatusInternalServerError, "failed to check if category exists")
 	}
@@ -80,7 +82,7 @@ func (uc *TransactionsUseCasesImpl) validatePayloadEntries(entries []CreateEntry
 	return validateTransaction(props, tType)
 }
 
-func (uc *TransactionsUseCasesImpl) persistEntries(tx *sql.Tx, transactionID string, entries []CreateEntryDTO, tType transactionRepo.TransactionType) error {
+func (uc *TransactionsUseCasesImpl) persistEntries(ctx context.Context, tx *sql.Tx, transactionID string, entries []CreateEntryDTO, tType transactionRepo.TransactionType) error {
 	for _, entry := range entries {
 		amount := entry.Amount
 		if (tType == transactionRepo.SimpleExpense || tType == transactionRepo.Installment) && amount > 0 {
@@ -89,7 +91,7 @@ func (uc *TransactionsUseCasesImpl) persistEntries(tx *sql.Tx, transactionID str
 			amount *= -1
 		}
 
-		err := uc.entriesRepo.Insert(tx, transactionRepo.CreateEntryDTO{
+		err := uc.entriesRepo.Insert(ctx, tx, transactionRepo.CreateEntryDTO{
 			ID:            ulid.Make().String(),
 			TransactionID: transactionID,
 			Amount:        amount,
@@ -103,8 +105,9 @@ func (uc *TransactionsUseCasesImpl) persistEntries(tx *sql.Tx, transactionID str
 	return nil
 }
 
-func (uc *TransactionsUseCasesImpl) fetchCreatedTransaction(id string) (transactionRepo.Transaction, error) {
-	created, err := uc.transactionsRepo.Select(uc.db, querybuilder.New().And("id", "eq", id))
+func (uc *TransactionsUseCasesImpl) fetchCreatedTransaction(ctx context.Context, id string) (transactionRepo.Transaction, error) {
+	filterCtx := querybuilder.WithBuilder(ctx, querybuilder.New().And("id", "eq", id))
+	created, err := uc.transactionsRepo.Select(filterCtx, uc.db)
 	if err != nil || len(created) == 0 {
 		return transactionRepo.Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to fetch created transaction")
 	}

@@ -40,12 +40,14 @@ func (o *ListOptions) Validate() error {
 }
 
 func (o *ListOptions) Run() error {
-	categoriesList, err := o.UseCases.List(o.Builder)
+	reqCtx := querybuilder.WithBuilder(o.Ctx, o.Builder)
+	categoriesList, err := o.UseCases.List(reqCtx)
 	if err != nil {
 		return err
 	}
 
-	count, err := o.UseCases.Count(querybuilder.ForCount(o.Builder))
+	countCtx := querybuilder.WithBuilder(o.Ctx, querybuilder.ForCount(o.Builder))
+	count, err := o.UseCases.Count(countCtx)
 	if err != nil {
 		return err
 	}

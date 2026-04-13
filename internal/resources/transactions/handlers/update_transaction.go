@@ -81,7 +81,7 @@ func (o *UpdateTransactionOptions) Run() error {
 		payload.Entries = utils.OptionalNullable[[]usecases.UpdateEntryDTO]{Set: true, Value: &updatedEntries}
 	}
 
-	transaction, err := o.UseCases.UpdateTransaction(o.ID, o.UserID, payload)
+	transaction, err := o.UseCases.UpdateTransaction(o.Ctx, o.ID, o.UserID, payload)
 
 	if err != nil {
 		return err

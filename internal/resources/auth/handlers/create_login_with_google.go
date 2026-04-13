@@ -33,7 +33,7 @@ func (o *CreateLoginWithGoogleOptions) Validate() error {
 }
 
 func (o *CreateLoginWithGoogleOptions) Run() error {
-	user, err := o.UseCases.LoginWithGoogle(o.Body.Code)
+	user, err := o.UseCases.LoginWithGoogle(o.Ctx, o.Body.Code)
 	if err != nil {
 		return err
 	}

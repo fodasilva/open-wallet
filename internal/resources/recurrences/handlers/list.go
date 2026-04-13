@@ -43,13 +43,15 @@ func (o *ListOptions) Run() error {
 
 	span.SetAttributes(attribute.String("user.id", o.UserID))
 
-	items, err := o.UseCases.List(tCtx, o.Builder)
+	reqCtx := querybuilder.WithBuilder(tCtx, o.Builder)
+	items, err := o.UseCases.List(reqCtx)
 	if err != nil {
 		span.RecordError(err)
 		return err
 	}
 
-	count, err := o.UseCases.Count(tCtx, querybuilder.New().And("user_id", "eq", o.UserID))
+	countCtx := querybuilder.WithBuilder(tCtx, querybuilder.New().And("user_id", "eq", o.UserID))
+	count, err := o.UseCases.Count(countCtx)
 	if err != nil {
 		span.RecordError(err)
 		return err

@@ -63,7 +63,7 @@ func (o *UpdateOptions) Validate() error {
 }
 
 func (o *UpdateOptions) Run() error {
-	category, err := o.UseCases.Update(o.ID, o.UserID, o.Payload)
+	category, err := o.UseCases.Update(o.Ctx, o.ID, o.UserID, o.Payload)
 	if err != nil {
 		return err
 	}

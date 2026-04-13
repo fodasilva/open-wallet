@@ -34,7 +34,7 @@ func (o *CreateOptions) Validate() error {
 }
 
 func (o *CreateOptions) Run() error {
-	category, err := o.UseCases.Create(repository.CreateCategoryDTO{
+	category, err := o.UseCases.Create(o.Ctx, repository.CreateCategoryDTO{
 		UserID: o.UserID,
 		Name:   o.Body.Name,
 		Color:  o.Body.Color,

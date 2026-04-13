@@ -48,7 +48,7 @@ func (o *CreateTransactionOptions) Run() error {
 		entriesDTO = entries
 	}
 
-	transaction, err := o.UseCases.CreateTransaction(usecases.CreateTransactionDTO{
+	transaction, err := o.UseCases.CreateTransaction(o.Ctx, usecases.CreateTransactionDTO{
 		UserID:     o.UserID,
 		Name:       o.Body.Name,
 		CategoryID: utils.OptionalNullable[string]{Set: o.Body.CategoryID != nil, Value: o.Body.CategoryID},
