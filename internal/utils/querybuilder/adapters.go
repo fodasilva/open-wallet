@@ -110,7 +110,28 @@ func ToUpdateSquirrel(query squirrel.UpdateBuilder, b *Builder) squirrel.UpdateB
 
 func conditionToSquirrel(condition Condition) squirrel.Sqlizer {
 	switch condition.Operator {
-	case "eq":
+	case "eq", "in":
+		if slice, ok := condition.Value.([]any); ok {
+			var nonNulls []any
+			hasNull := false
+			for _, v := range slice {
+				if v == nil {
+					hasNull = true
+				} else {
+					nonNulls = append(nonNulls, v)
+				}
+			}
+
+			if hasNull {
+				if len(nonNulls) == 0 {
+					return squirrel.Eq{condition.Field: nil}
+				}
+				return squirrel.Or{
+					squirrel.Eq{condition.Field: nonNulls},
+					squirrel.Eq{condition.Field: nil},
+				}
+			}
+		}
 		return squirrel.Eq{condition.Field: condition.Value}
 	case "ne":
 		return squirrel.NotEq{condition.Field: condition.Value}

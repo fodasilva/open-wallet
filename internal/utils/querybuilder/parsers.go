@@ -21,7 +21,7 @@ type ParseConfig struct {
 	AllowedSortFields []string
 }
 
-func ParseRequest(filter, pageStr, perPageStr, orderBy string, config *ParseConfig) (*Results, error) {
+func ParseRequest(filter, pageStr, perPageStr, orderBy string, config ParseConfig) (*Results, error) {
 	pageNum, err := strconv.Atoi(pageStr)
 	if err != nil {
 		pageNum = 1
@@ -52,18 +52,19 @@ func ParseRequest(filter, pageStr, perPageStr, orderBy string, config *ParseConf
 				return nil, fmt.Errorf("invalid order_by: empty field name")
 			}
 
-			// Validate sort field if config is provided
-			if config != nil && len(config.AllowedSortFields) > 0 {
-				found := false
-				for _, f := range config.AllowedSortFields {
-					if f == fieldName {
-						found = true
-						break
-					}
+			// Validate sort field
+			if len(config.AllowedSortFields) == 0 {
+				return nil, fmt.Errorf("no fields allowed for sorting")
+			}
+			found := false
+			for _, f := range config.AllowedSortFields {
+				if f == fieldName {
+					found = true
+					break
 				}
-				if !found {
-					return nil, fmt.Errorf("field '%s' not allowed for sorting", fieldName)
-				}
+			}
+			if !found {
+				return nil, fmt.Errorf("field '%s' not allowed for sorting", fieldName)
 			}
 
 			direction := "asc"
@@ -79,9 +80,11 @@ func ParseRequest(filter, pageStr, perPageStr, orderBy string, config *ParseConf
 	}
 
 	if filter != "" {
-		if _, err := parseFilter(filter, builder, config); err != nil {
+		b, err := parseFilter(filter, builder, config)
+		if err != nil {
 			return nil, err
 		}
+		builder = b
 	}
 
 	return &Results{
@@ -91,8 +94,11 @@ func ParseRequest(filter, pageStr, perPageStr, orderBy string, config *ParseConf
 	}, nil
 }
 
-func parseFilter(filter string, b *Builder, config *ParseConfig) (*Builder, error) {
+func parseFilter(filter string, b *Builder, config ParseConfig) (*Builder, error) {
 	splitted := splitByDelimiterOutsideQuotesAndParens(filter, " and ")
+	if splitted == nil {
+		return nil, fmt.Errorf("malformed filter: unclosed parenthesis in '%s'", filter)
+	}
 
 	allowedOperators := map[string]bool{
 		"eq":   true,
@@ -102,50 +108,60 @@ func parseFilter(filter string, b *Builder, config *ParseConfig) (*Builder, erro
 		"lt":   true,
 		"lte":  true,
 		"like": true,
+		"in":   true,
 	}
 
 	for _, filterPart := range splitted {
+		filterPart = strings.TrimSpace(filterPart)
+		if filterPart == "" {
+			return nil, fmt.Errorf("malformed filter: empty condition or redundant 'and' in '%s'", filter)
+		}
 		isOrGroup := strings.HasPrefix(filterPart, "(") && strings.HasSuffix(filterPart, ")")
 
 		if isOrGroup {
-			trimmedFilter := strings.TrimPrefix(filterPart, "(")
-			trimmedFilter = strings.TrimSuffix(trimmedFilter, ")")
+			trimmedFilter := filterPart[1 : len(filterPart)-1]
+			if strings.TrimSpace(trimmedFilter) == "" {
+				return nil, fmt.Errorf("malformed filter: empty parenthesis '()' in '%s'", filter)
+			}
 
 			splittedOrGroup := splitByDelimiterOutsideQuotesAndParens(trimmedFilter, " or ")
+			if splittedOrGroup == nil {
+				return nil, fmt.Errorf("malformed filter: unclosed parenthesis in or group '%s'", trimmedFilter)
+			}
 
 			orQuery := b.InitOr()
-
 			for _, filterSubPart := range splittedOrGroup {
 				splittedFilter, err := splitFilter(filterSubPart)
-
 				if err != nil {
 					return nil, err
 				}
+
 				if len(splittedFilter) != 3 {
-					return nil, fmt.Errorf("filter syntax error at '%s'", filterSubPart)
+					return nil, fmt.Errorf("malformed filter: expected 'field operator value' but got '%s' in or group", filterSubPart)
 				}
 
 				field := splittedFilter[0]
 				operator := splittedFilter[1]
 				valueRaw := splittedFilter[2]
 
-				// Validate field and operator if config is provided
-				if config != nil && config.AllowedFields != nil {
-					fieldConfig, allowed := config.AllowedFields[field]
-					if !allowed {
-						return nil, fmt.Errorf("field '%s' not allowed for filtering", field)
+				// Validate field and operator
+				if len(config.AllowedFields) == 0 {
+					return nil, fmt.Errorf("no fields allowed for filtering")
+				}
+				fieldConfig, allowed := config.AllowedFields[field]
+				if !allowed {
+					return nil, fmt.Errorf("field '%s' not allowed for filtering", field)
+				}
+				if len(fieldConfig.AllowedOperators) > 0 {
+					found := false
+					for _, op := range fieldConfig.AllowedOperators {
+						if op == operator {
+							found = true
+							break
+						}
 					}
-					if len(fieldConfig.AllowedOperators) > 0 {
-						found := false
-						for _, op := range fieldConfig.AllowedOperators {
-							if op == operator {
-								found = true
-								break
-							}
-						}
-						if !found {
-							return nil, fmt.Errorf("operator '%s' not allowed for field '%s'", operator, field)
-						}
+					if !found {
+						return nil, fmt.Errorf("operator '%s' not allowed for field '%s'", operator, field)
 					}
 				}
 
@@ -169,30 +185,31 @@ func parseFilter(filter string, b *Builder, config *ParseConfig) (*Builder, erro
 			}
 
 			if len(splittedFilter) != 3 {
-				return nil, fmt.Errorf("filter syntax error at '%s'", filterPart)
+				return nil, fmt.Errorf("malformed filter: expected 'field operator value' but got '%s'", filterPart)
 			}
 
 			field := splittedFilter[0]
 			operator := splittedFilter[1]
 			valueRaw := splittedFilter[2]
 
-			// Validate field and operator if config is provided
-			if config != nil && config.AllowedFields != nil {
-				fieldConfig, allowed := config.AllowedFields[field]
-				if !allowed {
-					return nil, fmt.Errorf("field '%s' not allowed for filtering", field)
+			// Validate field and operator
+			if len(config.AllowedFields) == 0 {
+				return nil, fmt.Errorf("no fields allowed for filtering")
+			}
+			fieldConfig, allowed := config.AllowedFields[field]
+			if !allowed {
+				return nil, fmt.Errorf("field '%s' not allowed for filtering", field)
+			}
+			if len(fieldConfig.AllowedOperators) > 0 {
+				found := false
+				for _, op := range fieldConfig.AllowedOperators {
+					if op == operator {
+						found = true
+						break
+					}
 				}
-				if len(fieldConfig.AllowedOperators) > 0 {
-					found := false
-					for _, op := range fieldConfig.AllowedOperators {
-						if op == operator {
-							found = true
-							break
-						}
-					}
-					if !found {
-						return nil, fmt.Errorf("operator '%s' not allowed for field '%s'", operator, field)
-					}
+				if !found {
+					return nil, fmt.Errorf("operator '%s' not allowed for field '%s'", operator, field)
 				}
 			}
 
@@ -213,6 +230,31 @@ func parseFilter(filter string, b *Builder, config *ParseConfig) (*Builder, erro
 }
 
 func parseFilterValue(value string) (any, error) {
+	if strings.HasPrefix(value, "(") && strings.HasSuffix(value, ")") {
+		trimmed := value[1 : len(value)-1]
+		if strings.TrimSpace(trimmed) == "" {
+			return nil, fmt.Errorf("malformed list: empty list '()'")
+		}
+
+		elements := splitByDelimiterOutsideQuotesAndParens(trimmed, ",")
+		if elements == nil {
+			return nil, fmt.Errorf("malformed list: unclosed parenthesis in '%s'", value)
+		}
+		var slice []any
+		for _, p := range elements {
+			p = strings.TrimSpace(p)
+			if p == "" {
+				return nil, fmt.Errorf("malformed list: empty item")
+			}
+			v, err := parseFilterValue(p)
+			if err != nil {
+				return nil, err
+			}
+			slice = append(slice, v)
+		}
+		return slice, nil
+	}
+
 	if strings.HasPrefix(value, "'") && strings.HasSuffix(value, "'") {
 		trimmed := strings.TrimPrefix(value, "'")
 		trimmed = strings.TrimSuffix(trimmed, "'")
@@ -271,9 +313,7 @@ func splitByDelimiterOutsideQuotesAndParens(input, delimiter string) []string {
 		}
 
 		if !inQuotes && parenLevel == 0 && strings.HasPrefix(input[i:], delimiter) {
-			if current.Len() > 0 {
-				result = append(result, strings.TrimSpace(current.String()))
-			}
+			result = append(result, strings.TrimSpace(current.String()))
 			current.Reset()
 			i += len(delimiter) - 1
 			continue
@@ -284,6 +324,10 @@ func splitByDelimiterOutsideQuotesAndParens(input, delimiter string) []string {
 
 	if current.Len() > 0 {
 		result = append(result, strings.TrimSpace(current.String()))
+	}
+
+	if parenLevel != 0 {
+		return nil // Indicate unclosed parens by returning nil so caller knows it failed
 	}
 	return result
 }
