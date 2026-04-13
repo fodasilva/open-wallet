@@ -20,6 +20,7 @@ func SetupCategoriesRoutes(r *gin.Engine, f *factory.Factory, redisClient *redis
 			"color":      {AllowedOperators: []string{"eq"}},
 			"created_at": {AllowedOperators: []string{"eq", "gt", "gte", "lt", "lte"}},
 			"id":         {AllowedOperators: []string{"eq"}},
+			"user_id":    {AllowedOperators: []string{"eq"}},
 		},
 		AllowedSortFields: []string{"name", "created_at", "id"},
 	}
@@ -31,6 +32,7 @@ func SetupCategoriesRoutes(r *gin.Engine, f *factory.Factory, redisClient *redis
 			"total_amount": {AllowedOperators: []string{"eq", "gt", "gte", "lt", "lte"}},
 			"period":       {AllowedOperators: []string{"eq"}},
 			"id":           {AllowedOperators: []string{"eq"}},
+			"user_id":      {AllowedOperators: []string{"eq"}},
 		},
 		AllowedSortFields: []string{"name", "total_amount", "period", "id"},
 	}
