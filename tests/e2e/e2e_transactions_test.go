@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -173,6 +174,56 @@ func TestE2eTransactions(t *testing.T) {
 					assert.NoError(t, err)
 					assert.Len(t, response.Data.Entries, tc.expectedCount)
 				}
+			})
+		}
+	})
+
+	t.Run("GET /transactions/entries - Filtering", func(t *testing.T) {
+		type testCase struct {
+			name          string
+			queryString   string
+			expectedCount int
+		}
+
+		cases := []testCase{
+			{
+				name:          "filter by amount exact",
+				queryString:   "filter=amount eq 5000",
+				expectedCount: 1,
+			},
+			{
+				name:          "filter by amount range",
+				queryString:   "filter=amount gt 1000",
+				expectedCount: 1,
+			},
+			{
+				name:          "filter by reference date",
+				queryString:   "filter=reference_date eq '2026-04-01'",
+				expectedCount: 1,
+			},
+			{
+				name:          "no match",
+				queryString:   "filter=amount lt 0",
+				expectedCount: 0,
+			},
+		}
+
+		for _, tc := range cases {
+			t.Run(tc.name, func(t *testing.T) {
+				params := url.Values{}
+				params.Set("filter", tc.queryString[7:]) // Strip "filter=" prefix
+
+				req := httptest.NewRequest(http.MethodGet, "/api/v1/transactions/entries?"+params.Encode(), nil)
+				req.Header.Set("Authorization", "Bearer "+token)
+				w := httptest.NewRecorder()
+
+				router.ServeHTTP(w, req)
+
+				assert.Equal(t, http.StatusOK, w.Code)
+				var response transactions.ListEntriesResponse
+				err := json.Unmarshal(w.Body.Bytes(), &response)
+				assert.NoError(t, err)
+				assert.Len(t, response.Data.Entries, tc.expectedCount)
 			})
 		}
 	})

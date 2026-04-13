@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -160,6 +161,51 @@ func TestE2eRecurrences(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Len(t, response.Data.Recurrences, 1)
 		assert.Equal(t, "Rent", response.Data.Recurrences[0].Name)
+	})
+
+	t.Run("GET /recurrences - Filtering", func(t *testing.T) {
+		type testCase struct {
+			name          string
+			queryString   string
+			expectedCount int
+		}
+
+		cases := []testCase{
+			{
+				name:          "filter by name exact",
+				queryString:   "filter=name eq 'Rent'",
+				expectedCount: 1,
+			},
+			{
+				name:          "filter by amount",
+				queryString:   "filter=amount eq -1000",
+				expectedCount: 1,
+			},
+			{
+				name:          "no match",
+				queryString:   "filter=name eq 'Gym'",
+				expectedCount: 0,
+			},
+		}
+
+		for _, tc := range cases {
+			t.Run(tc.name, func(t *testing.T) {
+				params := url.Values{}
+				params.Set("filter", tc.queryString[7:]) // Strip "filter=" prefix
+
+				req := httptest.NewRequest(http.MethodGet, "/api/v1/recurrences?"+params.Encode(), nil)
+				req.Header.Set("Authorization", "Bearer "+token)
+				w := httptest.NewRecorder()
+
+				router.ServeHTTP(w, req)
+
+				assert.Equal(t, http.StatusOK, w.Code)
+				var response handlers.ListRecurrencesResponse
+				err := json.Unmarshal(w.Body.Bytes(), &response)
+				assert.NoError(t, err)
+				assert.Len(t, response.Data.Recurrences, tc.expectedCount)
+			})
+		}
 	})
 
 	t.Run("POST /recurrences/:period (Prepare)", func(t *testing.T) {
