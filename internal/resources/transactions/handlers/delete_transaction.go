@@ -30,7 +30,7 @@ func (o *DeleteOptions) Validate() error {
 }
 
 func (o *DeleteOptions) Run() error {
-	err := o.UseCases.DeleteTransactionById(o.ID)
+	err := o.UseCases.DeleteTransactionById(o.Ctx, o.ID)
 	if err != nil {
 		return err
 	}

@@ -1,4 +1,5 @@
-func (r *{{RepoName}}) {{MethodName}}(db utils.Executer, filter *querybuilder.Builder) ({{ReturnType}}, error) {
+func (r *{{RepoName}}) {{MethodName}}(ctx context.Context, db utils.Executer) ({{ReturnType}}, error) {
+	filter := querybuilder.FromContext(ctx)
 	query := squirrel.Select({{Columns}}).
 		From("{{TableName}}").
 		PlaceholderFormat(squirrel.Dollar)
@@ -11,7 +12,7 @@ func (r *{{RepoName}}) {{MethodName}}(db utils.Executer, filter *querybuilder.Bu
 		return nil, err
 	}
 
-	rows, err := db.Query(sql, args...)
+	rows, err := db.QueryContext(ctx, sql, args...)
 
 	if err != nil {
 		return nil, err

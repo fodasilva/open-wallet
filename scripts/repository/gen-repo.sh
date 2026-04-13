@@ -188,6 +188,7 @@ for (( i=0; i<$NUM_TABLES; i++ )); do
 package $PACKAGE
 
 import (
+	"context"
 	"github.com/Masterminds/squirrel"
 	"github.com/felipe1496/open-wallet/internal/utils"
 $( [[ "$METHOD_LOWER" != "insert" ]] && echo "	\"github.com/felipe1496/open-wallet/internal/utils/querybuilder\"" )

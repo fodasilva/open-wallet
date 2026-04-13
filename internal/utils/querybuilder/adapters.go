@@ -8,6 +8,10 @@ import (
 )
 
 func ToSquirrel(query squirrel.SelectBuilder, b *Builder) squirrel.SelectBuilder {
+	if b == nil {
+		return query
+	}
+
 	for _, andCondition := range b.AndConditions {
 		query = query.Where(conditionToSquirrel(andCondition))
 	}
@@ -41,6 +45,10 @@ func ToSquirrel(query squirrel.SelectBuilder, b *Builder) squirrel.SelectBuilder
 }
 
 func ToDeleteSquirrel(query squirrel.DeleteBuilder, b *Builder) squirrel.DeleteBuilder {
+	if b == nil {
+		return query
+	}
+
 	for _, andCondition := range b.AndConditions {
 		query = query.Where(conditionToSquirrel(andCondition))
 	}
@@ -69,6 +77,10 @@ func ToDeleteSquirrel(query squirrel.DeleteBuilder, b *Builder) squirrel.DeleteB
 }
 
 func ToUpdateSquirrel(query squirrel.UpdateBuilder, b *Builder) squirrel.UpdateBuilder {
+	if b == nil {
+		return query
+	}
+
 	for _, andCondition := range b.AndConditions {
 		query = query.Where(conditionToSquirrel(andCondition))
 	}

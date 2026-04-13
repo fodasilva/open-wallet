@@ -1,6 +1,7 @@
 package usecases
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/felipe1496/open-wallet/internal/resources/users/repository"
@@ -17,7 +18,7 @@ var (
 )
 
 type AuthUseCases interface {
-	LoginWithGoogle(code string) (repository.User, error)
+	LoginWithGoogle(ctx context.Context, code string) (repository.User, error)
 }
 
 type AuthUseCasesImpl struct {

@@ -73,7 +73,7 @@ func (o *UpdateOptions) Run() error {
 		EndPeriod:   utils.OptionalNullable[string]{Set: slices.Contains(o.PassedKeys, "end_period"), Value: o.Body.EndPeriod},
 	}
 
-	rec, err := o.UseCases.Update(o.ID, o.UserID, payload)
+	rec, err := o.UseCases.Update(o.Ctx, o.ID, o.UserID, payload)
 	if err != nil {
 		return err
 	}

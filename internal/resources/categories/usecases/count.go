@@ -1,14 +1,14 @@
 package usecases
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/felipe1496/open-wallet/internal/utils"
-	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
-func (uc *CategoriesUseCasesImpl) Count(filter *querybuilder.Builder) (int, error) {
-	count, err := uc.repo.Count(uc.db, filter)
+func (uc *CategoriesUseCasesImpl) Count(ctx context.Context) (int, error) {
+	count, err := uc.repo.Count(ctx, uc.db)
 
 	if err != nil {
 		return 0, utils.NewHTTPError(http.StatusInternalServerError, "failed to count categories")

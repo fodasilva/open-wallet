@@ -10,10 +10,11 @@ import (
 	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
-func (uc *RecurrencesUseCasesImpl) Update(id string, userID string, payload repository.UpdateRecurrenceDTO) (repository.Recurrence, error) {
-	exists, err := uc.repo.Select(uc.db, querybuilder.New().
+func (uc *RecurrencesUseCasesImpl) Update(ctx context.Context, id string, userID string, payload repository.UpdateRecurrenceDTO) (repository.Recurrence, error) {
+	filterCtx := querybuilder.WithBuilder(ctx, querybuilder.New().
 		And("id", "eq", id).
 		And("user_id", "eq", userID))
+	exists, err := uc.repo.Select(filterCtx, uc.db)
 
 	if err != nil {
 		return repository.Recurrence{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to check if recurrence exists")
@@ -23,22 +24,23 @@ func (uc *RecurrencesUseCasesImpl) Update(id string, userID string, payload repo
 		return repository.Recurrence{}, utils.NewHTTPError(http.StatusNotFound, "recurrence not found")
 	}
 
-	if err := uc.validateCategory(userID, payload.CategoryID); err != nil {
+	if err := uc.validateCategory(ctx, userID, payload.CategoryID); err != nil {
 		return repository.Recurrence{}, err
 	}
 
-	err = uc.repo.Update(uc.db, payload, querybuilder.New().And("id", "eq", id))
+	updateFilterCtx := querybuilder.WithBuilder(ctx, querybuilder.New().And("id", "eq", id))
+	err = uc.repo.Update(updateFilterCtx, uc.db, payload)
 	if err != nil {
 		return repository.Recurrence{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to update recurrence")
 	}
 
-	rec, err := uc.fetchRecurrence(id)
+	rec, err := uc.fetchRecurrence(ctx, id)
 	if err != nil {
 		return repository.Recurrence{}, err
 	}
 
 	if payload.Amount.Set && payload.Amount.Value != nil {
-		if err := uc.syncLinkedTransactions(id, userID, *payload.Amount.Value); err != nil {
+		if err := uc.syncLinkedTransactions(ctx, id, userID, *payload.Amount.Value); err != nil {
 			return rec, err
 		}
 	}
@@ -46,14 +48,15 @@ func (uc *RecurrencesUseCasesImpl) Update(id string, userID string, payload repo
 	return rec, nil
 }
 
-func (uc *RecurrencesUseCasesImpl) validateCategory(userID string, categoryID utils.OptionalNullable[string]) error {
+func (uc *RecurrencesUseCasesImpl) validateCategory(ctx context.Context, userID string, categoryID utils.OptionalNullable[string]) error {
 	if !categoryID.Set || categoryID.Value == nil {
 		return nil
 	}
 
-	exists, err := uc.categoriesUseCase.List(querybuilder.New().
+	filterCtx := querybuilder.WithBuilder(ctx, querybuilder.New().
 		And("id", "eq", *categoryID.Value).
 		And("user_id", "eq", userID))
+	exists, err := uc.categoriesUseCase.List(filterCtx)
 	if err != nil {
 		return utils.NewHTTPError(http.StatusInternalServerError, "failed to check if category exists")
 	}
@@ -65,18 +68,20 @@ func (uc *RecurrencesUseCasesImpl) validateCategory(userID string, categoryID ut
 	return nil
 }
 
-func (uc *RecurrencesUseCasesImpl) fetchRecurrence(id string) (repository.Recurrence, error) {
-	recs, err := uc.repo.Select(uc.db, querybuilder.New().And("id", "eq", id))
+func (uc *RecurrencesUseCasesImpl) fetchRecurrence(ctx context.Context, id string) (repository.Recurrence, error) {
+	filterCtx := querybuilder.WithBuilder(ctx, querybuilder.New().And("id", "eq", id))
+	recs, err := uc.repo.Select(filterCtx, uc.db)
 	if err != nil || len(recs) == 0 {
 		return repository.Recurrence{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to fetch recurrence")
 	}
 	return recs[0], nil
 }
 
-func (uc *RecurrencesUseCasesImpl) syncLinkedTransactions(id string, userID string, amount float64) error {
-	txs, err := uc.transactionsUseCase.ListEntries(context.TODO(), querybuilder.New().
+func (uc *RecurrencesUseCasesImpl) syncLinkedTransactions(ctx context.Context, id string, userID string, amount float64) error {
+	txFilterCtx := querybuilder.WithBuilder(ctx, querybuilder.New().
 		And("user_id", "eq", userID).
 		And("recurrence_id", "eq", id))
+	txs, err := uc.transactionsUseCase.ListEntries(txFilterCtx)
 	if err != nil {
 		return utils.NewHTTPError(http.StatusInternalServerError, "failed to fetch linked transactions for sync")
 	}
@@ -94,7 +99,7 @@ func (uc *RecurrencesUseCasesImpl) syncLinkedTransactions(id string, userID stri
 		}
 	}
 
-	_, err = uc.transactionsUseCase.UpdateTransaction(transactionID, userID, usecases.UpdateTransactionDTO{
+	_, err = uc.transactionsUseCase.UpdateTransaction(ctx, transactionID, userID, usecases.UpdateTransactionDTO{
 		Entries: utils.OptionalNullable[[]usecases.UpdateEntryDTO]{Set: true, Value: &updatedEntries},
 	})
 	if err != nil {

@@ -1,20 +1,20 @@
 package usecases
 
 import (
+	"context"
 	"database/sql"
 
 	"github.com/felipe1496/open-wallet/internal/resources/categories/repository"
-	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
 type CategoriesUseCases interface {
-	Create(payload repository.CreateCategoryDTO) (repository.Category, error)
-	List(filter *querybuilder.Builder) ([]repository.Category, error)
-	DeleteByID(id string, userID string) error
-	Count(filter *querybuilder.Builder) (int, error)
-	ListCategoryAmountPerPeriod(period string, filter *querybuilder.Builder) ([]repository.CategoryAmountPerPeriod, error)
-	CountCategoryAmountPerPeriod(period string, filter *querybuilder.Builder) (int, error)
-	Update(id string, userID string, payload repository.UpdateCategoryDTO) (repository.Category, error)
+	Create(ctx context.Context, payload repository.CreateCategoryDTO) (repository.Category, error)
+	List(ctx context.Context) ([]repository.Category, error)
+	DeleteByID(ctx context.Context, id string, userID string) error
+	Count(ctx context.Context) (int, error)
+	ListCategoryAmountPerPeriod(ctx context.Context, period string) ([]repository.CategoryAmountPerPeriod, error)
+	CountCategoryAmountPerPeriod(ctx context.Context, period string) (int, error)
+	Update(ctx context.Context, id string, userID string, payload repository.UpdateCategoryDTO) (repository.Category, error)
 }
 
 type CategoriesUseCasesImpl struct {

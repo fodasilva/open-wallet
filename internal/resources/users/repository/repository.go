@@ -1,16 +1,17 @@
 package repository
 
 import (
+	"context"
+
 	"github.com/felipe1496/open-wallet/internal/utils"
-	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
 type UsersRepo interface {
-	Select(db utils.Executer, filter *querybuilder.Builder) ([]User, error)
-	Insert(db utils.Executer, data CreateUserDTO) error
-	Update(db utils.Executer, data UpdateUserDTO, filter *querybuilder.Builder) error
-	Delete(db utils.Executer, filter *querybuilder.Builder) error
-	Count(db utils.Executer, filter *querybuilder.Builder) (int, error)
+	Select(ctx context.Context, db utils.Executer) ([]User, error)
+	Insert(ctx context.Context, db utils.Executer, data CreateUserDTO) error
+	Update(ctx context.Context, db utils.Executer, data UpdateUserDTO) error
+	Delete(ctx context.Context, db utils.Executer) error
+	Count(ctx context.Context, db utils.Executer) (int, error)
 }
 
 type UsersRepoImpl struct{}

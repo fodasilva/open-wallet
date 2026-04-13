@@ -1,15 +1,15 @@
 package usecases
 
 import (
+	"context"
 	"database/sql"
 
 	"github.com/felipe1496/open-wallet/internal/resources/users/repository"
-	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
 type UsersUseCases interface {
-	List(filter *querybuilder.Builder) ([]repository.User, error)
-	Create(input repository.CreateUserDTO) (repository.User, error)
+	List(ctx context.Context) ([]repository.User, error)
+	Create(ctx context.Context, input repository.CreateUserDTO) (repository.User, error)
 }
 
 type UsersUseCasesImpl struct {
