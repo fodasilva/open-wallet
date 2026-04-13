@@ -62,6 +62,7 @@ The `filter` parameter uses an OData-like syntax.
 - `lt`: Less Than (`total lt 100`)
 - `lte`: Less Than or Equal (`total lte 100`)
 - `like`: Case-insensitive partial match (`description like 'rocket'`)
+- `in`: In List (`id in ('id1', 'id2', 'id3')`)
 
 **logical Operators:**
 - `and`: Combine multiple conditions (`active eq true and category_id eq 1`)
@@ -72,6 +73,7 @@ The `filter` parameter uses an OData-like syntax.
 - **Numbers**: Raw numbers (`10`, `25.5`).
 - **Booleans**: `true` or `false` (lowercase).
 - **Null**: `null` (lowercase, without quotes).
+- **Lists**: Comma-separated values enclosed in parentheses (`(val1, val2, ...)`). Values inside the list can be any of the above types.
 
 ### 2. Sorting (`order_by`)
 
@@ -98,8 +100,8 @@ To enable dynamic queries on a route, use the `QueryBuilderMiddleware`. It is hi
 filterConfig := &querybuilder.ParseConfig{
     AllowedFields: map[string]querybuilder.FieldConfig{
         "name":   {AllowedOperators: []string{"eq", "like"}},
-        "status": {AllowedOperators: []string{"eq"}},
-        "age":    {AllowedOperators: []string{"gt", "lt"}},
+        "status": {AllowedOperators: []string{"eq", "in"}},
+        "age":    {AllowedOperators: []string{"gt", "lt", "in"}},
     },
     AllowedSortFields: []string{"name", "created_at"},
 }
