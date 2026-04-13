@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"testing"
 
 	"github.com/gin-gonic/gin"
@@ -159,6 +160,56 @@ func TestE2eCategories(t *testing.T) {
 		err = json.Unmarshal(w.Body.Bytes(), &response)
 		assert.NoError(t, err)
 		assert.GreaterOrEqual(t, len(response.Data.Categories), 2)
+	})
+
+	t.Run("GET /categories - Filtering", func(t *testing.T) {
+		type testCase struct {
+			name          string
+			queryString   string
+			expectedCount int
+		}
+
+		cases := []testCase{
+			{
+				name:          "filter by name exact",
+				queryString:   "filter=name eq 'Transport'",
+				expectedCount: 1,
+			},
+			{
+				name:          "filter by name like",
+				queryString:   "filter=name like 'Heal'",
+				expectedCount: 1,
+			},
+			{
+				name:          "filter by color",
+				queryString:   "filter=color eq '#3357FF'",
+				expectedCount: 1,
+			},
+			{
+				name:          "no match",
+				queryString:   "filter=name eq 'NonExistent'",
+				expectedCount: 0,
+			},
+		}
+
+		for _, tc := range cases {
+			t.Run(tc.name, func(t *testing.T) {
+				params := url.Values{}
+				params.Set("filter", tc.queryString[7:]) // Strip "filter=" prefix
+
+				req := httptest.NewRequest(http.MethodGet, "/api/v1/categories?"+params.Encode(), nil)
+				req.Header.Set("Authorization", "Bearer "+token)
+				w := httptest.NewRecorder()
+
+				router.ServeHTTP(w, req)
+
+				assert.Equal(t, http.StatusOK, w.Code)
+				var response handlers.ListCategoriesResponse
+				err := json.Unmarshal(w.Body.Bytes(), &response)
+				assert.NoError(t, err)
+				assert.Len(t, response.Data.Categories, tc.expectedCount)
+			})
+		}
 	})
 
 	t.Run("GET /categories/:period", func(t *testing.T) {
