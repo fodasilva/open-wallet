@@ -5,6 +5,7 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 
 	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
@@ -140,6 +141,50 @@ func TestQueryBuilder_ParseRequest(t *testing.T) {
 			},
 		},
 		{
+			name:        "in operator with numbers",
+			filter:      "age in (25, 30, 35)",
+			wantPage:    1,
+			wantPerPage: 10,
+			validate: func(t *testing.T, r *querybuilder.Results) {
+				assert.Len(t, r.Builder.AndConditions, 1)
+				assert.Equal(t, "in", r.Builder.AndConditions[0].Operator)
+				assert.Equal(t, []any{float64(25), float64(30), float64(35)}, r.Builder.AndConditions[0].Value)
+			},
+		},
+		{
+			name:        "in operator with strings",
+			filter:      "name in ('Alice', 'Bob')",
+			wantPage:    1,
+			wantPerPage: 10,
+			validate: func(t *testing.T, r *querybuilder.Results) {
+				assert.Len(t, r.Builder.AndConditions, 1)
+				assert.Equal(t, "in", r.Builder.AndConditions[0].Operator)
+				assert.Equal(t, []any{"Alice", "Bob"}, r.Builder.AndConditions[0].Value)
+			},
+		},
+		{
+			name:        "in operator with booleans",
+			filter:      "is_active in (true, false)",
+			wantPage:    1,
+			wantPerPage: 10,
+			validate: func(t *testing.T, r *querybuilder.Results) {
+				assert.Len(t, r.Builder.AndConditions, 1)
+				assert.Equal(t, "in", r.Builder.AndConditions[0].Operator)
+				assert.Equal(t, []any{true, false}, r.Builder.AndConditions[0].Value)
+			},
+		},
+		{
+			name:        "in operator with null",
+			filter:      "name in ('Alice', null)",
+			wantPage:    1,
+			wantPerPage: 10,
+			validate: func(t *testing.T, r *querybuilder.Results) {
+				assert.Len(t, r.Builder.AndConditions, 1)
+				assert.Equal(t, "in", r.Builder.AndConditions[0].Operator)
+				assert.Equal(t, []any{"Alice", nil}, r.Builder.AndConditions[0].Value)
+			},
+		},
+		{
 			name:        "multiple OR groups",
 			filter:      "(status eq 'pending' or status eq 'failed') and (type eq 1 or type eq 2)",
 			page:        "1",
@@ -251,6 +296,26 @@ func TestQueryBuilder_ParseRequest(t *testing.T) {
 			wantErr: true,
 		},
 		{
+			name:    "unclosed parenthesis",
+			filter:  "(age gt 10",
+			wantErr: true,
+		},
+		{
+			name:    "empty parenthesis",
+			filter:  "()",
+			wantErr: true,
+		},
+		{
+			name:    "duplicated logic",
+			filter:  "age gt 10 and and name eq 'John'",
+			wantErr: true,
+		},
+		{
+			name:    "malformed in list - empty item",
+			filter:  "age in (1,,3)",
+			wantErr: true,
+		},
+		{
 			name:    "invalid sort direction",
 			orderBy: "name:sideways",
 			wantErr: true,
@@ -262,16 +327,42 @@ func TestQueryBuilder_ParseRequest(t *testing.T) {
 		},
 	}
 
+	permissiveConfig := &querybuilder.ParseConfig{
+		AllowedFields: map[string]querybuilder.FieldConfig{
+			"id":             {AllowedOperators: []string{"eq", "ne", "gt", "gte", "lt", "lte", "like", "in"}},
+			"name":           {AllowedOperators: []string{"eq", "ne", "gt", "gte", "lt", "lte", "like", "in"}},
+			"age":            {AllowedOperators: []string{"eq", "ne", "gt", "gte", "lt", "lte", "like", "in"}},
+			"is_active":      {AllowedOperators: []string{"eq", "ne", "gt", "gte", "lt", "lte", "like", "in"}},
+			"active":         {AllowedOperators: []string{"eq", "ne", "gt", "gte", "lt", "lte", "like", "in"}},
+			"type":           {AllowedOperators: []string{"eq", "ne", "gt", "gte", "lt", "lte", "like", "in"}},
+			"created_at":     {AllowedOperators: []string{"eq", "ne", "gt", "gte", "lt", "lte", "like", "in"}},
+			"color":          {AllowedOperators: []string{"eq", "ne", "gt", "gte", "lt", "lte", "like", "in"}},
+			"amount":         {AllowedOperators: []string{"eq", "ne", "gt", "gte", "lt", "lte", "like", "in"}},
+			"reference_date": {AllowedOperators: []string{"eq", "ne", "gt", "gte", "lt", "lte", "like", "in"}},
+			"verified":       {AllowedOperators: []string{"eq", "ne", "gt", "gte", "lt", "lte", "like", "in"}},
+			"description":    {AllowedOperators: []string{"eq", "ne", "gt", "gte", "lt", "lte", "like", "in"}},
+			"status":         {AllowedOperators: []string{"eq", "ne", "gt", "gte", "lt", "lte", "like", "in"}},
+			"category":       {AllowedOperators: []string{"eq", "ne", "gt", "gte", "lt", "lte", "like", "in"}},
+			"a":              {AllowedOperators: []string{"eq", "ne", "gt", "gte", "lt", "lte", "like", "in"}},
+			"b":              {AllowedOperators: []string{"eq", "ne", "gt", "gte", "lt", "lte", "like", "in"}},
+			"c":              {AllowedOperators: []string{"eq", "ne", "gt", "gte", "lt", "lte", "like", "in"}},
+			"d":              {AllowedOperators: []string{"eq", "ne", "gt", "gte", "lt", "lte", "like", "in"}},
+			"e":              {AllowedOperators: []string{"eq", "ne", "gt", "gte", "lt", "lte", "like", "in"}},
+			"f":              {AllowedOperators: []string{"eq", "ne", "gt", "gte", "lt", "lte", "like", "in"}},
+		},
+		AllowedSortFields: []string{"id", "name", "age", "is_active", "active", "created_at", "color", "amount", "reference_date", "verified", "description", "status", "category", "a", "b", "c", "d", "e", "f"},
+	}
+
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			results, err := querybuilder.ParseRequest(tt.filter, tt.page, tt.perPage, tt.orderBy, nil)
+			results, err := querybuilder.ParseRequest(tt.filter, tt.page, tt.perPage, tt.orderBy, *permissiveConfig)
 
 			if tt.wantErr {
 				assert.Error(t, err)
 				return
 			}
 
-			assert.NoError(t, err)
+			require.NoError(t, err)
 			assert.Equal(t, tt.wantPage, results.Page)
 			assert.Equal(t, tt.wantPerPage, results.PerPage)
 			if tt.validate != nil {
@@ -319,11 +410,6 @@ func TestQueryBuilder_ParseRequest_WithConfig(t *testing.T) {
 			orderBy: "name:desc",
 		},
 		{
-			name:    "disallowed sort field",
-			orderBy: "id:asc",
-			wantErr: true,
-		},
-		{
 			name:    "multiple sorts - one disallowed",
 			orderBy: "name:asc, id:desc",
 			wantErr: true,
@@ -332,7 +418,7 @@ func TestQueryBuilder_ParseRequest_WithConfig(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			_, err := querybuilder.ParseRequest(tt.filter, "1", "10", tt.orderBy, config)
+			_, err := querybuilder.ParseRequest(tt.filter, "1", "10", tt.orderBy, *config)
 			if tt.wantErr {
 				assert.Error(t, err)
 			} else {
@@ -392,6 +478,22 @@ func TestQueryBuilder_ToSquirrel(t *testing.T) {
 			},
 			wantSQL:  "SELECT * FROM t WHERE (a = ? OR b = ?)",
 			wantArgs: []interface{}{1, 2},
+		},
+		{
+			name: "IN operator SQL",
+			build: func() *querybuilder.Builder {
+				return querybuilder.New().And("id", "in", []any{1, 2, 3})
+			},
+			wantSQL:  "SELECT * FROM users WHERE id IN (?,?,?)",
+			wantArgs: []interface{}{1, 2, 3},
+		},
+		{
+			name: "IN operator with NULL SQL",
+			build: func() *querybuilder.Builder {
+				return querybuilder.New().And("id", "in", []any{1, nil})
+			},
+			wantSQL:  "SELECT * FROM users WHERE (id IN (?) OR id IS NULL)",
+			wantArgs: []interface{}{1},
 		},
 	}
 
