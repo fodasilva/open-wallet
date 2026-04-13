@@ -8,8 +8,8 @@ import (
 	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
-func (uc *TransactionsUseCasesImpl) DeleteTransactionById(ctx context.Context, id string) error {
-	filterCtx := querybuilder.WithBuilder(ctx, querybuilder.New().And("id", "eq", id))
+func (uc *TransactionsUseCasesImpl) DeleteTransactionById(ctx context.Context, id string, userID string) error {
+	filterCtx := querybuilder.WithBuilder(ctx, querybuilder.New().And("id", "eq", id).And("user_id", "eq", userID))
 	transactionExists, err := uc.transactionsRepo.Select(filterCtx, uc.db)
 
 	if err != nil {
