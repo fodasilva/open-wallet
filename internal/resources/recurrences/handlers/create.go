@@ -53,7 +53,7 @@ func (o *CreateOptions) Run() error {
 		EndPeriod:   utils.OptionalNullable[string]{Set: slices.Contains(o.PassedKeys, "end_period"), Value: o.Body.EndPeriod},
 	}
 
-	res, err := o.UseCases.Create(o.Ctx, payload)
+	res, err := o.UseCases.Create(o.Ctx.Request.Context(), payload)
 	if err != nil {
 		return err
 	}
