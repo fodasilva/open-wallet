@@ -18,10 +18,10 @@ import (
 )
 
 type QueryBuilderTestData struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	Age      int    `json:"age"`
-	IsActive bool   `json:"is_active"`
+	ID       string  `json:"id"`
+	Name     *string `json:"name"`
+	Age      int     `json:"age"`
+	IsActive bool    `json:"is_active"`
 }
 
 // SetupTestEngine replicates the real application's middleware stack from cmd/api/main.go
@@ -37,11 +37,12 @@ func SetupTestEngine(cfg *infra.Config, redisClient *redis.Client) *gin.Engine {
 }
 
 func RegisterQueryBuilderTestRoutes(r *gin.Engine, resources *TestResources) {
-	config := &querybuilder.ParseConfig{
+	config := querybuilder.ParseConfig{
 		AllowedFields: map[string]querybuilder.FieldConfig{
-			"name":      {AllowedOperators: []string{"eq", "ne", "like"}},
-			"age":       {AllowedOperators: []string{"eq", "ne", "gt", "gte", "lt", "lte"}},
-			"is_active": {AllowedOperators: []string{"eq"}},
+			"name":      {AllowedOperators: []string{"eq", "ne", "like", "in"}},
+			"age":       {AllowedOperators: []string{"eq", "ne", "gt", "gte", "lt", "lte", "in"}},
+			"is_active": {AllowedOperators: []string{"eq", "in"}},
+			"id":        {AllowedOperators: []string{"eq", "in"}},
 		},
 		AllowedSortFields: []string{"name", "age", "id"},
 	}
@@ -85,6 +86,8 @@ func RegisterQueryBuilderTestRoutes(r *gin.Engine, resources *TestResources) {
 	})
 }
 
+func stringPtr(s string) *string { return &s }
+
 func TestQueryBuilderE2E(t *testing.T) {
 	resources := SetupTestResources(t)
 	db := resources.DB
@@ -102,12 +105,16 @@ func TestQueryBuilderE2E(t *testing.T) {
 
 	// Seed data
 	seedData := []QueryBuilderTestData{
-		{ID: "01", Name: "Alice", Age: 25, IsActive: true},
-		{ID: "02", Name: "Bob", Age: 30, IsActive: false},
-		{ID: "03", Name: "Charlie", Age: 35, IsActive: true},
-		{ID: "04", Name: "David", Age: 40, IsActive: false},
-		{ID: "05", Name: "Eve", Age: 25, IsActive: true},
+		{ID: "01", Name: stringPtr("Alice"), Age: 25, IsActive: true},
+		{ID: "02", Name: stringPtr("Bob"), Age: 30, IsActive: false},
+		{ID: "03", Name: stringPtr("Charlie"), Age: 35, IsActive: true},
+		{ID: "04", Name: stringPtr("David"), Age: 40, IsActive: false},
+		{ID: "05", Name: stringPtr("Eve"), Age: 25, IsActive: true},
 	}
+	// Let's add real null for ID 06
+	_, err = db.Exec("INSERT INTO query_builder_tests (id, name, age, is_active) VALUES ($1, $2, $3, $4) ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, age = EXCLUDED.age, is_active = EXCLUDED.is_active",
+		"06", nil, 0, false)
+	require.NoError(t, err)
 
 	for _, d := range seedData {
 		_, err := db.Exec("INSERT INTO query_builder_tests (id, name, age, is_active) VALUES ($1, $2, $3, $4) ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, age = EXCLUDED.age, is_active = EXCLUDED.is_active",
@@ -166,7 +173,7 @@ func TestQueryBuilderE2E(t *testing.T) {
 		{
 			name:        "Order by age desc",
 			queryParams: "order_by=age:desc,id:asc",
-			expectedIDs: []string{"04", "03", "02", "01", "05"},
+			expectedIDs: []string{"04", "03", "02", "01", "05", "06"},
 		},
 		{
 			name:        "Pagination page 2 per_page 2",
@@ -174,13 +181,63 @@ func TestQueryBuilderE2E(t *testing.T) {
 			expectedIDs: []string{"03", "04"},
 		},
 		{
+			name:        "Query with IN operator (mixed types)",
+			queryParams: "filter=age in (25, 35, 40)",
+			expectedIDs: []string{"01", "03", "04", "05"},
+		},
+		{
+			name:        "Query with IN operator (strings)",
+			queryParams: "filter=name in ('Alice', 'Bob')",
+			expectedIDs: []string{"01", "02"},
+		},
+		{
+			name:        "Query with IN operator (booleans)",
+			queryParams: "filter=is_active in (true)",
+			expectedIDs: []string{"01", "03", "05"},
+		},
+		{
+			name:        "Query with IN operator (null)",
+			queryParams: "filter=name in ('Alice', null)&order_by=id:asc",
+			expectedIDs: []string{"01", "06"},
+		},
+		{
+			name:        "Query with IN operator (only null)",
+			queryParams: "filter=name in (null)&order_by=id:asc",
+			expectedIDs: []string{"06"},
+		},
+		{
 			name:           "Disallowed field",
-			queryParams:    "filter=id eq '01'",
+			queryParams:    "filter=unsupported_field eq '01'",
 			expectedStatus: http.StatusBadRequest,
 		},
 		{
 			name:           "Disallowed operator",
 			queryParams:    "filter=is_active gt true",
+			expectedStatus: http.StatusBadRequest,
+		},
+		{
+			name:           "Disallowed operator inside OR group",
+			queryParams:    "filter=(name eq 'Alice' or is_active gt true)",
+			expectedStatus: http.StatusBadRequest,
+		},
+		{
+			name:           "Malformed: missing value",
+			queryParams:    "filter=name eq",
+			expectedStatus: http.StatusBadRequest,
+		},
+		{
+			name:           "Malformed: unclosed parenthesis",
+			queryParams:    "filter=(name eq 'Alice'",
+			expectedStatus: http.StatusBadRequest,
+		},
+		{
+			name:           "Malformed: multiple ANDs",
+			queryParams:    "filter=name eq 'Alice' and and age gt 20",
+			expectedStatus: http.StatusBadRequest,
+		},
+		{
+			name:           "Malformed: invalid operator",
+			queryParams:    "filter=name not_an_op 'Alice'",
 			expectedStatus: http.StatusBadRequest,
 		},
 	}
