@@ -14,25 +14,25 @@ import (
 func SetupCategoriesRoutes(r *gin.Engine, f *factory.Factory, redisClient *redis.Client, cfg *infra.Config) {
 	jwtService := f.JWTService()
 	categoriesHandler := handlers.NewHandler(f.CategoriesUseCases())
-	categoriesFilterConfig := &querybuilder.ParseConfig{
+	categoriesFilterConfig := querybuilder.ParseConfig{
 		AllowedFields: map[string]querybuilder.FieldConfig{
-			"name":       {AllowedOperators: []string{"eq", "like"}},
-			"color":      {AllowedOperators: []string{"eq"}},
+			"name":       {AllowedOperators: []string{"eq", "like", "in"}},
+			"color":      {AllowedOperators: []string{"eq", "in"}},
 			"created_at": {AllowedOperators: []string{"eq", "gt", "gte", "lt", "lte"}},
-			"id":         {AllowedOperators: []string{"eq"}},
-			"user_id":    {AllowedOperators: []string{"eq"}},
+			"id":         {AllowedOperators: []string{"eq", "in"}},
+			"user_id":    {AllowedOperators: []string{"eq", "in"}},
 		},
 		AllowedSortFields: []string{"name", "created_at", "id"},
 	}
 
-	periodCategoriesFilterConfig := &querybuilder.ParseConfig{
+	periodCategoriesFilterConfig := querybuilder.ParseConfig{
 		AllowedFields: map[string]querybuilder.FieldConfig{
-			"name":         {AllowedOperators: []string{"eq", "like"}},
-			"color":        {AllowedOperators: []string{"eq"}},
+			"name":         {AllowedOperators: []string{"eq", "like", "in"}},
+			"color":        {AllowedOperators: []string{"eq", "in"}},
 			"total_amount": {AllowedOperators: []string{"eq", "gt", "gte", "lt", "lte"}},
-			"period":       {AllowedOperators: []string{"eq"}},
-			"id":           {AllowedOperators: []string{"eq"}},
-			"user_id":      {AllowedOperators: []string{"eq"}},
+			"period":       {AllowedOperators: []string{"eq", "in"}},
+			"id":           {AllowedOperators: []string{"eq", "in"}},
+			"user_id":      {AllowedOperators: []string{"eq", "in"}},
 		},
 		AllowedSortFields: []string{"name", "total_amount", "period", "id"},
 	}

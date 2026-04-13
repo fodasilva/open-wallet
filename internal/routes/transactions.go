@@ -8,16 +8,29 @@ import (
 	"github.com/felipe1496/open-wallet/internal/factory"
 	"github.com/felipe1496/open-wallet/internal/middlewares"
 	"github.com/felipe1496/open-wallet/internal/resources/transactions/handlers"
+	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
 func SetupTransactionsRoutes(r *gin.Engine, f *factory.Factory, redisClient *redis.Client, cfg *infra.Config) {
 	jwtService := f.JWTService()
 	transactionsHandler := handlers.NewHandler(f.TransactionsUseCases())
+	transactionsFilterConfig := querybuilder.ParseConfig{
+		AllowedFields: map[string]querybuilder.FieldConfig{
+			"category_id":    {AllowedOperators: []string{"eq", "in"}},
+			"type":           {AllowedOperators: []string{"eq", "in"}},
+			"reference_date": {AllowedOperators: []string{"eq", "gt", "gte", "lt", "lte"}},
+			"amount":         {AllowedOperators: []string{"eq", "gt", "gte", "lt", "lte"}},
+			"id":             {AllowedOperators: []string{"eq", "in"}},
+			"user_id":        {AllowedOperators: []string{"eq", "in"}},
+		},
+		AllowedSortFields: []string{"reference_date", "amount", "id"},
+	}
+
 	transactionsGroup := r.Group("/api/v1/transactions")
 	{
 		transactionsGroup.GET("/entries",
 			middlewares.RequireAuthMiddleware(jwtService),
-			middlewares.QueryBuilderMiddleware(nil),
+			middlewares.QueryBuilderMiddleware(transactionsFilterConfig),
 			transactionsHandler.ListEntries)
 		transactionsGroup.DELETE("/:transaction_id",
 			middlewares.RequireAuthMiddleware(jwtService),
