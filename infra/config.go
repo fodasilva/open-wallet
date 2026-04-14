@@ -14,19 +14,26 @@ import (
 )
 
 type Config struct {
-	Environment          string
-	Delay                int
-	Origins              []string
-	GcpProjectID         *string
-	Port                 int
-	DatabaseURL          string
-	GoogleClientID       string
-	GoogleSecret         string
-	LoginRedirectURI     string
-	JWTSecret            string
-	RateLimitDBURL       string
-	RateLimitMaxRequests int
-	RateLimitWindowMs    int
+	Environment      string
+	Delay            int
+	Origins          []string
+	GcpProjectID     *string
+	Port             int
+	DatabaseURL      string
+	GoogleClientID   string
+	GoogleSecret     string
+	LoginRedirectURI string
+	JWTSecret        string
+	RateLimitDBURL   string
+	RateLimits       RateLimits
+}
+
+type RateLimits struct {
+	XS func() (maxRequests int, windowMs int)
+	SM func() (maxRequests int, windowMs int)
+	MD func() (maxRequests int, windowMs int)
+	LG func() (maxRequests int, windowMs int)
+	XL func() (maxRequests int, windowMs int)
 }
 
 type loader struct {
@@ -144,25 +151,56 @@ func (l *loader) loadJWTConfig() {
 func (l *loader) loadRateLimitConfig() {
 	l.cfg.RateLimitDBURL = l.getRequired("RATE_LIMIT_DB_URL")
 
-	maxReq := os.Getenv("RATE_LIMIT_MAX_REQUESTS")
-	if maxReq == "" {
-		l.cfg.RateLimitMaxRequests = 100
-	} else if val, err := strconv.Atoi(maxReq); err != nil {
-		l.errs = append(l.errs, "RATE_LIMIT_MAX_REQUESTS must be a number")
-		l.cfg.RateLimitMaxRequests = 100
-	} else {
-		l.cfg.RateLimitMaxRequests = val
+	type params struct {
+		max    int
+		window int
 	}
 
-	window := os.Getenv("RATE_LIMIT_WINDOW_MS")
-	if window == "" {
-		l.cfg.RateLimitWindowMs = 60000
-	} else if val, err := strconv.Atoi(window); err != nil {
-		l.errs = append(l.errs, "RATE_LIMIT_WINDOW_MS must be a number")
-		l.cfg.RateLimitWindowMs = 60000
-	} else {
-		l.cfg.RateLimitWindowMs = val
+	defaults := map[string]params{
+		"XS": {max: 10, window: 60000},
+		"SM": {max: 30, window: 60000},
+		"MD": {max: 60, window: 60000},
+		"LG": {max: 120, window: 60000},
+		"XL": {max: 240, window: 60000},
 	}
+
+	loadSize := func(size string) (int, int) {
+		p := defaults[size]
+		maxReqKey := fmt.Sprintf("RATE_LIMIT_%s_MAX_REQUESTS", size)
+		windowKey := fmt.Sprintf("RATE_LIMIT_%s_WINDOW_MS", size)
+
+		if val := os.Getenv(maxReqKey); val != "" {
+			if intVal, err := strconv.Atoi(val); err == nil {
+				p.max = intVal
+			} else {
+				l.errs = append(l.errs, fmt.Sprintf("%s must be a number", maxReqKey))
+			}
+		}
+
+		if val := os.Getenv(windowKey); val != "" {
+			if intVal, err := strconv.Atoi(val); err == nil {
+				p.window = intVal
+			} else {
+				l.errs = append(l.errs, fmt.Sprintf("%s must be a number", windowKey))
+			}
+		}
+		return p.max, p.window
+	}
+
+	xsMax, xsWin := loadSize("XS")
+	l.cfg.RateLimits.XS = func() (int, int) { return xsMax, xsWin }
+
+	smMax, smWin := loadSize("SM")
+	l.cfg.RateLimits.SM = func() (int, int) { return smMax, smWin }
+
+	mdMax, mdWin := loadSize("MD")
+	l.cfg.RateLimits.MD = func() (int, int) { return mdMax, mdWin }
+
+	lgMax, lgWin := loadSize("LG")
+	l.cfg.RateLimits.LG = func() (int, int) { return lgMax, lgWin }
+
+	xlMax, xlWin := loadSize("XL")
+	l.cfg.RateLimits.XL = func() (int, int) { return xlMax, xlWin }
 }
 
 func (l *loader) getRequired(key string) string {
