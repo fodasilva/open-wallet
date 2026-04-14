@@ -13,9 +13,10 @@ import (
 func SetupAuthRoutes(r *gin.Engine, f *factory.Factory, redisClient *redis.Client, cfg *infra.Config) {
 	authHandler := handlers.NewHandler(f.AuthUseCases(), f.JWTService())
 	authGroup := r.Group("/api/v1/auth")
+	authMax, authWin := cfg.RateLimits.XS()
 	{
 		authGroup.POST("/login/google",
-			middlewares.RouteRateLimitMiddleware(redisClient, 5, 300000, "POST:/api/v1/auth/login/google"),
+			middlewares.NewRateLimitMiddleware(redisClient, authMax, authWin, "auth:google-login"),
 			authHandler.CreateLoginWithGoogle)
 	}
 }

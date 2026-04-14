@@ -27,6 +27,8 @@ func SetupRecurrencesRoutes(r *gin.Engine, f *factory.Factory, redisClient *redi
 	}
 
 	recurrencesGroup := r.Group("/api/v1/recurrences")
+	recMax, recWin := cfg.RateLimits.XS()
+	prepMax, prepWin := cfg.RateLimits.SM()
 	{
 		recurrencesGroup.GET("",
 			middlewares.RequireAuthMiddleware(jwtService),
@@ -37,15 +39,15 @@ func SetupRecurrencesRoutes(r *gin.Engine, f *factory.Factory, redisClient *redi
 			recurrencesHandler.Delete)
 		recurrencesGroup.POST("",
 			middlewares.RequireAuthMiddleware(jwtService),
-			middlewares.RouteRateLimitMiddleware(redisClient, 5, 60000, "POST:/api/v1/recurrences"),
+			middlewares.NewRateLimitMiddleware(redisClient, recMax, recWin, "recurrences:create"),
 			recurrencesHandler.Create)
 		recurrencesGroup.PATCH("/:id",
 			middlewares.RequireAuthMiddleware(jwtService),
-			middlewares.RouteRateLimitMiddleware(redisClient, 5, 60000, "PATCH:/api/v1/recurrences/:id"),
+			middlewares.NewRateLimitMiddleware(redisClient, recMax, recWin, "recurrences:update"),
 			recurrencesHandler.Update)
 		recurrencesGroup.POST("/:period",
 			middlewares.RequireAuthMiddleware(jwtService),
-			middlewares.RouteRateLimitMiddleware(redisClient, 20, 60000, "POST:/api/v1/recurrences/:period"),
+			middlewares.NewRateLimitMiddleware(redisClient, prepMax, prepWin, "recurrences:prepare"),
 			recurrencesHandler.Prepare)
 	}
 }
