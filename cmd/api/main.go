@@ -43,7 +43,8 @@ func main() {
 	r := gin.New()
 	r.Use(middlewares.DelayMiddleware(cfg))
 	r.Use(middlewares.CorsMiddleware(cfg))
-	r.Use(middlewares.GlobalRateLimitMiddleware(redisClient, cfg))
+	globalMax, globalWin := cfg.RateLimits.MD()
+	r.Use(middlewares.NewRateLimitMiddleware(redisClient, globalMax, globalWin, "global"))
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 

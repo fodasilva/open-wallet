@@ -38,10 +38,11 @@ func SetupCategoriesRoutes(r *gin.Engine, f *factory.Factory, redisClient *redis
 	}
 
 	categoriesGroup := r.Group("/api/v1/categories")
+	catMax, catWin := cfg.RateLimits.XS()
 	{
 		categoriesGroup.POST("",
 			middlewares.RequireAuthMiddleware(jwtService),
-			middlewares.RouteRateLimitMiddleware(redisClient, 5, 60000, "POST:/api/v1/categories"),
+			middlewares.NewRateLimitMiddleware(redisClient, catMax, catWin, "categories:create"),
 			categoriesHandler.Create)
 		categoriesGroup.GET("", middlewares.RequireAuthMiddleware(jwtService),
 			middlewares.QueryBuilderMiddleware(categoriesFilterConfig),
@@ -55,7 +56,7 @@ func SetupCategoriesRoutes(r *gin.Engine, f *factory.Factory, redisClient *redis
 			categoriesHandler.ListCategoryAmountPerPeriod)
 		categoriesGroup.PATCH("/:category_id",
 			middlewares.RequireAuthMiddleware(jwtService),
-			middlewares.RouteRateLimitMiddleware(redisClient, 5, 60000, "PATCH:/api/v1/categories/:category_id"),
+			middlewares.NewRateLimitMiddleware(redisClient, catMax, catWin, "categories:update"),
 			categoriesHandler.Update)
 	}
 }

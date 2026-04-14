@@ -27,6 +27,7 @@ func SetupTransactionsRoutes(r *gin.Engine, f *factory.Factory, redisClient *red
 	}
 
 	transactionsGroup := r.Group("/api/v1/transactions")
+	txMax, txWin := cfg.RateLimits.XS()
 	{
 		transactionsGroup.GET("/entries",
 			middlewares.RequireAuthMiddleware(jwtService),
@@ -37,11 +38,11 @@ func SetupTransactionsRoutes(r *gin.Engine, f *factory.Factory, redisClient *red
 			transactionsHandler.DeleteTransaction)
 		transactionsGroup.POST("",
 			middlewares.RequireAuthMiddleware(jwtService),
-			middlewares.RouteRateLimitMiddleware(redisClient, 5, 60000, "POST:/api/v1/transactions"),
+			middlewares.NewRateLimitMiddleware(redisClient, txMax, txWin, "transactions:create"),
 			transactionsHandler.CreateTransaction)
 		transactionsGroup.PATCH("/:transaction_id",
 			middlewares.RequireAuthMiddleware(jwtService),
-			middlewares.RouteRateLimitMiddleware(redisClient, 5, 60000, "PATCH:/api/v1/transactions/:transaction_id"),
+			middlewares.NewRateLimitMiddleware(redisClient, txMax, txWin, "transactions:update"),
 			transactionsHandler.UpdateTransaction)
 	}
 }
