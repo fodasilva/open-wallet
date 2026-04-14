@@ -30,7 +30,8 @@ func SetupTestEngine(cfg *infra.Config, redisClient *redis.Client) *gin.Engine {
 	r := gin.New()
 	r.Use(middlewares.DelayMiddleware(cfg))
 	r.Use(middlewares.CorsMiddleware(cfg))
-	r.Use(middlewares.GlobalRateLimitMiddleware(redisClient, cfg))
+	max, win := cfg.RateLimits.MD()
+	r.Use(middlewares.NewRateLimitMiddleware(redisClient, max, win, "global"))
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 	return r
@@ -123,12 +124,17 @@ func TestQueryBuilderE2E(t *testing.T) {
 	}
 
 	cfg := &infra.Config{
-		Environment:          "test",
-		Delay:                0,
-		Origins:              []string{"http://localhost:3000"},
-		RateLimitMaxRequests: 1000,
-		RateLimitWindowMs:    60000,
-		RateLimitDBURL:       resources.RedisConnStr,
+		Environment:    "test",
+		Delay:          0,
+		Origins:        []string{"http://localhost:3000"},
+		RateLimitDBURL: resources.RedisConnStr,
+		RateLimits: infra.RateLimits{
+			MD: func() (int, int) { return 1000, 60000 },
+			XS: func() (int, int) { return 10, 60000 },
+			SM: func() (int, int) { return 30, 60000 },
+			LG: func() (int, int) { return 120, 60000 },
+			XL: func() (int, int) { return 240, 60000 },
+		},
 	}
 
 	r := SetupTestEngine(cfg, resources.RedisClient)
