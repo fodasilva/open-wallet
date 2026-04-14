@@ -42,6 +42,9 @@ func TestE2eRecurrences(t *testing.T) {
 	cfg := &infra.Config{
 		JWTSecret: "test-secret",
 	}
+	cfg.RateLimits.XS = func() (int, int) { return 1000, 60000 }
+	cfg.RateLimits.SM = func() (int, int) { return 1000, 60000 }
+	cfg.RateLimits.MD = func() (int, int) { return 1000, 60000 }
 
 	AssertTableIsEmpty(t, res.DB, "users")
 	AssertTableIsEmpty(t, res.DB, "recurrences")
