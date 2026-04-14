@@ -9,11 +9,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
 
-	"github.com/felipe1496/open-wallet/infra"
 	"github.com/felipe1496/open-wallet/internal/utils"
 )
 
-func rateLimit(redisClient *redis.Client, maxRequests int, windowMilliseconds int, prefix string) gin.HandlerFunc {
+func NewRateLimitMiddleware(redisClient *redis.Client, maxRequests int, windowMilliseconds int, prefix string) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		ip := ctx.ClientIP()
 		key := fmt.Sprintf("rate_limit:%s:%s", prefix, ip)
@@ -37,14 +36,4 @@ func rateLimit(redisClient *redis.Client, maxRequests int, windowMilliseconds in
 
 		ctx.Next()
 	}
-}
-
-func GlobalRateLimitMiddleware(redisClient *redis.Client, cfg *infra.Config) gin.HandlerFunc {
-	limit := cfg.RateLimitMaxRequests
-	window := time.Duration(cfg.RateLimitWindowMs) * time.Millisecond
-	return rateLimit(redisClient, limit, int(window.Milliseconds()), "global")
-}
-
-func RouteRateLimitMiddleware(redisClient *redis.Client, maxRequests int, windowMilliseconds int, prefix string) gin.HandlerFunc {
-	return rateLimit(redisClient, maxRequests, windowMilliseconds, prefix)
 }
