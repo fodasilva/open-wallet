@@ -73,6 +73,7 @@ func (o *ListAmountPerPeriodOptions) Run() error {
 
 // @Summary List categories with amount per period
 // @Description List categories with amount per period
+// @ID v1ListCategoryAmountPerPeriod
 // @Tags categories
 // @Security BearerAuth
 // @Accept json

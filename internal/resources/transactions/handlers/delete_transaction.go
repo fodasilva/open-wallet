@@ -41,6 +41,7 @@ func (o *DeleteOptions) Run() error {
 
 // @Summary Delete Transaction By ID
 // @Description Delete a transaction and all entries related by the ID of the transaction
+// @ID v1DeleteTransaction
 // @Tags transactions
 // @Security BearerAuth
 // @Accept json

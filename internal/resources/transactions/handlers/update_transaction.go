@@ -97,6 +97,7 @@ func (o *UpdateTransactionOptions) Run() error {
 
 // @Summary Update a transaction
 // @Description Update a transaction
+// @ID v1UpdateTransaction
 // @Tags transactions
 // @Security BearerAuth
 // @Accept json

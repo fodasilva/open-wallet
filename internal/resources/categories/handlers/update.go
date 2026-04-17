@@ -78,6 +78,7 @@ func (o *UpdateOptions) Run() error {
 
 // @Summary Update Category By ID
 // @Description Update a category
+// @ID v1UpdateCategory
 // @Tags categories
 // @Security BearerAuth
 // @Accept json

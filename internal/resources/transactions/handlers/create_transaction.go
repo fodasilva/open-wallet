@@ -71,6 +71,7 @@ func (o *CreateTransactionOptions) Run() error {
 
 // @Summary Create a transaction
 // @Description Create a transaction with all of it entries
+// @ID v1CreateTransaction
 // @Tags transactions
 // @Security BearerAuth
 // @Accept json
