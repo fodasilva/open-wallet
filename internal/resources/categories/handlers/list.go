@@ -77,6 +77,7 @@ func (o *ListOptions) Run() error {
 
 // @Summary List categories
 // @Description List categories
+// @ID v1ListCategories
 // @Tags categories
 // @Security BearerAuth
 // @Accept json

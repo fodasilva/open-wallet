@@ -41,6 +41,7 @@ func (o *DeleteOptions) Run() error {
 
 // @Summary Delete Category By ID
 // @Description Delete a category
+// @ID v1DeleteCategory
 // @Tags categories
 // @Security BearerAuth
 // @Accept json

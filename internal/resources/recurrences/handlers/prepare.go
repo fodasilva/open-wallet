@@ -53,6 +53,7 @@ func (o *PrepareOptions) Run() error {
 
 // @Summary Prepare recurrences for a period
 // @Description Generates entry records for all recurrence templates that don't already have one in the given period.
+// @ID v1PrepareRecurrence
 // @Tags recurrences
 // @Security BearerAuth
 // @Accept json

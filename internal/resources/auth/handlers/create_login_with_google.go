@@ -55,6 +55,7 @@ func (o *CreateLoginWithGoogleOptions) Run() error {
 
 // @Summary Login with Google
 // @Description Authenticates user with Google OAuth
+// @ID v1LoginWithGoogle
 // @Tags auth
 // @Accept json
 // @Produce json

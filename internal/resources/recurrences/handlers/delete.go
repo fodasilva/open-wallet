@@ -48,6 +48,7 @@ func (o *DeleteOptions) Run() error {
 
 // @Summary Delete Recurrence By ID
 // @Description Delete a recurrence template
+// @ID v1DeleteRecurrence
 // @Tags recurrences
 // @Security BearerAuth
 // @Accept json

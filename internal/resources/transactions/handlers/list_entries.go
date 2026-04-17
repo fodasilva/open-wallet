@@ -84,6 +84,7 @@ func (o *ListEntriesOptions) Run() error {
 
 // @Summary List entries
 // @Description List a detailed view of entries joined with transactions for a given period
+// @ID v1ListEntries
 // @Tags transactions
 // @Security BearerAuth
 // @Accept json

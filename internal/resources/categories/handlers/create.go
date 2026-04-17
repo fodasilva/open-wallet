@@ -54,6 +54,7 @@ func (o *CreateOptions) Run() error {
 
 // @Summary Create a category
 // @Description Create a category
+// @ID v1CreateCategory
 // @Tags categories
 // @Security BearerAuth
 // @Accept json

@@ -88,6 +88,7 @@ func (o *UpdateOptions) Run() error {
 
 // @Summary Update a recurrence
 // @Description Update a recurrence template
+// @ID v1UpdateRecurrence
 // @Tags recurrences
 // @Security BearerAuth
 // @Accept json

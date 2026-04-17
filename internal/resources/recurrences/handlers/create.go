@@ -69,6 +69,7 @@ func (o *CreateOptions) Run() error {
 
 // @Summary Create a recurrence
 // @Description Create a new recurrence template
+// @ID v1CreateRecurrence
 // @Tags recurrences
 // @Security BearerAuth
 // @Accept json

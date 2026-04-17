@@ -81,6 +81,7 @@ func (o *ListOptions) Run() error {
 
 // @Summary List recurrences
 // @Description List user recurrences
+// @ID v1ListRecurrences
 // @Tags recurrences
 // @Security BearerAuth
 // @Accept json
