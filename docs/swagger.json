@@ -20,6 +20,7 @@
                     "auth"
                 ],
                 "summary": "Login with Google",
+                "operationId": "v1LoginWithGoogle",
                 "parameters": [
                     {
                         "description": "Login payload",
@@ -71,6 +72,7 @@
                     "categories"
                 ],
                 "summary": "List categories",
+                "operationId": "v1ListCategories",
                 "parameters": [
                     {
                         "type": "integer",
@@ -144,6 +146,7 @@
                     "categories"
                 ],
                 "summary": "Create a category",
+                "operationId": "v1CreateCategory",
                 "parameters": [
                     {
                         "description": "Category payload",
@@ -195,6 +198,7 @@
                     "categories"
                 ],
                 "summary": "Delete Category By ID",
+                "operationId": "v1DeleteCategory",
                 "parameters": [
                     {
                         "type": "string",
@@ -245,6 +249,7 @@
                     "categories"
                 ],
                 "summary": "Update Category By ID",
+                "operationId": "v1UpdateCategory",
                 "parameters": [
                     {
                         "type": "string",
@@ -309,6 +314,7 @@
                     "categories"
                 ],
                 "summary": "List categories with amount per period",
+                "operationId": "v1ListCategoryAmountPerPeriod",
                 "parameters": [
                     {
                         "type": "string",
@@ -385,6 +391,7 @@
                     "recurrences"
                 ],
                 "summary": "List recurrences",
+                "operationId": "v1ListRecurrences",
                 "parameters": [
                     {
                         "type": "integer",
@@ -439,6 +446,7 @@
                     "recurrences"
                 ],
                 "summary": "Create a recurrence",
+                "operationId": "v1CreateRecurrence",
                 "parameters": [
                     {
                         "description": "Recurrence payload",
@@ -496,6 +504,7 @@
                     "recurrences"
                 ],
                 "summary": "Delete Recurrence By ID",
+                "operationId": "v1DeleteRecurrence",
                 "parameters": [
                     {
                         "type": "string",
@@ -557,6 +566,7 @@
                     "recurrences"
                 ],
                 "summary": "Update a recurrence",
+                "operationId": "v1UpdateRecurrence",
                 "parameters": [
                     {
                         "type": "string",
@@ -621,6 +631,7 @@
                     "recurrences"
                 ],
                 "summary": "Prepare recurrences for a period",
+                "operationId": "v1PrepareRecurrence",
                 "parameters": [
                     {
                         "type": "string",
@@ -673,6 +684,7 @@
                     "transactions"
                 ],
                 "summary": "Create a transaction",
+                "operationId": "v1CreateTransaction",
                 "parameters": [
                     {
                         "description": "Transaction payload",
@@ -730,6 +742,7 @@
                     "transactions"
                 ],
                 "summary": "List entries",
+                "operationId": "v1ListEntries",
                 "parameters": [
                     {
                         "type": "integer",
@@ -793,6 +806,7 @@
                     "transactions"
                 ],
                 "summary": "Delete Transaction By ID",
+                "operationId": "v1DeleteTransaction",
                 "parameters": [
                     {
                         "type": "string",
@@ -843,6 +857,7 @@
                     "transactions"
                 ],
                 "summary": "Update a transaction",
+                "operationId": "v1UpdateTransaction",
                 "parameters": [
                     {
                         "type": "string",
