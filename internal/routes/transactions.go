@@ -22,10 +22,8 @@ func SetupTransactionsRoutes(r *gin.Engine, f *factory.Factory, redisClient *red
 			"amount":         {AllowedOperators: []string{"eq", "gt", "gte", "lt", "lte"}},
 			"id":             {AllowedOperators: []string{"eq", "in"}},
 			"user_id":        {AllowedOperators: []string{"eq", "in"}},
-			"period":         {AllowedOperators: []string{"eq", "in"}},
-			"created_at":     {AllowedOperators: []string{"eq", "gt", "gte", "lt", "lte"}},
 		},
-		AllowedSortFields: []string{"reference_date", "amount", "id", "created_at"},
+		AllowedSortFields: []string{"reference_date", "amount", "id"},
 	}
 
 	transactionsGroup := r.Group("/api/v1/transactions")
