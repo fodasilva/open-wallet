@@ -451,6 +451,7 @@ paths:
       consumes:
       - application/json
       description: Authenticates user with Google OAuth
+      operationId: v1LoginWithGoogle
       parameters:
       - description: Login payload
         in: body
@@ -481,6 +482,7 @@ paths:
       consumes:
       - application/json
       description: List categories
+      operationId: v1ListCategories
       parameters:
       - default: 1
         description: Page number
@@ -529,6 +531,7 @@ paths:
       consumes:
       - application/json
       description: Create a category
+      operationId: v1CreateCategory
       parameters:
       - description: Category payload
         in: body
@@ -561,6 +564,7 @@ paths:
       consumes:
       - application/json
       description: Delete a category
+      operationId: v1DeleteCategory
       parameters:
       - description: category ID
         in: path
@@ -593,6 +597,7 @@ paths:
       consumes:
       - application/json
       description: Update a category
+      operationId: v1UpdateCategory
       parameters:
       - description: category ID
         in: path
@@ -634,6 +639,7 @@ paths:
       consumes:
       - application/json
       description: List categories with amount per period
+      operationId: v1ListCategoryAmountPerPeriod
       parameters:
       - description: period
         in: path
@@ -684,6 +690,7 @@ paths:
       consumes:
       - application/json
       description: List user recurrences
+      operationId: v1ListRecurrences
       parameters:
       - default: 1
         description: Page number
@@ -719,6 +726,7 @@ paths:
       consumes:
       - application/json
       description: Create a new recurrence template
+      operationId: v1CreateRecurrence
       parameters:
       - description: Recurrence payload
         in: body
@@ -755,6 +763,7 @@ paths:
       consumes:
       - application/json
       description: Delete a recurrence template
+      operationId: v1DeleteRecurrence
       parameters:
       - description: recurrence ID
         in: path
@@ -797,6 +806,7 @@ paths:
       consumes:
       - application/json
       description: Update a recurrence template
+      operationId: v1UpdateRecurrence
       parameters:
       - description: recurrence ID
         in: path
@@ -839,6 +849,7 @@ paths:
       - application/json
       description: Generates entry records for all recurrence templates that don't
         already have one in the given period.
+      operationId: v1PrepareRecurrence
       parameters:
       - description: Period in YYYYMM format (e.g. 202603)
         in: path
@@ -872,6 +883,7 @@ paths:
       consumes:
       - application/json
       description: Create a transaction with all of it entries
+      operationId: v1CreateTransaction
       parameters:
       - description: Transaction payload
         in: body
@@ -908,6 +920,7 @@ paths:
       consumes:
       - application/json
       description: Delete a transaction and all entries related by the ID of the transaction
+      operationId: v1DeleteTransaction
       parameters:
       - description: transaction ID
         in: path
@@ -940,6 +953,7 @@ paths:
       consumes:
       - application/json
       description: Update a transaction
+      operationId: v1UpdateTransaction
       parameters:
       - description: transaction ID
         in: path
@@ -982,6 +996,7 @@ paths:
       - application/json
       description: List a detailed view of entries joined with transactions for a
         given period
+      operationId: v1ListEntries
       parameters:
       - default: 1
         description: Page number

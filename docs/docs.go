@@ -28,6 +28,7 @@ const docTemplate = `{
                     "auth"
                 ],
                 "summary": "Login with Google",
+                "operationId": "v1LoginWithGoogle",
                 "parameters": [
                     {
                         "description": "Login payload",
@@ -79,6 +80,7 @@ const docTemplate = `{
                     "categories"
                 ],
                 "summary": "List categories",
+                "operationId": "v1ListCategories",
                 "parameters": [
                     {
                         "type": "integer",
@@ -152,6 +154,7 @@ const docTemplate = `{
                     "categories"
                 ],
                 "summary": "Create a category",
+                "operationId": "v1CreateCategory",
                 "parameters": [
                     {
                         "description": "Category payload",
@@ -203,6 +206,7 @@ const docTemplate = `{
                     "categories"
                 ],
                 "summary": "Delete Category By ID",
+                "operationId": "v1DeleteCategory",
                 "parameters": [
                     {
                         "type": "string",
@@ -253,6 +257,7 @@ const docTemplate = `{
                     "categories"
                 ],
                 "summary": "Update Category By ID",
+                "operationId": "v1UpdateCategory",
                 "parameters": [
                     {
                         "type": "string",
@@ -317,6 +322,7 @@ const docTemplate = `{
                     "categories"
                 ],
                 "summary": "List categories with amount per period",
+                "operationId": "v1ListCategoryAmountPerPeriod",
                 "parameters": [
                     {
                         "type": "string",
@@ -393,6 +399,7 @@ const docTemplate = `{
                     "recurrences"
                 ],
                 "summary": "List recurrences",
+                "operationId": "v1ListRecurrences",
                 "parameters": [
                     {
                         "type": "integer",
@@ -447,6 +454,7 @@ const docTemplate = `{
                     "recurrences"
                 ],
                 "summary": "Create a recurrence",
+                "operationId": "v1CreateRecurrence",
                 "parameters": [
                     {
                         "description": "Recurrence payload",
@@ -504,6 +512,7 @@ const docTemplate = `{
                     "recurrences"
                 ],
                 "summary": "Delete Recurrence By ID",
+                "operationId": "v1DeleteRecurrence",
                 "parameters": [
                     {
                         "type": "string",
@@ -565,6 +574,7 @@ const docTemplate = `{
                     "recurrences"
                 ],
                 "summary": "Update a recurrence",
+                "operationId": "v1UpdateRecurrence",
                 "parameters": [
                     {
                         "type": "string",
@@ -629,6 +639,7 @@ const docTemplate = `{
                     "recurrences"
                 ],
                 "summary": "Prepare recurrences for a period",
+                "operationId": "v1PrepareRecurrence",
                 "parameters": [
                     {
                         "type": "string",
@@ -681,6 +692,7 @@ const docTemplate = `{
                     "transactions"
                 ],
                 "summary": "Create a transaction",
+                "operationId": "v1CreateTransaction",
                 "parameters": [
                     {
                         "description": "Transaction payload",
@@ -738,6 +750,7 @@ const docTemplate = `{
                     "transactions"
                 ],
                 "summary": "List entries",
+                "operationId": "v1ListEntries",
                 "parameters": [
                     {
                         "type": "integer",
@@ -801,6 +814,7 @@ const docTemplate = `{
                     "transactions"
                 ],
                 "summary": "Delete Transaction By ID",
+                "operationId": "v1DeleteTransaction",
                 "parameters": [
                     {
                         "type": "string",
@@ -851,6 +865,7 @@ const docTemplate = `{
                     "transactions"
                 ],
                 "summary": "Update a transaction",
+                "operationId": "v1UpdateTransaction",
                 "parameters": [
                     {
                         "type": "string",
