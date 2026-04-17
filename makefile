@@ -56,3 +56,6 @@ check-repos:
 		exit 1; \
 	fi
 	@echo "Repositories are up to date."
+
+check-swagger-ids:
+	@bash scripts/check_swagger_ids.sh

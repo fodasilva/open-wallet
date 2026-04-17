@@ -124,3 +124,13 @@ jobs:
 
       - name: Check Repositories
         run: make check-repos
+
+  check-swagger-ids:
+    name: Check Swagger IDs
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check Swagger IDs
+        run: make check-swagger-ids
