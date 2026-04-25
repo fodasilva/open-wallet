@@ -44,9 +44,9 @@ func (o *CreateOptions) Run() error {
 		return err
 	}
 
-	o.Ctx.JSON(http.StatusCreated, CreateCategoryResponse{
+	o.Ctx.JSON(http.StatusCreated, utils.ResponseData[CreateCategoryResponseData]{
 		Data: CreateCategoryResponseData{
-			Category: category,
+			Category: MapCategoryResource(category),
 		},
 	})
 	return nil
@@ -60,7 +60,7 @@ func (o *CreateOptions) Run() error {
 // @Accept json
 // @Produce json
 // @Param body body CreateCategoryRequest true "Category payload"
-// @Success 201 {object} CreateCategoryResponse "Category created"
+// @Success 201 {object} utils.ResponseData[CreateCategoryResponseData] "Category created"
 // @Failure 401 {object} utils.HTTPError "Unauthorized"
 // @Failure 500 {object} utils.HTTPError "Internal server error"
 // @Router /api/v1/categories [post]

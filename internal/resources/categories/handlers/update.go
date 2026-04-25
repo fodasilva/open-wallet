@@ -68,9 +68,9 @@ func (o *UpdateOptions) Run() error {
 		return err
 	}
 
-	o.Ctx.JSON(http.StatusOK, UpdateCategoryResponse{
+	o.Ctx.JSON(http.StatusOK, utils.ResponseData[UpdateCategoryResponseData]{
 		Data: UpdateCategoryResponseData{
-			Category: category,
+			Category: MapCategoryResource(category),
 		},
 	})
 	return nil
@@ -85,7 +85,7 @@ func (o *UpdateOptions) Run() error {
 // @Produce json
 // @Param category_id path string true "category ID"
 // @Param body body UpdateCategoryRequest true "Category payload"
-// @Success 200 {object} UpdateCategoryResponse "Category updated"
+// @Success 200 {object} utils.ResponseData[UpdateCategoryResponseData] "Category updated"
 // @Failure 401 {object} utils.HTTPError "Unauthorized"
 // @Failure 404 {object} utils.HTTPError "Not found"
 // @Failure 500 {object} utils.HTTPError "Internal server error"
