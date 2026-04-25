@@ -32,14 +32,16 @@ type UpdateEntryRequest struct {
 }
 
 type TransactionResource struct {
-	ID           string    `json:"id" binding:"required"`
-	UserID       string    `json:"user_id" binding:"required"`
-	Type         string    `json:"type" binding:"required"`
-	Name         string    `json:"name" binding:"required"`
-	Description  *string   `json:"description"`
-	CreatedAt    time.Time `json:"created_at" binding:"required"`
-	CategoryID   *string   `json:"category_id"`
-	RecurrenceID *string   `json:"recurrence_id"`
+	ID            string    `json:"id" binding:"required"`
+	UserID        string    `json:"user_id" binding:"required"`
+	Type          string    `json:"type" binding:"required"`
+	Name          string    `json:"name" binding:"required"`
+	Description   *string   `json:"description"`
+	CreatedAt     time.Time `json:"created_at" binding:"required"`
+	CategoryID    *string   `json:"category_id"`
+	CategoryName  *string   `json:"category_name,omitempty"`
+	CategoryColor *string   `json:"category_color,omitempty"`
+	RecurrenceID  *string   `json:"recurrence_id"`
 }
 
 type EntryResource struct {
@@ -63,15 +65,15 @@ type EntryResource struct {
 }
 
 type UpdateTransactionResponseData struct {
-	Transaction TransactionResource `json:"transaction"`
+	Transaction TransactionResource `json:"transaction" binding:"required"`
 }
 
 type CreateTransactionResponseData struct {
-	Transaction TransactionResource `json:"transaction"`
+	Transaction TransactionResource `json:"transaction" binding:"required"`
 }
 
 type ListEntriesResponseData struct {
-	Entries []EntryResource `json:"entries"`
+	Entries []EntryResource `json:"entries" binding:"required"`
 }
 
 type MonthlySummaryResource struct {

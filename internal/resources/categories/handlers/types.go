@@ -10,26 +10,26 @@ type CreateCategoryRequest struct {
 }
 
 type CategoryResource struct {
-	ID        string    `json:"id"`
-	UserID    string    `json:"user_id"`
-	Name      string    `json:"name"`
-	Color     string    `json:"color"`
-	CreatedAt time.Time `json:"created_at"`
+	ID        string    `json:"id" binding:"required"`
+	UserID    string    `json:"user_id" binding:"required"`
+	Name      string    `json:"name" binding:"required"`
+	Color     string    `json:"color" binding:"required"`
+	CreatedAt time.Time `json:"created_at" binding:"required"`
 }
 
 type CategoryAmountPerPeriodResource struct {
-	ID          string  `json:"id"`
-	Name        string  `json:"name"`
-	Color       string  `json:"color"`
-	TotalAmount float64 `json:"total_amount"`
+	ID          string  `json:"id" binding:"required"`
+	Name        string  `json:"name" binding:"required"`
+	Color       string  `json:"color" binding:"required"`
+	TotalAmount float64 `json:"total_amount" binding:"required"`
 }
 
 type CreateCategoryResponseData struct {
-	Category CategoryResource `json:"category"`
+	Category CategoryResource `json:"category" binding:"required"`
 }
 
 type ListCategoriesResponseData struct {
-	Categories []CategoryResource `json:"categories"`
+	Categories []CategoryResource `json:"categories" binding:"required"`
 }
 
 type UpdateCategoryRequest struct {
@@ -38,9 +38,9 @@ type UpdateCategoryRequest struct {
 }
 
 type UpdateCategoryResponseData struct {
-	Category CategoryResource `json:"category"`
+	Category CategoryResource `json:"category" binding:"required"`
 }
 
 type ListCategoryAmountPerPeriodResponseData struct {
-	Categories []CategoryAmountPerPeriodResource `json:"categories"`
+	Categories []CategoryAmountPerPeriodResource `json:"categories" binding:"required"`
 }

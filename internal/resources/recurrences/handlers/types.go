@@ -15,20 +15,22 @@ type CreateRecurrenceRequest struct {
 }
 
 type RecurrenceResource struct {
-	ID          string    `json:"id"`
-	UserID      string    `json:"user_id"`
-	Name        string    `json:"name"`
-	Amount      float64   `json:"amount"`
-	DayOfMonth  int       `json:"day_of_month"`
-	StartPeriod string    `json:"start_period"`
-	EndPeriod   *string   `json:"end_period"`
-	Note        *string   `json:"note"`
-	CategoryID  *string   `json:"category_id"`
-	CreatedAt   time.Time `json:"created_at"`
+	ID            string    `json:"id" binding:"required"`
+	UserID        string    `json:"user_id" binding:"required"`
+	Name          string    `json:"name" binding:"required"`
+	Amount        float64   `json:"amount" binding:"required"`
+	DayOfMonth    int       `json:"day_of_month" binding:"required"`
+	StartPeriod   string    `json:"start_period" binding:"required"`
+	EndPeriod     *string   `json:"end_period"`
+	Note          *string   `json:"note"`
+	CategoryID    *string   `json:"category_id"`
+	CategoryName  *string   `json:"category_name"`
+	CategoryColor *string   `json:"category_color"`
+	CreatedAt     time.Time `json:"created_at" binding:"required"`
 }
 
 type CreateRecurrenceResponseData struct {
-	Recurrence RecurrenceResource `json:"recurrence"`
+	Recurrence RecurrenceResource `json:"recurrence" binding:"required"`
 }
 
 type UpdateRecurrenceRequest struct {
@@ -42,9 +44,9 @@ type UpdateRecurrenceRequest struct {
 }
 
 type UpdateRecurrenceResponseData struct {
-	Recurrence RecurrenceResource `json:"recurrence"`
+	Recurrence RecurrenceResource `json:"recurrence" binding:"required"`
 }
 
 type ListRecurrencesResponseData struct {
-	Recurrences []RecurrenceResource `json:"recurrences"`
+	Recurrences []RecurrenceResource `json:"recurrences" binding:"required"`
 }
