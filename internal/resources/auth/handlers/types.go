@@ -5,18 +5,18 @@ import (
 )
 
 type LoginGoogleRequest struct {
-	Code string `json:"code"`
+	Code string `json:"code" binding:"required"`
 }
 
 type UserResource struct {
-	ID        string    `json:"id"`
-	Email     string    `json:"email"`
-	Name      string    `json:"name"`
-	AvatarURL string    `json:"avatar_url"`
-	CreatedAt time.Time `json:"created_at"`
+	ID        string    `json:"id" binding:"required"`
+	Email     string    `json:"email" binding:"required"`
+	Name      string    `json:"name" binding:"required"`
+	AvatarURL string    `json:"avatar_url" binding:"required"`
+	CreatedAt time.Time `json:"created_at" binding:"required"`
 }
 
 type LoginGoogleResponseData struct {
-	AccessToken string       `json:"access_token"`
-	User        UserResource `json:"user"`
+	AccessToken string       `json:"access_token" binding:"required"`
+	User        UserResource `json:"user" binding:"required"`
 }
