@@ -20,12 +20,12 @@ type Executer interface {
 }
 
 type ResponseData[T any] struct {
-	Data T `json:"data"`
+	Data T `json:"data" binding:"required"`
 }
 
 type PaginatedResponse[T any] struct {
-	Data  T                     `json:"data"`
-	Query querybuilder.Metadata `json:"query"`
+	Data  T                     `json:"data" binding:"required"`
+	Query querybuilder.Metadata `json:"query" binding:"required"`
 }
 
 type OptionalNullable[T any] struct {

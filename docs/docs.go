@@ -1010,6 +1010,10 @@ const docTemplate = `{
         },
         "github_com_felipe1496_open-wallet_internal_utils.PaginatedResponse-internal_resources_categories_handlers_ListCategoriesResponseData": {
             "type": "object",
+            "required": [
+                "data",
+                "query"
+            ],
             "properties": {
                 "data": {
                     "$ref": "#/definitions/internal_resources_categories_handlers.ListCategoriesResponseData"
@@ -1021,6 +1025,10 @@ const docTemplate = `{
         },
         "github_com_felipe1496_open-wallet_internal_utils.PaginatedResponse-internal_resources_categories_handlers_ListCategoryAmountPerPeriodResponseData": {
             "type": "object",
+            "required": [
+                "data",
+                "query"
+            ],
             "properties": {
                 "data": {
                     "$ref": "#/definitions/internal_resources_categories_handlers.ListCategoryAmountPerPeriodResponseData"
@@ -1032,6 +1040,10 @@ const docTemplate = `{
         },
         "github_com_felipe1496_open-wallet_internal_utils.PaginatedResponse-internal_resources_recurrences_handlers_ListRecurrencesResponseData": {
             "type": "object",
+            "required": [
+                "data",
+                "query"
+            ],
             "properties": {
                 "data": {
                     "$ref": "#/definitions/internal_resources_recurrences_handlers.ListRecurrencesResponseData"
@@ -1043,6 +1055,10 @@ const docTemplate = `{
         },
         "github_com_felipe1496_open-wallet_internal_utils.PaginatedResponse-internal_resources_transactions_handlers_ListEntriesResponseData": {
             "type": "object",
+            "required": [
+                "data",
+                "query"
+            ],
             "properties": {
                 "data": {
                     "$ref": "#/definitions/internal_resources_transactions_handlers.ListEntriesResponseData"
@@ -1054,6 +1070,9 @@ const docTemplate = `{
         },
         "github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_auth_handlers_LoginGoogleResponseData": {
             "type": "object",
+            "required": [
+                "data"
+            ],
             "properties": {
                 "data": {
                     "$ref": "#/definitions/internal_resources_auth_handlers.LoginGoogleResponseData"
@@ -1062,6 +1081,9 @@ const docTemplate = `{
         },
         "github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_categories_handlers_CreateCategoryResponseData": {
             "type": "object",
+            "required": [
+                "data"
+            ],
             "properties": {
                 "data": {
                     "$ref": "#/definitions/internal_resources_categories_handlers.CreateCategoryResponseData"
@@ -1070,6 +1092,9 @@ const docTemplate = `{
         },
         "github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_categories_handlers_UpdateCategoryResponseData": {
             "type": "object",
+            "required": [
+                "data"
+            ],
             "properties": {
                 "data": {
                     "$ref": "#/definitions/internal_resources_categories_handlers.UpdateCategoryResponseData"
@@ -1078,6 +1103,9 @@ const docTemplate = `{
         },
         "github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_recurrences_handlers_CreateRecurrenceResponseData": {
             "type": "object",
+            "required": [
+                "data"
+            ],
             "properties": {
                 "data": {
                     "$ref": "#/definitions/internal_resources_recurrences_handlers.CreateRecurrenceResponseData"
@@ -1086,6 +1114,9 @@ const docTemplate = `{
         },
         "github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_recurrences_handlers_UpdateRecurrenceResponseData": {
             "type": "object",
+            "required": [
+                "data"
+            ],
             "properties": {
                 "data": {
                     "$ref": "#/definitions/internal_resources_recurrences_handlers.UpdateRecurrenceResponseData"
@@ -1094,6 +1125,9 @@ const docTemplate = `{
         },
         "github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_transactions_handlers_CreateTransactionResponseData": {
             "type": "object",
+            "required": [
+                "data"
+            ],
             "properties": {
                 "data": {
                     "$ref": "#/definitions/internal_resources_transactions_handlers.CreateTransactionResponseData"
@@ -1102,6 +1136,9 @@ const docTemplate = `{
         },
         "github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_transactions_handlers_SummaryResponseData": {
             "type": "object",
+            "required": [
+                "data"
+            ],
             "properties": {
                 "data": {
                     "$ref": "#/definitions/internal_resources_transactions_handlers.SummaryResponseData"
@@ -1110,6 +1147,9 @@ const docTemplate = `{
         },
         "github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_transactions_handlers_UpdateTransactionResponseData": {
             "type": "object",
+            "required": [
+                "data"
+            ],
             "properties": {
                 "data": {
                     "$ref": "#/definitions/internal_resources_transactions_handlers.UpdateTransactionResponseData"
@@ -1118,6 +1158,13 @@ const docTemplate = `{
         },
         "github_com_felipe1496_open-wallet_internal_utils_querybuilder.Metadata": {
             "type": "object",
+            "required": [
+                "next_page",
+                "page",
+                "per_page",
+                "total_items",
+                "total_pages"
+            ],
             "properties": {
                 "next_page": {
                     "type": "boolean"
