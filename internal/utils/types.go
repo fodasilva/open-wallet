@@ -3,6 +3,8 @@ package utils
 import (
 	"context"
 	"database/sql"
+
+	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
 type Executer interface {
@@ -17,12 +19,13 @@ type Executer interface {
 	PrepareContext(ctx context.Context, query string) (*sql.Stmt, error)
 }
 
-type QueryMeta struct {
-	NextPage   bool `json:"next_page"`
-	Page       int  `json:"page"`
-	PerPage    int  `json:"per_page"`
-	TotalItems int  `json:"total_items"`
-	TotalPages int  `json:"total_pages"`
+type ResponseData[T any] struct {
+	Data T `json:"data"`
+}
+
+type PaginatedResponse[T any] struct {
+	Data  T                     `json:"data"`
+	Query querybuilder.Metadata `json:"query"`
 }
 
 type OptionalNullable[T any] struct {
