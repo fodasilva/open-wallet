@@ -31,6 +31,9 @@ definitions:
         $ref: '#/definitions/internal_resources_categories_handlers.ListCategoriesResponseData'
       query:
         $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils_querybuilder.Metadata'
+    required:
+    - data
+    - query
     type: object
   ? github_com_felipe1496_open-wallet_internal_utils.PaginatedResponse-internal_resources_categories_handlers_ListCategoryAmountPerPeriodResponseData
   : properties:
@@ -38,6 +41,9 @@ definitions:
         $ref: '#/definitions/internal_resources_categories_handlers.ListCategoryAmountPerPeriodResponseData'
       query:
         $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils_querybuilder.Metadata'
+    required:
+    - data
+    - query
     type: object
   ? github_com_felipe1496_open-wallet_internal_utils.PaginatedResponse-internal_resources_recurrences_handlers_ListRecurrencesResponseData
   : properties:
@@ -45,6 +51,9 @@ definitions:
         $ref: '#/definitions/internal_resources_recurrences_handlers.ListRecurrencesResponseData'
       query:
         $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils_querybuilder.Metadata'
+    required:
+    - data
+    - query
     type: object
   ? github_com_felipe1496_open-wallet_internal_utils.PaginatedResponse-internal_resources_transactions_handlers_ListEntriesResponseData
   : properties:
@@ -52,46 +61,65 @@ definitions:
         $ref: '#/definitions/internal_resources_transactions_handlers.ListEntriesResponseData'
       query:
         $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils_querybuilder.Metadata'
+    required:
+    - data
+    - query
     type: object
   github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_auth_handlers_LoginGoogleResponseData:
     properties:
       data:
         $ref: '#/definitions/internal_resources_auth_handlers.LoginGoogleResponseData'
+    required:
+    - data
     type: object
   github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_categories_handlers_CreateCategoryResponseData:
     properties:
       data:
         $ref: '#/definitions/internal_resources_categories_handlers.CreateCategoryResponseData'
+    required:
+    - data
     type: object
   github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_categories_handlers_UpdateCategoryResponseData:
     properties:
       data:
         $ref: '#/definitions/internal_resources_categories_handlers.UpdateCategoryResponseData'
+    required:
+    - data
     type: object
   ? github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_recurrences_handlers_CreateRecurrenceResponseData
   : properties:
       data:
         $ref: '#/definitions/internal_resources_recurrences_handlers.CreateRecurrenceResponseData'
+    required:
+    - data
     type: object
   ? github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_recurrences_handlers_UpdateRecurrenceResponseData
   : properties:
       data:
         $ref: '#/definitions/internal_resources_recurrences_handlers.UpdateRecurrenceResponseData'
+    required:
+    - data
     type: object
   ? github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_transactions_handlers_CreateTransactionResponseData
   : properties:
       data:
         $ref: '#/definitions/internal_resources_transactions_handlers.CreateTransactionResponseData'
+    required:
+    - data
     type: object
   github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_transactions_handlers_SummaryResponseData:
     properties:
       data:
         $ref: '#/definitions/internal_resources_transactions_handlers.SummaryResponseData'
+    required:
+    - data
     type: object
   ? github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_transactions_handlers_UpdateTransactionResponseData
   : properties:
       data:
         $ref: '#/definitions/internal_resources_transactions_handlers.UpdateTransactionResponseData'
+    required:
+    - data
     type: object
   github_com_felipe1496_open-wallet_internal_utils_querybuilder.Metadata:
     properties:
@@ -105,6 +133,12 @@ definitions:
         type: integer
       total_pages:
         type: integer
+    required:
+    - next_page
+    - page
+    - per_page
+    - total_items
+    - total_pages
     type: object
   internal_resources_auth_handlers.LoginGoogleRequest:
     properties:
