@@ -22,7 +22,10 @@ db-migrate-install:
 gen-repos:
 	bash scripts/repository/gen-repos.sh
 
-gen-docs:
+gen-swagger-filters:
+	go run scripts/gen-swagger-filters.go
+
+gen-docs: gen-swagger-filters
 	swag init -g cmd/api/main.go --parseDependency --parseInternal
 
 gen-docs-install:
@@ -56,6 +59,16 @@ check-repos:
 		exit 1; \
 	fi
 	@echo "Repositories are up to date."
+	
+check-filters:
+	@go run scripts/gen-swagger-filters.go
+	@if [ -n "$$(git status -s internal/resources/)" ]; then \
+		echo "Filters documentation is out of sync!"; \
+		echo "Please run 'make gen-swagger-filters' locally and commit the updated files."; \
+		git status -s internal/resources/; \
+		exit 1; \
+	fi
+	@echo "Filters documentation is up to date."
 
 check-swagger-ids:
 	@bash scripts/check_swagger_ids.sh
