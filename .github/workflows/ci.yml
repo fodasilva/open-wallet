@@ -134,3 +134,19 @@ jobs:
 
       - name: Check Swagger IDs
         run: make check-swagger-ids
+
+  check-filters:
+    name: Check Filters Sync
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24"
+          cache: true
+
+      - name: Check Filters Sync
+        run: make check-filters
