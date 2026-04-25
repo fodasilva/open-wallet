@@ -12,6 +12,19 @@ import (
 	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
+// @gen_swagger_filter
+var RecurrencesFilterConfig = querybuilder.ParseConfig{
+	AllowedFields: map[string]querybuilder.FieldConfig{
+		"id":          {AllowedOperators: []string{"eq", "in"}},
+		"category_id": {AllowedOperators: []string{"eq", "in"}},
+		"name":        {AllowedOperators: []string{"eq", "like", "in"}},
+		"user_id":     {AllowedOperators: []string{"eq", "in"}},
+		"created_at":  {AllowedOperators: []string{"eq", "gt", "gte", "lt", "lte"}},
+		"amount":      {AllowedOperators: []string{"eq", "gt", "gte", "lt", "lte"}},
+	},
+	AllowedSortFields: []string{"name", "created_at", "id"},
+}
+
 type ListOptions struct {
 	Ctx      *gin.Context
 	UseCases usecases.RecurrencesUseCases
@@ -81,6 +94,8 @@ func (o *ListOptions) Run() error {
 // @Produce json
 // @Param page query int false "Page number" default(1)
 // @Param per_page query int false "Items per page" default(10)
+// @Param filter query string false "Filter expression. \n- Allowed fields & ops:\n  - amount: eq, gt, gte, lt, lte\n  - category_id: eq, in\n  - created_at: eq, gt, gte, lt, lte\n  - id: eq, in\n  - name: eq, like, in\n  - user_id: eq, in\n"
+// @Param order_by query string false "Sort field. \n- Allowed: name, created_at, id" example(name:asc)
 // @Success 200 {object} utils.PaginatedResponse[ListRecurrencesResponseData] "List of recurrences"
 // @Failure 401 {object} utils.HTTPError "Unauthorized"
 // @Failure 500 {object} utils.HTTPError "Internal server error"
