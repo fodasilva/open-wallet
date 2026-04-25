@@ -58,9 +58,9 @@ func (o *CreateOptions) Run() error {
 		return err
 	}
 
-	o.Ctx.JSON(http.StatusCreated, CreateRecurrenceResponse{
+	o.Ctx.JSON(http.StatusCreated, utils.ResponseData[CreateRecurrenceResponseData]{
 		Data: CreateRecurrenceResponseData{
-			Recurrence: res,
+			Recurrence: MapRecurrenceResource(res),
 		},
 	})
 
@@ -75,7 +75,7 @@ func (o *CreateOptions) Run() error {
 // @Accept json
 // @Produce json
 // @Param body body CreateRecurrenceRequest true "Recurrence payload"
-// @Success 201 {object} CreateRecurrenceResponse "Recurrence created"
+// @Success 201 {object} utils.ResponseData[CreateRecurrenceResponseData] "Recurrence created"
 // @Failure 400 {object} utils.HTTPError "Bad request"
 // @Failure 401 {object} utils.HTTPError "Unauthorized"
 // @Failure 500 {object} utils.HTTPError "Internal server error"

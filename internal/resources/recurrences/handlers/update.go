@@ -78,9 +78,9 @@ func (o *UpdateOptions) Run() error {
 		return err
 	}
 
-	o.Ctx.JSON(http.StatusOK, UpdateRecurrenceResponse{
+	o.Ctx.JSON(http.StatusOK, utils.ResponseData[UpdateRecurrenceResponseData]{
 		Data: UpdateRecurrenceResponseData{
-			Recurrence: rec,
+			Recurrence: MapRecurrenceResource(rec),
 		},
 	})
 	return nil
@@ -95,7 +95,7 @@ func (o *UpdateOptions) Run() error {
 // @Produce json
 // @Param id path string true "recurrence ID"
 // @Param body body UpdateRecurrenceRequest true "Recurrence payload"
-// @Success 200 {object} UpdateRecurrenceResponse "Recurrence updated"
+// @Success 200 {object} utils.ResponseData[UpdateRecurrenceResponseData] "Recurrence updated"
 // @Failure 400 {object} utils.HTTPError "Bad request"
 // @Failure 401 {object} utils.HTTPError "Unauthorized"
 // @Failure 500 {object} utils.HTTPError "Internal server error"
