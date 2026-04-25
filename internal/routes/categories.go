@@ -8,35 +8,11 @@ import (
 	"github.com/felipe1496/open-wallet/internal/factory"
 	"github.com/felipe1496/open-wallet/internal/middlewares"
 	"github.com/felipe1496/open-wallet/internal/resources/categories/handlers"
-	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
 func SetupCategoriesRoutes(r *gin.Engine, f *factory.Factory, redisClient *redis.Client, cfg *infra.Config) {
 	jwtService := f.JWTService()
 	categoriesHandler := handlers.NewHandler(f.CategoriesUseCases())
-	categoriesFilterConfig := querybuilder.ParseConfig{
-		AllowedFields: map[string]querybuilder.FieldConfig{
-			"name":       {AllowedOperators: []string{"eq", "like", "in"}},
-			"color":      {AllowedOperators: []string{"eq", "in"}},
-			"created_at": {AllowedOperators: []string{"eq", "gt", "gte", "lt", "lte"}},
-			"id":         {AllowedOperators: []string{"eq", "in"}},
-			"user_id":    {AllowedOperators: []string{"eq", "in"}},
-		},
-		AllowedSortFields: []string{"name", "created_at", "id"},
-	}
-
-	periodCategoriesFilterConfig := querybuilder.ParseConfig{
-		AllowedFields: map[string]querybuilder.FieldConfig{
-			"name":         {AllowedOperators: []string{"eq", "like", "in"}},
-			"color":        {AllowedOperators: []string{"eq", "in"}},
-			"total_amount": {AllowedOperators: []string{"eq", "gt", "gte", "lt", "lte"}},
-			"period":       {AllowedOperators: []string{"eq", "in"}},
-			"id":           {AllowedOperators: []string{"eq", "in"}},
-			"user_id":      {AllowedOperators: []string{"eq", "in"}},
-		},
-		AllowedSortFields: []string{"name", "total_amount", "period", "id"},
-	}
-
 	categoriesGroup := r.Group("/api/v1/categories")
 	catMax, catWin := cfg.RateLimits.XS()
 	{
@@ -45,14 +21,14 @@ func SetupCategoriesRoutes(r *gin.Engine, f *factory.Factory, redisClient *redis
 			middlewares.NewRateLimitMiddleware(redisClient, catMax, catWin, "categories:create"),
 			categoriesHandler.Create)
 		categoriesGroup.GET("", middlewares.RequireAuthMiddleware(jwtService),
-			middlewares.QueryBuilderMiddleware(categoriesFilterConfig),
+			middlewares.QueryBuilderMiddleware(handlers.CategoriesFilterConfig),
 			categoriesHandler.List)
 		categoriesGroup.DELETE("/:category_id",
 			middlewares.RequireAuthMiddleware(jwtService),
 			categoriesHandler.DeleteByID)
 		categoriesGroup.GET("/:period",
 			middlewares.RequireAuthMiddleware(jwtService),
-			middlewares.QueryBuilderMiddleware(periodCategoriesFilterConfig),
+			middlewares.QueryBuilderMiddleware(handlers.PeriodCategoriesFilterConfig),
 			categoriesHandler.ListCategoryAmountPerPeriod)
 		categoriesGroup.PATCH("/:category_id",
 			middlewares.RequireAuthMiddleware(jwtService),
