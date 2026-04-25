@@ -13,6 +13,17 @@ import (
 	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
+// @gen_swagger_filter
+var SummaryFilterConfig = querybuilder.ParseConfig{
+	AllowedFields: map[string]querybuilder.FieldConfig{
+		"period":        {AllowedOperators: []string{"eq", "in", "gte", "lte"}},
+		"total_expense": {AllowedOperators: []string{"eq", "gt", "gte", "lt", "lte"}},
+		"total_income":  {AllowedOperators: []string{"eq", "gt", "gte", "lt", "lte"}},
+		"total_balance": {AllowedOperators: []string{"eq", "gt", "gte", "lt", "lte"}},
+	},
+	AllowedSortFields: []string{"period", "total_expense", "total_income", "total_balance"},
+}
+
 type SummaryOptions struct {
 	Ctx      *gin.Context
 	UseCases usecases.TransactionsUseCases
@@ -108,8 +119,8 @@ func (o *SummaryOptions) Run() error {
 // @Security BearerAuth
 // @Accept json
 // @Produce json
-// @Param filter query string true "- Required: 'period gte YYYYMM and period lte YYYYMM'\n- Allowed fields & ops:\n  - period: eq, in, gte, lte\n  - total_expense: eq, gt, gte, lt, lte\n  - total_income: eq, gt, gte, lt, lte\n  - total_balance: eq, gt, gte, lt, lte\n- Rules: gte <= lte, max 12 months range"
-// @Param order_by query string false "Sort field.\n- Allowed: period, total_expense, total_income, total_balance" example(period:desc,total_balance:asc)
+// @Param filter query string false "Filter expression. \n- Allowed fields & ops:\n  - period: eq, in, gte, lte\n  - total_balance: eq, gt, gte, lt, lte\n  - total_expense: eq, gt, gte, lt, lte\n  - total_income: eq, gt, gte, lt, lte\n"
+// @Param order_by query string false "Sort field. \n- Allowed: period, total_expense, total_income, total_balance" example(period:asc)
 // @Success 200 {object} utils.ResponseData[SummaryResponseData] "Summary data"
 // @Failure 401 {object} utils.HTTPError "Unauthorized"
 // @Failure 500 {object} utils.HTTPError "Internal server error"

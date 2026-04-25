@@ -12,6 +12,21 @@ import (
 	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
+// @gen_swagger_filter
+var TransactionsFilterConfig = querybuilder.ParseConfig{
+	AllowedFields: map[string]querybuilder.FieldConfig{
+		"category_id":    {AllowedOperators: []string{"eq", "in"}},
+		"type":           {AllowedOperators: []string{"eq", "in"}},
+		"reference_date": {AllowedOperators: []string{"eq", "gt", "gte", "lt", "lte"}},
+		"amount":         {AllowedOperators: []string{"eq", "gt", "gte", "lt", "lte"}},
+		"id":             {AllowedOperators: []string{"eq", "in"}},
+		"user_id":        {AllowedOperators: []string{"eq", "in"}},
+		"period":         {AllowedOperators: []string{"eq", "in", "gte", "lte"}},
+		"created_at":     {AllowedOperators: []string{"eq", "gt", "gte", "lt", "lte"}},
+	},
+	AllowedSortFields: []string{"reference_date", "amount", "id", "created_at"},
+}
+
 type ListEntriesOptions struct {
 	Ctx      *gin.Context
 	UseCases usecases.TransactionsUseCases
@@ -81,7 +96,8 @@ func (o *ListEntriesOptions) Run() error {
 // @Produce json
 // @Param page query int false "Page number" default(1)
 // @Param per_page query int false "Items per page" default(10)
-// @Param order_by query string false "Sort field" example(name:asc,created_at:desc)
+// @Param filter query string false "Filter expression. \n- Allowed fields & ops:\n  - amount: eq, gt, gte, lt, lte\n  - category_id: eq, in\n  - created_at: eq, gt, gte, lt, lte\n  - id: eq, in\n  - period: eq, in, gte, lte\n  - reference_date: eq, gt, gte, lt, lte\n  - type: eq, in\n  - user_id: eq, in\n"
+// @Param order_by query string false "Sort field. \n- Allowed: reference_date, amount, id, created_at" example(reference_date:asc)
 // @Success 200 {object} utils.PaginatedResponse[ListEntriesResponseData] "List of entries"
 // @Failure 401 {object} utils.HTTPError "Unauthorized"
 // @Failure 500 {object} utils.HTTPError "Internal server error"
