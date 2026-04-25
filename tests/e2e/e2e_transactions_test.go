@@ -340,4 +340,145 @@ func TestE2eTransactions(t *testing.T) {
 			})
 		}
 	})
+
+	t.Run("GET /summary", func(t *testing.T) {
+		// Seed transactions for multiple periods
+		// Period: 202601
+		_, _ = res.DB.Exec("INSERT INTO transactions (id, user_id, name, category) VALUES ($1, $2, $3, $4)",
+			ulid.Make().String(), testUser.ID, "Jan Expense", "simple_expense")
+		_, _ = res.DB.Exec("INSERT INTO entries (id, transaction_id, amount, reference_date) VALUES ($1, (SELECT id FROM transactions WHERE name = 'Jan Expense'), $2, $3)",
+			ulid.Make().String(), 100.0, "2026-01-15")
+
+		_, _ = res.DB.Exec("INSERT INTO transactions (id, user_id, name, category) VALUES ($1, $2, $3, $4)",
+			ulid.Make().String(), testUser.ID, "Jan Income", "income")
+		_, _ = res.DB.Exec("INSERT INTO entries (id, transaction_id, amount, reference_date) VALUES ($1, (SELECT id FROM transactions WHERE name = 'Jan Income'), $2, $3)",
+			ulid.Make().String(), 500.0, "2026-01-10")
+
+		// Period: 202602
+		_, _ = res.DB.Exec("INSERT INTO transactions (id, user_id, name, category) VALUES ($1, $2, $3, $4)",
+			ulid.Make().String(), testUser.ID, "Feb Expense", "simple_expense")
+		_, _ = res.DB.Exec("INSERT INTO entries (id, transaction_id, amount, reference_date) VALUES ($1, (SELECT id FROM transactions WHERE name = 'Feb Expense'), $2, $3)",
+			ulid.Make().String(), 250.0, "2026-02-20")
+
+		t.Run("should fail when missing period filters", func(t *testing.T) {
+			req := httptest.NewRequest(http.MethodGet, "/api/v1/transactions/summary", nil)
+			req.Header.Set("Authorization", "Bearer "+token)
+			w := httptest.NewRecorder()
+
+			router.ServeHTTP(w, req)
+
+			assert.Equal(t, http.StatusBadRequest, w.Code)
+		})
+
+		t.Run("should fail when period format is invalid", func(t *testing.T) {
+			cases := []struct {
+				name   string
+				filter string
+			}{
+				{"too short", "period gte '20261' and period lte '202602'"},
+				{"too long", "period gte '2026011' and period lte '202602'"},
+				{"invalid month", "period gte '202613' and period lte '202602'"},
+				{"non-digits", "period gte '2026AB' and period lte '202602'"},
+				{"gte > lte", "period gte '202602' and period lte '202601'"},
+				{"range > 12 months", "period gte '202601' and period lte '202701'"},
+			}
+
+			for _, tc := range cases {
+				t.Run(tc.name, func(t *testing.T) {
+					params := url.Values{}
+					params.Set("filter", tc.filter)
+
+					req := httptest.NewRequest(http.MethodGet, "/api/v1/transactions/summary?"+params.Encode(), nil)
+					req.Header.Set("Authorization", "Bearer "+token)
+					w := httptest.NewRecorder()
+
+					router.ServeHTTP(w, req)
+
+					assert.Equal(t, http.StatusBadRequest, w.Code)
+				})
+			}
+		})
+
+		t.Run("should return summary for valid period range", func(t *testing.T) {
+			params := url.Values{}
+			params.Set("filter", "period gte '202601' and period lte '202602'")
+
+			req := httptest.NewRequest(http.MethodGet, "/api/v1/transactions/summary?"+params.Encode(), nil)
+			req.Header.Set("Authorization", "Bearer "+token)
+			w := httptest.NewRecorder()
+
+			router.ServeHTTP(w, req)
+
+			assert.Equal(t, http.StatusOK, w.Code)
+
+			var response utils.ResponseData[handlers.SummaryResponseData]
+			err := json.Unmarshal(w.Body.Bytes(), &response)
+			assert.NoError(t, err)
+
+			assert.Len(t, response.Data.Summary, 2)
+
+			// Check 202601
+			foundJan := false
+			for _, s := range response.Data.Summary {
+				if s.Period == "202601" {
+					assert.Equal(t, 500.0, s.Income)
+					assert.Equal(t, 100.0, s.Expense)
+					assert.Equal(t, 400.0, s.Balance)
+					foundJan = true
+				}
+			}
+			assert.True(t, foundJan)
+		})
+
+		t.Run("should respect sorting", func(t *testing.T) {
+			params := url.Values{}
+			params.Set("filter", "period gte '202601' and period lte '202602'")
+			params.Set("order_by", "period:desc")
+
+			req := httptest.NewRequest(http.MethodGet, "/api/v1/transactions/summary?"+params.Encode(), nil)
+			req.Header.Set("Authorization", "Bearer "+token)
+			w := httptest.NewRecorder()
+
+			router.ServeHTTP(w, req)
+
+			assert.Equal(t, http.StatusOK, w.Code)
+
+			var response utils.ResponseData[handlers.SummaryResponseData]
+			err := json.Unmarshal(w.Body.Bytes(), &response)
+			assert.NoError(t, err)
+
+			assert.Len(t, response.Data.Summary, 2)
+			assert.Equal(t, "202602", response.Data.Summary[0].Period)
+			assert.Equal(t, "202601", response.Data.Summary[1].Period)
+		})
+		t.Run("should skip periods with no data", func(t *testing.T) {
+			// Seed data for 202604
+			_, _ = res.DB.Exec("INSERT INTO transactions (id, user_id, name, category) VALUES ($1, $2, $3, $4)",
+				ulid.Make().String(), testUser.ID, "April Expense", "simple_expense")
+			_, _ = res.DB.Exec("INSERT INTO entries (id, transaction_id, amount, reference_date) VALUES ($1, (SELECT id FROM transactions WHERE name = 'April Expense'), $2, $3)",
+				ulid.Make().String(), 50.0, "2026-04-05")
+
+			// Request range 202602 to 202604. 202603 is empty.
+			params := url.Values{}
+			params.Set("filter", "period gte '202602' and period lte '202604'")
+			params.Set("order_by", "period:asc")
+
+			req := httptest.NewRequest(http.MethodGet, "/api/v1/transactions/summary?"+params.Encode(), nil)
+			req.Header.Set("Authorization", "Bearer "+token)
+			w := httptest.NewRecorder()
+
+			router.ServeHTTP(w, req)
+
+			assert.Equal(t, http.StatusOK, w.Code)
+
+			var response utils.ResponseData[handlers.SummaryResponseData]
+			err := json.Unmarshal(w.Body.Bytes(), &response)
+			assert.NoError(t, err)
+
+			// Should only have 202602 and 202604. 202603 should NOT be there.
+			assert.Len(t, response.Data.Summary, 2)
+			assert.Equal(t, "202602", response.Data.Summary[0].Period)
+			assert.Equal(t, "202604", response.Data.Summary[1].Period)
+		})
+	})
 }
