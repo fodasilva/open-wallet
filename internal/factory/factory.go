@@ -73,6 +73,7 @@ func (f *Factory) TransactionsUseCases() transactionsUseCases.TransactionsUseCas
 		f.transactionsUseCases = transactionsUseCases.NewTransactionsUseCases(
 			transactionsRepo.NewTransactionsRepo(),
 			transactionsRepo.NewEntriesRepo(),
+			transactionsRepo.NewSummariesRepo(),
 			f.CategoriesUseCases(),
 			f.db,
 		)

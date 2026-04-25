@@ -90,3 +90,23 @@ func ForCount(b *Builder) *Builder {
 		OffsetValue:   nil,
 	}
 }
+
+func (b *Builder) HasAndFieldOperator(field, operator string) []Condition {
+	var results []Condition
+	for _, cond := range b.AndConditions {
+		if cond.Field == field && cond.Operator == operator {
+			results = append(results, cond)
+		}
+	}
+	return results
+}
+
+func (b *Builder) HasAndField(field string) []Condition {
+	var results []Condition
+	for _, cond := range b.AndConditions {
+		if cond.Field == field {
+			results = append(results, cond)
+		}
+	}
+	return results
+}

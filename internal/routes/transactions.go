@@ -22,10 +22,20 @@ func SetupTransactionsRoutes(r *gin.Engine, f *factory.Factory, redisClient *red
 			"amount":         {AllowedOperators: []string{"eq", "gt", "gte", "lt", "lte"}},
 			"id":             {AllowedOperators: []string{"eq", "in"}},
 			"user_id":        {AllowedOperators: []string{"eq", "in"}},
-			"period":         {AllowedOperators: []string{"eq", "in"}},
+			"period":         {AllowedOperators: []string{"eq", "in", "gte", "lte"}},
 			"created_at":     {AllowedOperators: []string{"eq", "gt", "gte", "lt", "lte"}},
 		},
 		AllowedSortFields: []string{"reference_date", "amount", "id", "created_at"},
+	}
+
+	summaryFilterConfig := querybuilder.ParseConfig{
+		AllowedFields: map[string]querybuilder.FieldConfig{
+			"period":        {AllowedOperators: []string{"eq", "in", "gte", "lte"}},
+			"total_expense": {AllowedOperators: []string{"eq", "gt", "gte", "lt", "lte"}},
+			"total_income":  {AllowedOperators: []string{"eq", "gt", "gte", "lt", "lte"}},
+			"total_balance": {AllowedOperators: []string{"eq", "gt", "gte", "lt", "lte"}},
+		},
+		AllowedSortFields: []string{"period", "total_expense", "total_income", "total_balance"},
 	}
 
 	transactionsGroup := r.Group("/api/v1/transactions")
@@ -35,6 +45,10 @@ func SetupTransactionsRoutes(r *gin.Engine, f *factory.Factory, redisClient *red
 			middlewares.RequireAuthMiddleware(jwtService),
 			middlewares.QueryBuilderMiddleware(transactionsFilterConfig),
 			transactionsHandler.ListEntries)
+		transactionsGroup.GET("/summary",
+			middlewares.RequireAuthMiddleware(jwtService),
+			middlewares.QueryBuilderMiddleware(summaryFilterConfig),
+			transactionsHandler.Summary)
 		transactionsGroup.DELETE("/:transaction_id",
 			middlewares.RequireAuthMiddleware(jwtService),
 			transactionsHandler.DeleteTransaction)

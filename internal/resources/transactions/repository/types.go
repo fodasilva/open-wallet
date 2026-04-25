@@ -97,6 +97,20 @@ type ViewEntry struct {
 	RecurrenceID      *string
 }
 
+// @gen_repo
+// @table: v_summaries
+// @entity: ViewSummary
+// @name: SummariesRepoImpl
+// @method: Select | fields: user_id:UserID, period:Period, total_expense:TotalExpense, total_income:TotalIncome, total_balance:TotalBalance
+
+type ViewSummary struct {
+	UserID       string  `json:"user_id"`
+	Period       string  `json:"period"`
+	TotalExpense float64 `json:"total_expense"`
+	TotalIncome  float64 `json:"total_income"`
+	TotalBalance float64 `json:"total_balance"`
+}
+
 type TransactionType string
 
 const (
