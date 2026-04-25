@@ -1,8 +1,7 @@
 package handlers
 
 import (
-	"github.com/felipe1496/open-wallet/internal/resources/categories/repository"
-	"github.com/felipe1496/open-wallet/internal/utils"
+	"time"
 )
 
 type CreateCategoryRequest struct {
@@ -10,21 +9,27 @@ type CreateCategoryRequest struct {
 	Color string `json:"color" binding:"required"`
 }
 
-type CreateCategoryResponse struct {
-	Data CreateCategoryResponseData `json:"data"`
+type CategoryResource struct {
+	ID        string    `json:"id"`
+	UserID    string    `json:"user_id"`
+	Name      string    `json:"name"`
+	Color     string    `json:"color"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+type CategoryAmountPerPeriodResource struct {
+	ID          string  `json:"id"`
+	Name        string  `json:"name"`
+	Color       string  `json:"color"`
+	TotalAmount float64 `json:"total_amount"`
 }
 
 type CreateCategoryResponseData struct {
-	Category repository.Category `json:"category"`
-}
-
-type ListCategoriesResponse struct {
-	Data  ListCategoriesResponseData `json:"data"`
-	Query utils.QueryMeta            `json:"query"`
+	Category CategoryResource `json:"category"`
 }
 
 type ListCategoriesResponseData struct {
-	Categories []repository.Category `json:"categories"`
+	Categories []CategoryResource `json:"categories"`
 }
 
 type UpdateCategoryRequest struct {
@@ -32,19 +37,10 @@ type UpdateCategoryRequest struct {
 	Color *string `json:"color" binding:"omitempty,hexcolor,len=7"`
 }
 
-type UpdateCategoryResponse struct {
-	Data UpdateCategoryResponseData `json:"data"`
-}
-
 type UpdateCategoryResponseData struct {
-	Category repository.Category `json:"category"`
-}
-
-type ListCategoryAmountPerPeriodResponse struct {
-	Data  ListCategoryAmountPerPeriodResponseData `json:"data"`
-	Query utils.QueryMeta                         `json:"query"`
+	Category CategoryResource `json:"category"`
 }
 
 type ListCategoryAmountPerPeriodResponseData struct {
-	Categories []repository.CategoryAmountPerPeriod `json:"categories"`
+	Categories []CategoryAmountPerPeriodResource `json:"categories"`
 }

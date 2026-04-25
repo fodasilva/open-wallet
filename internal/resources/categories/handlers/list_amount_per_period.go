@@ -49,24 +49,16 @@ func (o *ListAmountPerPeriodOptions) Run() error {
 		return err
 	}
 
-	nextPage := len(categories) > o.PerPage
-	totalPages := (count + o.PerPage - 1) / o.PerPage
-
-	if nextPage {
-		categories = categories[:len(categories)-1]
+	categoriesResource := make([]CategoryAmountPerPeriodResource, len(categories))
+	for i, c := range categories {
+		categoriesResource[i] = MapCategoryAmountPerPeriodResource(c)
 	}
 
-	o.Ctx.JSON(http.StatusOK, ListCategoryAmountPerPeriodResponse{
+	o.Ctx.JSON(http.StatusOK, utils.PaginatedResponse[ListCategoryAmountPerPeriodResponseData]{
 		Data: ListCategoryAmountPerPeriodResponseData{
-			Categories: categories,
+			Categories: categoriesResource,
 		},
-		Query: utils.QueryMeta{
-			NextPage:   nextPage,
-			Page:       o.Page,
-			PerPage:    o.PerPage,
-			TotalItems: count,
-			TotalPages: totalPages,
-		},
+		Query: querybuilder.BuildMetadata(o.Page, o.PerPage, count),
 	})
 	return nil
 }
@@ -83,7 +75,7 @@ func (o *ListAmountPerPeriodOptions) Run() error {
 // @Param per_page query int false "Items per page" default(10)
 // @Param filter query string false "Category filter"
 // @Param order_by query string false "Sort field" example(name:asc,created_at:desc)
-// @Success 200 {object} ListCategoryAmountPerPeriodResponse "List of categories with amount per period"
+// @Success 200 {object} utils.PaginatedResponse[ListCategoryAmountPerPeriodResponseData] "List of categories with amount per period"
 // @Failure 401 {object} utils.HTTPError "Unauthorized"
 // @Failure 500 {object} utils.HTTPError "Internal server error"
 // @Router /api/v1/categories/{period} [get]

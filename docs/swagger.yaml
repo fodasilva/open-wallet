@@ -1,59 +1,4 @@
 definitions:
-  github_com_felipe1496_open-wallet_internal_resources_categories_repository.Category:
-    properties:
-      color:
-        type: string
-      created_at:
-        type: string
-      id:
-        type: string
-      name:
-        type: string
-      user_id:
-        type: string
-    type: object
-  github_com_felipe1496_open-wallet_internal_resources_categories_repository.CategoryAmountPerPeriod:
-    properties:
-      color:
-        type: string
-      id:
-        type: string
-      name:
-        type: string
-      period:
-        type: string
-      total_amount:
-        type: number
-      user_id:
-        type: string
-    type: object
-  github_com_felipe1496_open-wallet_internal_resources_recurrences_repository.Recurrence:
-    properties:
-      amount:
-        type: number
-      category_color:
-        type: string
-      category_id:
-        type: string
-      category_name:
-        type: string
-      created_at:
-        type: string
-      day_of_month:
-        type: integer
-      end_period:
-        type: string
-      id:
-        type: string
-      name:
-        type: string
-      note:
-        type: string
-      start_period:
-        type: string
-      user_id:
-        type: string
-    type: object
   github_com_felipe1496_open-wallet_internal_resources_transactions_repository.TransactionType:
     enum:
     - simple_expense
@@ -66,21 +11,6 @@ definitions:
     - Income
     - Installment
     - Recurrence
-  github_com_felipe1496_open-wallet_internal_resources_users_repository.User:
-    properties:
-      avatar_url:
-        type: string
-      created_at:
-        type: string
-      email:
-        type: string
-      id:
-        type: string
-      name:
-        type: string
-      username:
-        type: string
-    type: object
   github_com_felipe1496_open-wallet_internal_utils.HTTPError:
     properties:
       error:
@@ -181,7 +111,44 @@ definitions:
       access_token:
         type: string
       user:
-        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_users_repository.User'
+        $ref: '#/definitions/internal_resources_auth_handlers.UserResource'
+    type: object
+  internal_resources_auth_handlers.UserResource:
+    properties:
+      avatar_url:
+        type: string
+      created_at:
+        type: string
+      email:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  internal_resources_categories_handlers.CategoryAmountPerPeriodResource:
+    properties:
+      color:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      total_amount:
+        type: number
+    type: object
+  internal_resources_categories_handlers.CategoryResource:
+    properties:
+      color:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      user_id:
+        type: string
     type: object
   internal_resources_categories_handlers.CreateCategoryRequest:
     properties:
@@ -196,20 +163,20 @@ definitions:
   internal_resources_categories_handlers.CreateCategoryResponseData:
     properties:
       category:
-        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_categories_repository.Category'
+        $ref: '#/definitions/internal_resources_categories_handlers.CategoryResource'
     type: object
   internal_resources_categories_handlers.ListCategoriesResponseData:
     properties:
       categories:
         items:
-          $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_categories_repository.Category'
+          $ref: '#/definitions/internal_resources_categories_handlers.CategoryResource'
         type: array
     type: object
   internal_resources_categories_handlers.ListCategoryAmountPerPeriodResponseData:
     properties:
       categories:
         items:
-          $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_categories_repository.CategoryAmountPerPeriod'
+          $ref: '#/definitions/internal_resources_categories_handlers.CategoryAmountPerPeriodResource'
         type: array
     type: object
   internal_resources_categories_handlers.UpdateCategoryRequest:
@@ -224,7 +191,7 @@ definitions:
   internal_resources_categories_handlers.UpdateCategoryResponseData:
     properties:
       category:
-        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_categories_repository.Category'
+        $ref: '#/definitions/internal_resources_categories_handlers.CategoryResource'
     type: object
   internal_resources_recurrences_handlers.CreateRecurrenceRequest:
     properties:
@@ -257,14 +224,37 @@ definitions:
   internal_resources_recurrences_handlers.CreateRecurrenceResponseData:
     properties:
       recurrence:
-        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_recurrences_repository.Recurrence'
+        $ref: '#/definitions/internal_resources_recurrences_handlers.RecurrenceResource'
     type: object
   internal_resources_recurrences_handlers.ListRecurrencesResponseData:
     properties:
       recurrences:
         items:
-          $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_recurrences_repository.Recurrence'
+          $ref: '#/definitions/internal_resources_recurrences_handlers.RecurrenceResource'
         type: array
+    type: object
+  internal_resources_recurrences_handlers.RecurrenceResource:
+    properties:
+      amount:
+        type: number
+      category_id:
+        type: string
+      created_at:
+        type: string
+      day_of_month:
+        type: integer
+      end_period:
+        type: string
+      id:
+        type: string
+      name:
+        type: string
+      note:
+        type: string
+      start_period:
+        type: string
+      user_id:
+        type: string
     type: object
   internal_resources_recurrences_handlers.UpdateRecurrenceRequest:
     properties:
@@ -292,7 +282,7 @@ definitions:
   internal_resources_recurrences_handlers.UpdateRecurrenceResponseData:
     properties:
       recurrence:
-        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_resources_recurrences_repository.Recurrence'
+        $ref: '#/definitions/internal_resources_recurrences_handlers.RecurrenceResource'
     type: object
   internal_resources_transactions_handlers.CreateEntryRequest:
     properties:

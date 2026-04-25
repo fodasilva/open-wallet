@@ -20,6 +20,7 @@ import (
 	"github.com/felipe1496/open-wallet/internal/factory"
 	"github.com/felipe1496/open-wallet/internal/resources/categories/handlers"
 	"github.com/felipe1496/open-wallet/internal/routes"
+	"github.com/felipe1496/open-wallet/internal/utils"
 )
 
 func setupCategoryTestServer(pg *sql.DB, redisClient *redis.Client, cfg *infra.Config) (*gin.Engine, *factory.Factory) {
@@ -157,7 +158,7 @@ func TestE2eCategories(t *testing.T) {
 		}
 		assert.Equal(t, http.StatusOK, w.Code)
 
-		var response handlers.ListCategoriesResponse
+		var response utils.PaginatedResponse[handlers.ListCategoriesResponseData]
 		err = json.Unmarshal(w.Body.Bytes(), &response)
 		assert.NoError(t, err)
 		assert.GreaterOrEqual(t, len(response.Data.Categories), 2)
@@ -205,7 +206,7 @@ func TestE2eCategories(t *testing.T) {
 				router.ServeHTTP(w, req)
 
 				assert.Equal(t, http.StatusOK, w.Code)
-				var response handlers.ListCategoriesResponse
+				var response utils.PaginatedResponse[handlers.ListCategoriesResponseData]
 				err := json.Unmarshal(w.Body.Bytes(), &response)
 				assert.NoError(t, err)
 				assert.Len(t, response.Data.Categories, tc.expectedCount)
@@ -244,7 +245,7 @@ func TestE2eCategories(t *testing.T) {
 		}
 		assert.Equal(t, http.StatusOK, w.Code)
 
-		var response handlers.ListCategoryAmountPerPeriodResponse
+		var response utils.PaginatedResponse[handlers.ListCategoryAmountPerPeriodResponseData]
 		err = json.Unmarshal(w.Body.Bytes(), &response)
 		assert.NoError(t, err)
 

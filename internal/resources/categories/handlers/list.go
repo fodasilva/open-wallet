@@ -52,24 +52,16 @@ func (o *ListOptions) Run() error {
 		return err
 	}
 
-	nextPage := len(categoriesList) > o.PerPage
-	totalPages := (count + o.PerPage - 1) / o.PerPage
-
-	if nextPage {
-		categoriesList = categoriesList[:len(categoriesList)-1]
+	categoriesResource := make([]CategoryResource, len(categoriesList))
+	for i, c := range categoriesList {
+		categoriesResource[i] = MapCategoryResource(c)
 	}
 
-	o.Ctx.JSON(http.StatusOK, ListCategoriesResponse{
+	o.Ctx.JSON(http.StatusOK, utils.PaginatedResponse[ListCategoriesResponseData]{
 		Data: ListCategoriesResponseData{
-			Categories: categoriesList,
+			Categories: categoriesResource,
 		},
-		Query: utils.QueryMeta{
-			NextPage:   nextPage,
-			Page:       o.Page,
-			PerPage:    o.PerPage,
-			TotalItems: count,
-			TotalPages: totalPages,
-		},
+		Query: querybuilder.BuildMetadata(o.Page, o.PerPage, count),
 	})
 
 	return nil
@@ -87,7 +79,7 @@ func (o *ListOptions) Run() error {
 // @Param order_by query string false "Sort field" example(name:asc,created_at:desc)
 // @Param filter query string false "Category filter"
 // @Param name query string false "A category name to filter by"
-// @Success 200 {object} ListCategoriesResponse "List of categories"
+// @Success 200 {object} utils.PaginatedResponse[ListCategoriesResponseData] "List of categories"
 // @Failure 401 {object} utils.HTTPError "Unauthorized"
 // @Failure 500 {object} utils.HTTPError "Internal server error"
 // @Router /api/v1/categories [get]
