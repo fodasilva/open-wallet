@@ -567,12 +567,14 @@ paths:
         in: query
         name: per_page
         type: integer
-      - description: Sort field
-        example: name:asc,created_at:desc
+      - description: "Sort field. \n- Allowed: name, created_at, id"
+        example: name:asc
         in: query
         name: order_by
         type: string
-      - description: Category filter
+      - description: "Filter expression. \n- Allowed fields & ops:\n  - color: eq,
+          in\n  - created_at: eq, gt, gte, lt, lte\n  - id: eq, in\n  - name: eq,
+          like, in\n  - user_id: eq, in\n"
         in: query
         name: filter
         type: string
@@ -729,12 +731,14 @@ paths:
         in: query
         name: per_page
         type: integer
-      - description: Category filter
+      - description: "Filter expression. \n- Allowed fields & ops:\n  - color: eq,
+          in\n  - id: eq, in\n  - name: eq, like, in\n  - period: eq, in\n  - total_amount:
+          eq, gt, gte, lt, lte\n  - user_id: eq, in\n"
         in: query
         name: filter
         type: string
-      - description: Sort field
-        example: name:asc,created_at:desc
+      - description: "Sort field. \n- Allowed: name, total_amount, period, id"
+        example: name:asc
         in: query
         name: order_by
         type: string
@@ -775,6 +779,17 @@ paths:
         in: query
         name: per_page
         type: integer
+      - description: "Filter expression. \n- Allowed fields & ops:\n  - amount: eq,
+          gt, gte, lt, lte\n  - category_id: eq, in\n  - created_at: eq, gt, gte,
+          lt, lte\n  - id: eq, in\n  - name: eq, like, in\n  - user_id: eq, in\n"
+        in: query
+        name: filter
+        type: string
+      - description: "Sort field. \n- Allowed: name, created_at, id"
+        example: name:asc
+        in: query
+        name: order_by
+        type: string
       produces:
       - application/json
       responses:
@@ -1081,8 +1096,15 @@ paths:
         in: query
         name: per_page
         type: integer
-      - description: Sort field
-        example: name:asc,created_at:desc
+      - description: "Filter expression. \n- Allowed fields & ops:\n  - amount: eq,
+          gt, gte, lt, lte\n  - category_id: eq, in\n  - created_at: eq, gt, gte,
+          lt, lte\n  - id: eq, in\n  - period: eq, in, gte, lte\n  - reference_date:
+          eq, gt, gte, lt, lte\n  - type: eq, in\n  - user_id: eq, in\n"
+        in: query
+        name: filter
+        type: string
+      - description: "Sort field. \n- Allowed: reference_date, amount, id, created_at"
+        example: reference_date:asc
         in: query
         name: order_by
         type: string
@@ -1115,22 +1137,15 @@ paths:
         Note: Only periods with existing transactions/entries will be returned.
       operationId: v1GetSummary
       parameters:
-      - description: |-
-          - Required: 'period gte YYYYMM and period lte YYYYMM'
-          - Allowed fields & ops:
-            - period: eq, in, gte, lte
-            - total_expense: eq, gt, gte, lt, lte
-            - total_income: eq, gt, gte, lt, lte
-            - total_balance: eq, gt, gte, lt, lte
-          - Rules: gte <= lte, max 12 months range
+      - description: "Filter expression. \n- Allowed fields & ops:\n  - period: eq,
+          in, gte, lte\n  - total_balance: eq, gt, gte, lt, lte\n  - total_expense:
+          eq, gt, gte, lt, lte\n  - total_income: eq, gt, gte, lt, lte\n"
         in: query
         name: filter
-        required: true
         type: string
-      - description: |-
-          Sort field.
-          - Allowed: period, total_expense, total_income, total_balance
-        example: period:desc,total_balance:asc
+      - description: "Sort field. \n- Allowed: period, total_expense, total_income,
+          total_balance"
+        example: period:asc
         in: query
         name: order_by
         type: string

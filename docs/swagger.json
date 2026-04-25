@@ -90,14 +90,14 @@
                     },
                     {
                         "type": "string",
-                        "example": "name:asc,created_at:desc",
-                        "description": "Sort field",
+                        "example": "name:asc",
+                        "description": "Sort field. \n- Allowed: name, created_at, id",
                         "name": "order_by",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "Category filter",
+                        "description": "Filter expression. \n- Allowed fields \u0026 ops:\n  - color: eq, in\n  - created_at: eq, gt, gte, lt, lte\n  - id: eq, in\n  - name: eq, like, in\n  - user_id: eq, in\n",
                         "name": "filter",
                         "in": "query"
                     },
@@ -339,14 +339,14 @@
                     },
                     {
                         "type": "string",
-                        "description": "Category filter",
+                        "description": "Filter expression. \n- Allowed fields \u0026 ops:\n  - color: eq, in\n  - id: eq, in\n  - name: eq, like, in\n  - period: eq, in\n  - total_amount: eq, gt, gte, lt, lte\n  - user_id: eq, in\n",
                         "name": "filter",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "example": "name:asc,created_at:desc",
-                        "description": "Sort field",
+                        "example": "name:asc",
+                        "description": "Sort field. \n- Allowed: name, total_amount, period, id",
                         "name": "order_by",
                         "in": "query"
                     }
@@ -405,6 +405,19 @@
                         "default": 10,
                         "description": "Items per page",
                         "name": "per_page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Filter expression. \n- Allowed fields \u0026 ops:\n  - amount: eq, gt, gte, lt, lte\n  - category_id: eq, in\n  - created_at: eq, gt, gte, lt, lte\n  - id: eq, in\n  - name: eq, like, in\n  - user_id: eq, in\n",
+                        "name": "filter",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "name:asc",
+                        "description": "Sort field. \n- Allowed: name, created_at, id",
+                        "name": "order_by",
                         "in": "query"
                     }
                 ],
@@ -760,8 +773,14 @@
                     },
                     {
                         "type": "string",
-                        "example": "name:asc,created_at:desc",
-                        "description": "Sort field",
+                        "description": "Filter expression. \n- Allowed fields \u0026 ops:\n  - amount: eq, gt, gte, lt, lte\n  - category_id: eq, in\n  - created_at: eq, gt, gte, lt, lte\n  - id: eq, in\n  - period: eq, in, gte, lte\n  - reference_date: eq, gt, gte, lt, lte\n  - type: eq, in\n  - user_id: eq, in\n",
+                        "name": "filter",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "example": "reference_date:asc",
+                        "description": "Sort field. \n- Allowed: reference_date, amount, id, created_at",
                         "name": "order_by",
                         "in": "query"
                     }
@@ -810,15 +829,14 @@
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "- Required: 'period gte YYYYMM and period lte YYYYMM'\n- Allowed fields \u0026 ops:\n  - period: eq, in, gte, lte\n  - total_expense: eq, gt, gte, lt, lte\n  - total_income: eq, gt, gte, lt, lte\n  - total_balance: eq, gt, gte, lt, lte\n- Rules: gte \u003c= lte, max 12 months range",
+                        "description": "Filter expression. \n- Allowed fields \u0026 ops:\n  - period: eq, in, gte, lte\n  - total_balance: eq, gt, gte, lt, lte\n  - total_expense: eq, gt, gte, lt, lte\n  - total_income: eq, gt, gte, lt, lte\n",
                         "name": "filter",
-                        "in": "query",
-                        "required": true
+                        "in": "query"
                     },
                     {
                         "type": "string",
-                        "example": "period:desc,total_balance:asc",
-                        "description": "Sort field.\n- Allowed: period, total_expense, total_income, total_balance",
+                        "example": "period:asc",
+                        "description": "Sort field. \n- Allowed: period, total_expense, total_income, total_balance",
                         "name": "order_by",
                         "in": "query"
                     }
