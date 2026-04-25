@@ -73,3 +73,14 @@ type CreateTransactionResponseData struct {
 type ListEntriesResponseData struct {
 	Entries []EntryResource `json:"entries"`
 }
+
+type MonthlySummaryResource struct {
+	Period  string  `json:"period" binding:"required"`
+	Income  float64 `json:"income" binding:"required"`
+	Expense float64 `json:"expense" binding:"required"`
+	Balance float64 `json:"balance" binding:"required"`
+}
+
+type SummaryResponseData struct {
+	Summary []MonthlySummaryResource `json:"summary" binding:"required"`
+}

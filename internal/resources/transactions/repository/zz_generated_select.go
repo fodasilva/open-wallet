@@ -98,3 +98,40 @@ func (r *EntriesRepoImpl) Select(ctx context.Context, db utils.Executer) ([]View
 
 	return results, nil
 }
+func (r *SummariesRepoImpl) Select(ctx context.Context, db utils.Executer) ([]ViewSummary, error) {
+	filter := querybuilder.FromContext(ctx)
+	query := squirrel.Select("user_id", "period", "total_expense", "total_income", "total_balance").
+		From("v_summaries").
+		PlaceholderFormat(squirrel.Dollar)
+
+	query = querybuilder.ToSquirrel(query, filter)
+
+	sql, args, err := query.ToSql()
+
+	if err != nil {
+		return nil, err
+	}
+
+	rows, err := db.QueryContext(ctx, sql, args...)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	var results []ViewSummary = []ViewSummary{}
+	for rows.Next() {
+		var item ViewSummary
+		err = rows.Scan(
+			&item.UserID,
+			&item.Period,
+			&item.TotalExpense,
+			&item.TotalIncome,
+			&item.TotalBalance,
+		)
+		results = append(results, item)
+	}
+
+	return results, nil
+}

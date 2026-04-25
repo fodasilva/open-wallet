@@ -14,11 +14,13 @@ type TransactionsUseCases interface {
 	DeleteTransactionById(ctx context.Context, id string, userID string) error
 	CreateTransaction(ctx context.Context, payload CreateTransactionDTO) (transactionRepo.Transaction, error)
 	UpdateTransaction(ctx context.Context, transactionID string, userID string, payload UpdateTransactionDTO) (transactionRepo.Transaction, error)
+	Summary(ctx context.Context) ([]transactionRepo.ViewSummary, error)
 }
 
 type TransactionsUseCasesImpl struct {
 	transactionsRepo  transactionRepo.TransactionsRepo
 	entriesRepo       transactionRepo.EntriesRepo
+	summariesRepo     transactionRepo.SummariesRepo
 	categoriesUseCase categories.CategoriesUseCases
 	db                *sql.DB
 }
@@ -26,6 +28,7 @@ type TransactionsUseCasesImpl struct {
 func NewTransactionsUseCases(
 	transactionsRepo transactionRepo.TransactionsRepo,
 	entriesRepo transactionRepo.EntriesRepo,
+	summariesRepo transactionRepo.SummariesRepo,
 	categoriesUseCase categories.CategoriesUseCases,
 	db *sql.DB,
 ) TransactionsUseCases {
@@ -33,6 +36,7 @@ func NewTransactionsUseCases(
 	return &TransactionsUseCasesImpl{
 		transactionsRepo:  transactionsRepo,
 		entriesRepo:       entriesRepo,
+		summariesRepo:     summariesRepo,
 		categoriesUseCase: categoriesUseCase,
 		db:                db,
 	}

@@ -39,3 +39,14 @@ type EntriesRepoImpl struct {
 func NewEntriesRepo() EntriesRepo {
 	return &EntriesRepoImpl{}
 }
+
+type SummariesRepo interface {
+	Select(ctx context.Context, db utils.Executer) ([]ViewSummary, error)
+}
+
+type SummariesRepoImpl struct {
+}
+
+func NewSummariesRepo() SummariesRepo {
+	return &SummariesRepoImpl{}
+}
