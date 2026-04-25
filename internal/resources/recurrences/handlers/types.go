@@ -1,8 +1,7 @@
 package handlers
 
 import (
-	"github.com/felipe1496/open-wallet/internal/resources/recurrences/repository"
-	"github.com/felipe1496/open-wallet/internal/utils"
+	"time"
 )
 
 type CreateRecurrenceRequest struct {
@@ -15,12 +14,21 @@ type CreateRecurrenceRequest struct {
 	EndPeriod   *string `json:"end_period" binding:"omitempty,len=6"`
 }
 
-type CreateRecurrenceResponse struct {
-	Data CreateRecurrenceResponseData `json:"data"`
+type RecurrenceResource struct {
+	ID          string    `json:"id"`
+	UserID      string    `json:"user_id"`
+	Name        string    `json:"name"`
+	Amount      float64   `json:"amount"`
+	DayOfMonth  int       `json:"day_of_month"`
+	StartPeriod string    `json:"start_period"`
+	EndPeriod   *string   `json:"end_period"`
+	Note        *string   `json:"note"`
+	CategoryID  *string   `json:"category_id"`
+	CreatedAt   time.Time `json:"created_at"`
 }
 
 type CreateRecurrenceResponseData struct {
-	Recurrence repository.Recurrence `json:"recurrence"`
+	Recurrence RecurrenceResource `json:"recurrence"`
 }
 
 type UpdateRecurrenceRequest struct {
@@ -33,19 +41,10 @@ type UpdateRecurrenceRequest struct {
 	EndPeriod   *string  `json:"end_period" binding:"omitempty,len=6"`
 }
 
-type UpdateRecurrenceResponse struct {
-	Data UpdateRecurrenceResponseData `json:"data"`
-}
-
 type UpdateRecurrenceResponseData struct {
-	Recurrence repository.Recurrence `json:"recurrence"`
-}
-
-type ListRecurrencesResponse struct {
-	Data  ListRecurrencesResponseData `json:"data"`
-	Query utils.QueryMeta             `json:"query"`
+	Recurrence RecurrenceResource `json:"recurrence"`
 }
 
 type ListRecurrencesResponseData struct {
-	Recurrences []repository.Recurrence `json:"recurrences"`
+	Recurrences []RecurrenceResource `json:"recurrences"`
 }

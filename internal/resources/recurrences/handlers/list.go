@@ -57,23 +57,16 @@ func (o *ListOptions) Run() error {
 		return err
 	}
 
-	nextPage := len(items) > o.PerPage
-	if nextPage {
-		items = items[:len(items)-1]
+	recurrencesResource := make([]RecurrenceResource, len(items))
+	for i, r := range items {
+		recurrencesResource[i] = MapRecurrenceResource(r)
 	}
-	totalPages := (count + o.PerPage - 1) / o.PerPage
 
-	o.Ctx.JSON(http.StatusOK, ListRecurrencesResponse{
+	o.Ctx.JSON(http.StatusOK, utils.PaginatedResponse[ListRecurrencesResponseData]{
 		Data: ListRecurrencesResponseData{
-			Recurrences: items,
+			Recurrences: recurrencesResource,
 		},
-		Query: utils.QueryMeta{
-			Page:       o.Page,
-			PerPage:    o.PerPage,
-			NextPage:   nextPage,
-			TotalPages: totalPages,
-			TotalItems: count,
-		},
+		Query: querybuilder.BuildMetadata(o.Page, o.PerPage, count),
 	})
 
 	return nil
@@ -88,7 +81,7 @@ func (o *ListOptions) Run() error {
 // @Produce json
 // @Param page query int false "Page number" default(1)
 // @Param per_page query int false "Items per page" default(10)
-// @Success 200 {object} ListRecurrencesResponse "List of recurrences"
+// @Success 200 {object} utils.PaginatedResponse[ListRecurrencesResponseData] "List of recurrences"
 // @Failure 401 {object} utils.HTTPError "Unauthorized"
 // @Failure 500 {object} utils.HTTPError "Internal server error"
 // @Router /api/v1/recurrences [get]
