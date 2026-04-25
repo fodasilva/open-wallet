@@ -43,10 +43,10 @@ func (o *CreateLoginWithGoogleOptions) Run() error {
 		return err
 	}
 
-	o.Ctx.JSON(http.StatusOK, LoginGoogleResponse{
+	o.Ctx.JSON(http.StatusOK, utils.ResponseData[LoginGoogleResponseData]{
 		Data: LoginGoogleResponseData{
 			AccessToken: accessToken,
-			User:        user,
+			User:        MapUserResource(user),
 		},
 	})
 
@@ -60,7 +60,7 @@ func (o *CreateLoginWithGoogleOptions) Run() error {
 // @Accept json
 // @Produce json
 // @Param body body LoginGoogleRequest true "Login payload"
-// @Success 200 {object} LoginGoogleResponse "User logged in"
+// @Success 200 {object} utils.ResponseData[LoginGoogleResponseData] "User logged in"
 // @Failure 400 {object} utils.HTTPError "Bad request"
 // @Failure 401 {object} utils.HTTPError "Unauthorized"
 // @Router /api/v1/auth/login/google [post]
