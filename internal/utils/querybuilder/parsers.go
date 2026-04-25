@@ -34,7 +34,7 @@ func ParseRequest(filter, pageStr, perPageStr, orderBy string, config ParseConfi
 
 	builder := New()
 	builder.Offset((pageNum - 1) * perPageNum)
-	builder.Limit(perPageNum + 1)
+	builder.Limit(perPageNum)
 
 	if orderBy != "" {
 		splittedByComma := strings.Split(orderBy, ",")

@@ -14,6 +14,7 @@ import (
 
 	"github.com/felipe1496/open-wallet/infra"
 	"github.com/felipe1496/open-wallet/internal/middlewares"
+	"github.com/felipe1496/open-wallet/internal/utils"
 	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
 )
 
@@ -51,6 +52,7 @@ func RegisterQueryBuilderTestRoutes(r *gin.Engine, resources *TestResources) {
 	r.GET("/test-query-builder", middlewares.QueryBuilderMiddleware(config), func(c *gin.Context) {
 		builder := c.MustGet("query_builder").(*querybuilder.Builder)
 
+		// 1. Data Query
 		query := squirrel.Select("*").From("query_builder_tests").PlaceholderFormat(squirrel.Dollar)
 		query = querybuilder.ToSquirrel(query, builder)
 
@@ -78,12 +80,29 @@ func RegisterQueryBuilderTestRoutes(r *gin.Engine, resources *TestResources) {
 			results = append(results, d)
 		}
 
-		perPage := c.GetInt("per_page")
-		if len(results) > perPage {
-			results = results[:perPage]
+		// 2. Count Query (respecting filters)
+		countBuilder := querybuilder.ForCount(builder)
+		countQuery := squirrel.Select("COUNT(*)").From("query_builder_tests").PlaceholderFormat(squirrel.Dollar)
+		countQuery = querybuilder.ToSquirrel(countQuery, countBuilder)
+
+		countSql, countArgs, err := countQuery.ToSql()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
 		}
 
-		c.JSON(http.StatusOK, results)
+		var totalItems int
+		err = resources.DB.QueryRowContext(c.Request.Context(), countSql, countArgs...).Scan(&totalItems)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		// 3. Return Paginated Response
+		c.JSON(http.StatusOK, utils.PaginatedResponse[[]QueryBuilderTestData]{
+			Data:  results,
+			Query: querybuilder.BuildMetadata(c.GetInt("page"), c.GetInt("per_page"), totalItems),
+		})
 	})
 }
 
@@ -145,7 +164,38 @@ func TestQueryBuilderE2E(t *testing.T) {
 		queryParams    string
 		expectedIDs    []string
 		expectedStatus int
+		verifyMetadata func(*testing.T, utils.PaginatedResponse[[]QueryBuilderTestData])
 	}{
+		{
+			name:        "Metadata: Filtered Count - age eq 25",
+			queryParams: "filter=age eq 25&page=1&per_page=1",
+			expectedIDs: []string{"01"}, // Alice
+			verifyMetadata: func(t *testing.T, res utils.PaginatedResponse[[]QueryBuilderTestData]) {
+				assert.Equal(t, 2, res.Query.TotalItems) // Alice and Eve
+				assert.Equal(t, 2, res.Query.TotalPages)
+				assert.Equal(t, true, res.Query.NextPage)
+			},
+		},
+		{
+			name:        "Metadata: Filtered Count - is_active eq true",
+			queryParams: "filter=is_active eq true&per_page=10",
+			expectedIDs: []string{"01", "03", "05"},
+			verifyMetadata: func(t *testing.T, res utils.PaginatedResponse[[]QueryBuilderTestData]) {
+				assert.Equal(t, 3, res.Query.TotalItems)
+				assert.Equal(t, 1, res.Query.TotalPages)
+				assert.Equal(t, false, res.Query.NextPage)
+			},
+		},
+		{
+			name:        "Metadata: Last Page",
+			queryParams: "filter=age eq 25&page=2&per_page=1",
+			expectedIDs: []string{"05"}, // Eve
+			verifyMetadata: func(t *testing.T, res utils.PaginatedResponse[[]QueryBuilderTestData]) {
+				assert.Equal(t, 2, res.Query.TotalItems)
+				assert.Equal(t, 2, res.Query.TotalPages)
+				assert.Equal(t, false, res.Query.NextPage)
+			},
+		},
 		{
 			name:        "Query by name eq",
 			queryParams: "filter=name eq 'Alice'",
@@ -266,16 +316,20 @@ func TestQueryBuilderE2E(t *testing.T) {
 
 			assert.Equal(t, http.StatusOK, w.Code)
 
-			var results []QueryBuilderTestData
-			err := json.Unmarshal(w.Body.Bytes(), &results)
+			var res utils.PaginatedResponse[[]QueryBuilderTestData]
+			err := json.Unmarshal(w.Body.Bytes(), &res)
 			require.NoError(t, err)
 
 			var actualIDs []string
-			for _, r := range results {
-				actualIDs = append(actualIDs, r.ID)
+			for _, item := range res.Data {
+				actualIDs = append(actualIDs, item.ID)
 			}
 
 			assert.Equal(t, tt.expectedIDs, actualIDs)
+
+			if tt.verifyMetadata != nil {
+				tt.verifyMetadata(t, res)
+			}
 		})
 	}
 }
