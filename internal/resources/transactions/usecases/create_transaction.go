@@ -85,7 +85,7 @@ func (uc *TransactionsUseCasesImpl) validatePayloadEntries(entries []CreateEntry
 func (uc *TransactionsUseCasesImpl) persistEntries(ctx context.Context, tx *sql.Tx, transactionID string, entries []CreateEntryDTO, tType transactionRepo.TransactionType) error {
 	for _, entry := range entries {
 		amount := entry.Amount
-		if (tType == transactionRepo.SimpleExpense || tType == transactionRepo.Installment) && amount > 0 {
+		if (tType == transactionRepo.SimpleExpense || tType == transactionRepo.Installment || tType == transactionRepo.Recurrence) && amount > 0 {
 			amount *= -1
 		} else if tType == transactionRepo.Income && amount < 0 {
 			amount *= -1
