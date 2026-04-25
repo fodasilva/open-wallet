@@ -347,7 +347,7 @@ func TestE2eTransactions(t *testing.T) {
 		_, _ = res.DB.Exec("INSERT INTO transactions (id, user_id, name, category) VALUES ($1, $2, $3, $4)",
 			ulid.Make().String(), testUser.ID, "Jan Expense", "simple_expense")
 		_, _ = res.DB.Exec("INSERT INTO entries (id, transaction_id, amount, reference_date) VALUES ($1, (SELECT id FROM transactions WHERE name = 'Jan Expense'), $2, $3)",
-			ulid.Make().String(), 100.0, "2026-01-15")
+			ulid.Make().String(), -100.0, "2026-01-15")
 
 		_, _ = res.DB.Exec("INSERT INTO transactions (id, user_id, name, category) VALUES ($1, $2, $3, $4)",
 			ulid.Make().String(), testUser.ID, "Jan Income", "income")
@@ -358,7 +358,7 @@ func TestE2eTransactions(t *testing.T) {
 		_, _ = res.DB.Exec("INSERT INTO transactions (id, user_id, name, category) VALUES ($1, $2, $3, $4)",
 			ulid.Make().String(), testUser.ID, "Feb Expense", "simple_expense")
 		_, _ = res.DB.Exec("INSERT INTO entries (id, transaction_id, amount, reference_date) VALUES ($1, (SELECT id FROM transactions WHERE name = 'Feb Expense'), $2, $3)",
-			ulid.Make().String(), 250.0, "2026-02-20")
+			ulid.Make().String(), -250.0, "2026-02-20")
 
 		t.Run("should fail when missing period filters", func(t *testing.T) {
 			req := httptest.NewRequest(http.MethodGet, "/api/v1/transactions/summary", nil)
@@ -456,7 +456,7 @@ func TestE2eTransactions(t *testing.T) {
 			_, _ = res.DB.Exec("INSERT INTO transactions (id, user_id, name, category) VALUES ($1, $2, $3, $4)",
 				ulid.Make().String(), testUser.ID, "April Expense", "simple_expense")
 			_, _ = res.DB.Exec("INSERT INTO entries (id, transaction_id, amount, reference_date) VALUES ($1, (SELECT id FROM transactions WHERE name = 'April Expense'), $2, $3)",
-				ulid.Make().String(), 50.0, "2026-04-05")
+				ulid.Make().String(), -50.0, "2026-04-05")
 
 			// Request range 202602 to 202604. 202603 is empty.
 			params := url.Values{}
