@@ -7,7 +7,6 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 
-	"github.com/felipe1496/open-wallet/internal/resources/transactions"
 	"github.com/felipe1496/open-wallet/internal/resources/transactions/usecases"
 	"github.com/felipe1496/open-wallet/internal/utils"
 	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
@@ -51,7 +50,7 @@ func (o *ListEntriesOptions) Run() error {
 		return err
 	}
 
-	countCtx := querybuilder.WithBuilder(tCtx, querybuilder.New().And("user_id", "eq", o.UserID))
+	countCtx := querybuilder.WithBuilder(tCtx, querybuilder.ForCount(o.Builder))
 	count, err := o.UseCases.CountEntries(countCtx)
 
 	if err != nil {
@@ -59,25 +58,16 @@ func (o *ListEntriesOptions) Run() error {
 		return err
 	}
 
-	nextPage := len(entries) > o.PerPage
-
-	if nextPage {
-		entries = entries[:len(entries)-1]
+	entriesResource := make([]EntryResource, len(entries))
+	for i, e := range entries {
+		entriesResource[i] = MapEntryResource(e)
 	}
 
-	totalPages := (count + o.PerPage - 1) / o.PerPage
-
-	o.Ctx.JSON(http.StatusOK, transactions.ListEntriesResponse{
-		Data: transactions.ListEntriesResponseData{
-			Entries: entries,
+	o.Ctx.JSON(http.StatusOK, utils.PaginatedResponse[ListEntriesResponseData]{
+		Data: ListEntriesResponseData{
+			Entries: entriesResource,
 		},
-		Query: utils.QueryMeta{
-			Page:       o.Page,
-			PerPage:    o.PerPage,
-			NextPage:   nextPage,
-			TotalPages: totalPages,
-			TotalItems: count,
-		},
+		Query: querybuilder.BuildMetadata(o.Page, o.PerPage, count),
 	})
 	return nil
 }
@@ -92,7 +82,7 @@ func (o *ListEntriesOptions) Run() error {
 // @Param page query int false "Page number" default(1)
 // @Param per_page query int false "Items per page" default(10)
 // @Param order_by query string false "Sort field" example(name:asc,created_at:desc)
-// @Success 200 {object} transactions.ListEntriesResponse "List of entries"
+// @Success 200 {object} utils.PaginatedResponse[ListEntriesResponseData] "List of entries"
 // @Failure 401 {object} utils.HTTPError "Unauthorized"
 // @Failure 500 {object} utils.HTTPError "Internal server error"
 // @Router /api/v1/transactions/entries [get]

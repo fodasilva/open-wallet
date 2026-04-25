@@ -18,8 +18,9 @@ import (
 
 	"github.com/felipe1496/open-wallet/infra"
 	"github.com/felipe1496/open-wallet/internal/factory"
-	"github.com/felipe1496/open-wallet/internal/resources/transactions"
+	"github.com/felipe1496/open-wallet/internal/resources/transactions/handlers"
 	"github.com/felipe1496/open-wallet/internal/routes"
+	"github.com/felipe1496/open-wallet/internal/utils"
 )
 
 func setupTransactionTestServer(pg *sql.DB, redisClient *redis.Client, cfg *infra.Config) (*gin.Engine, *factory.Factory) {
@@ -76,7 +77,7 @@ func TestE2eTransactions(t *testing.T) {
 
 		type testCase struct {
 			name           string
-			payload        transactions.CreateTransactionRequest
+			payload        handlers.CreateTransactionRequest
 			expectedStatus int
 			validateDB     bool
 		}
@@ -84,11 +85,11 @@ func TestE2eTransactions(t *testing.T) {
 		cases := []testCase{
 			{
 				name: "should create transaction successfully",
-				payload: transactions.CreateTransactionRequest{
+				payload: handlers.CreateTransactionRequest{
 					Name:       "Lunch",
 					CategoryID: &categoryID,
 					Type:       "simple_expense",
-					Entries: []transactions.CreateEntryRequest{
+					Entries: []handlers.CreateEntryRequest{
 						{Amount: -25.5, ReferenceDate: "2026-04-10"},
 					},
 				},
@@ -97,7 +98,7 @@ func TestE2eTransactions(t *testing.T) {
 			},
 			{
 				name: "should fail with invalid payload (missing entries)",
-				payload: transactions.CreateTransactionRequest{
+				payload: handlers.CreateTransactionRequest{
 					Name: "Invalid",
 					Type: "simple_expense",
 				},
@@ -170,7 +171,7 @@ func TestE2eTransactions(t *testing.T) {
 
 				assert.Equal(t, tc.expectedStatus, w.Code)
 				if tc.expectedStatus == http.StatusOK {
-					var response transactions.ListEntriesResponse
+					var response utils.PaginatedResponse[handlers.ListEntriesResponseData]
 					err := json.Unmarshal(w.Body.Bytes(), &response)
 					assert.NoError(t, err)
 					assert.Len(t, response.Data.Entries, tc.expectedCount)
@@ -221,7 +222,7 @@ func TestE2eTransactions(t *testing.T) {
 				router.ServeHTTP(w, req)
 
 				assert.Equal(t, http.StatusOK, w.Code)
-				var response transactions.ListEntriesResponse
+				var response utils.PaginatedResponse[handlers.ListEntriesResponseData]
 				err := json.Unmarshal(w.Body.Bytes(), &response)
 				assert.NoError(t, err)
 				assert.Len(t, response.Data.Entries, tc.expectedCount)
@@ -242,7 +243,7 @@ func TestE2eTransactions(t *testing.T) {
 		type testCase struct {
 			name           string
 			id             string
-			payload        transactions.UpdateTransactionRequest
+			payload        handlers.UpdateTransactionRequest
 			expectedStatus int
 			expectedName   string
 		}
@@ -252,7 +253,7 @@ func TestE2eTransactions(t *testing.T) {
 			{
 				name: "should update name successfully",
 				id:   txID,
-				payload: transactions.UpdateTransactionRequest{
+				payload: handlers.UpdateTransactionRequest{
 					Name: &newName,
 				},
 				expectedStatus: http.StatusOK,
@@ -261,7 +262,7 @@ func TestE2eTransactions(t *testing.T) {
 			{
 				name:           "should fail with 404 for non-existent transaction",
 				id:             ulid.Make().String(),
-				payload:        transactions.UpdateTransactionRequest{Name: &newName},
+				payload:        handlers.UpdateTransactionRequest{Name: &newName},
 				expectedStatus: http.StatusNotFound,
 			},
 		}

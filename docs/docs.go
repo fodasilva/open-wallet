@@ -44,7 +44,7 @@ const docTemplate = `{
                     "200": {
                         "description": "User logged in",
                         "schema": {
-                            "$ref": "#/definitions/internal_resources_auth_handlers.LoginGoogleResponse"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_auth_handlers_LoginGoogleResponseData"
                         }
                     },
                     "400": {
@@ -120,7 +120,7 @@ const docTemplate = `{
                     "200": {
                         "description": "List of categories",
                         "schema": {
-                            "$ref": "#/definitions/internal_resources_categories_handlers.ListCategoriesResponse"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.PaginatedResponse-internal_resources_categories_handlers_ListCategoriesResponseData"
                         }
                     },
                     "401": {
@@ -170,7 +170,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Category created",
                         "schema": {
-                            "$ref": "#/definitions/internal_resources_categories_handlers.CreateCategoryResponse"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_categories_handlers_CreateCategoryResponseData"
                         }
                     },
                     "401": {
@@ -280,7 +280,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Category updated",
                         "schema": {
-                            "$ref": "#/definitions/internal_resources_categories_handlers.UpdateCategoryResponse"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_categories_handlers_UpdateCategoryResponseData"
                         }
                     },
                     "401": {
@@ -363,7 +363,7 @@ const docTemplate = `{
                     "200": {
                         "description": "List of categories with amount per period",
                         "schema": {
-                            "$ref": "#/definitions/internal_resources_categories_handlers.ListCategoryAmountPerPeriodResponse"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.PaginatedResponse-internal_resources_categories_handlers_ListCategoryAmountPerPeriodResponseData"
                         }
                     },
                     "401": {
@@ -420,7 +420,7 @@ const docTemplate = `{
                     "200": {
                         "description": "List of recurrences",
                         "schema": {
-                            "$ref": "#/definitions/internal_resources_recurrences_handlers.ListRecurrencesResponse"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.PaginatedResponse-internal_resources_recurrences_handlers_ListRecurrencesResponseData"
                         }
                     },
                     "401": {
@@ -470,7 +470,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Recurrence created",
                         "schema": {
-                            "$ref": "#/definitions/internal_resources_recurrences_handlers.CreateRecurrenceResponse"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_recurrences_handlers_CreateRecurrenceResponseData"
                         }
                     },
                     "400": {
@@ -597,7 +597,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Recurrence updated",
                         "schema": {
-                            "$ref": "#/definitions/internal_resources_recurrences_handlers.UpdateRecurrenceResponse"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_recurrences_handlers_UpdateRecurrenceResponseData"
                         }
                     },
                     "400": {
@@ -700,7 +700,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions.CreateTransactionRequest"
+                            "$ref": "#/definitions/internal_resources_transactions_handlers.CreateTransactionRequest"
                         }
                     }
                 ],
@@ -708,7 +708,7 @@ const docTemplate = `{
                     "201": {
                         "description": "Installment updated",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions.CreateTransactionResponse"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_transactions_handlers_CreateTransactionResponseData"
                         }
                     },
                     "400": {
@@ -778,7 +778,7 @@ const docTemplate = `{
                     "200": {
                         "description": "List of entries",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions.ListEntriesResponse"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.PaginatedResponse-internal_resources_transactions_handlers_ListEntriesResponseData"
                         }
                     },
                     "401": {
@@ -880,7 +880,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions.UpdateTransactionRequest"
+                            "$ref": "#/definitions/internal_resources_transactions_handlers.UpdateTransactionRequest"
                         }
                     }
                 ],
@@ -888,7 +888,7 @@ const docTemplate = `{
                     "200": {
                         "description": "Installment updated",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions.UpdateTransactionResponse"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_transactions_handlers_UpdateTransactionResponseData"
                         }
                     },
                     "400": {
@@ -998,192 +998,6 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_felipe1496_open-wallet_internal_resources_transactions.CreateEntryRequest": {
-            "type": "object",
-            "required": [
-                "amount",
-                "reference_date"
-            ],
-            "properties": {
-                "amount": {
-                    "type": "number",
-                    "maximum": 999999,
-                    "minimum": -999999
-                },
-                "reference_date": {
-                    "type": "string"
-                }
-            }
-        },
-        "github_com_felipe1496_open-wallet_internal_resources_transactions.CreateTransactionRequest": {
-            "type": "object",
-            "required": [
-                "entries",
-                "name",
-                "type"
-            ],
-            "properties": {
-                "category_id": {
-                    "type": "string"
-                },
-                "entries": {
-                    "type": "array",
-                    "maxItems": 100,
-                    "minItems": 1,
-                    "items": {
-                        "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions.CreateEntryRequest"
-                    }
-                },
-                "name": {
-                    "type": "string",
-                    "maxLength": 100,
-                    "minLength": 1
-                },
-                "note": {
-                    "type": "string",
-                    "maxLength": 400,
-                    "minLength": 0
-                },
-                "type": {
-                    "enum": [
-                        "installment",
-                        "simple_expense",
-                        "income"
-                    ],
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions_repository.TransactionType"
-                        }
-                    ]
-                }
-            }
-        },
-        "github_com_felipe1496_open-wallet_internal_resources_transactions.CreateTransactionResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions.CreateTransactionResponseData"
-                }
-            }
-        },
-        "github_com_felipe1496_open-wallet_internal_resources_transactions.CreateTransactionResponseData": {
-            "type": "object",
-            "properties": {
-                "transaction": {
-                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions_repository.Transaction"
-                }
-            }
-        },
-        "github_com_felipe1496_open-wallet_internal_resources_transactions.ListEntriesResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions.ListEntriesResponseData"
-                },
-                "query": {
-                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.QueryMeta"
-                }
-            }
-        },
-        "github_com_felipe1496_open-wallet_internal_resources_transactions.ListEntriesResponseData": {
-            "type": "object",
-            "properties": {
-                "entries": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions_repository.ViewEntry"
-                    }
-                }
-            }
-        },
-        "github_com_felipe1496_open-wallet_internal_resources_transactions.UpdateEntryRequest": {
-            "type": "object",
-            "required": [
-                "amount",
-                "reference_date"
-            ],
-            "properties": {
-                "amount": {
-                    "type": "number",
-                    "maximum": 999999,
-                    "minimum": -999999
-                },
-                "reference_date": {
-                    "type": "string"
-                }
-            }
-        },
-        "github_com_felipe1496_open-wallet_internal_resources_transactions.UpdateTransactionRequest": {
-            "type": "object",
-            "properties": {
-                "category_id": {
-                    "type": "string"
-                },
-                "entries": {
-                    "type": "array",
-                    "maxItems": 100,
-                    "minItems": 1,
-                    "items": {
-                        "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions.UpdateEntryRequest"
-                    }
-                },
-                "name": {
-                    "type": "string",
-                    "maxLength": 100,
-                    "minLength": 1
-                },
-                "note": {
-                    "type": "string",
-                    "maxLength": 400,
-                    "minLength": 0
-                }
-            }
-        },
-        "github_com_felipe1496_open-wallet_internal_resources_transactions.UpdateTransactionResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions.UpdateTransactionResponseData"
-                }
-            }
-        },
-        "github_com_felipe1496_open-wallet_internal_resources_transactions.UpdateTransactionResponseData": {
-            "type": "object",
-            "properties": {
-                "transaction": {
-                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions_repository.Transaction"
-                }
-            }
-        },
-        "github_com_felipe1496_open-wallet_internal_resources_transactions_repository.Transaction": {
-            "type": "object",
-            "properties": {
-                "category_id": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "recurrence_id": {
-                    "type": "string"
-                },
-                "type": {
-                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions_repository.TransactionType"
-                },
-                "user_id": {
-                    "type": "string"
-                }
-            }
-        },
         "github_com_felipe1496_open-wallet_internal_resources_transactions_repository.TransactionType": {
             "type": "string",
             "enum": [
@@ -1198,62 +1012,6 @@ const docTemplate = `{
                 "Installment",
                 "Recurrence"
             ]
-        },
-        "github_com_felipe1496_open-wallet_internal_resources_transactions_repository.ViewEntry": {
-            "type": "object",
-            "properties": {
-                "amount": {
-                    "type": "number"
-                },
-                "category_color": {
-                    "type": "string"
-                },
-                "category_id": {
-                    "type": "string"
-                },
-                "category_name": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "type": "string"
-                },
-                "description": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "installment": {
-                    "type": "integer"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "period": {
-                    "type": "string"
-                },
-                "recurrence_id": {
-                    "type": "string"
-                },
-                "reference_date": {
-                    "type": "string"
-                },
-                "total_amount": {
-                    "type": "number"
-                },
-                "total_installments": {
-                    "type": "integer"
-                },
-                "transaction_id": {
-                    "type": "string"
-                },
-                "type": {
-                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions_repository.TransactionType"
-                },
-                "user_id": {
-                    "type": "string"
-                }
-            }
         },
         "github_com_felipe1496_open-wallet_internal_resources_users_repository.User": {
             "type": "object",
@@ -1300,7 +1058,107 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_felipe1496_open-wallet_internal_utils.QueryMeta": {
+        "github_com_felipe1496_open-wallet_internal_utils.PaginatedResponse-internal_resources_categories_handlers_ListCategoriesResponseData": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/internal_resources_categories_handlers.ListCategoriesResponseData"
+                },
+                "query": {
+                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils_querybuilder.Metadata"
+                }
+            }
+        },
+        "github_com_felipe1496_open-wallet_internal_utils.PaginatedResponse-internal_resources_categories_handlers_ListCategoryAmountPerPeriodResponseData": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/internal_resources_categories_handlers.ListCategoryAmountPerPeriodResponseData"
+                },
+                "query": {
+                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils_querybuilder.Metadata"
+                }
+            }
+        },
+        "github_com_felipe1496_open-wallet_internal_utils.PaginatedResponse-internal_resources_recurrences_handlers_ListRecurrencesResponseData": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/internal_resources_recurrences_handlers.ListRecurrencesResponseData"
+                },
+                "query": {
+                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils_querybuilder.Metadata"
+                }
+            }
+        },
+        "github_com_felipe1496_open-wallet_internal_utils.PaginatedResponse-internal_resources_transactions_handlers_ListEntriesResponseData": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/internal_resources_transactions_handlers.ListEntriesResponseData"
+                },
+                "query": {
+                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils_querybuilder.Metadata"
+                }
+            }
+        },
+        "github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_auth_handlers_LoginGoogleResponseData": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/internal_resources_auth_handlers.LoginGoogleResponseData"
+                }
+            }
+        },
+        "github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_categories_handlers_CreateCategoryResponseData": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/internal_resources_categories_handlers.CreateCategoryResponseData"
+                }
+            }
+        },
+        "github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_categories_handlers_UpdateCategoryResponseData": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/internal_resources_categories_handlers.UpdateCategoryResponseData"
+                }
+            }
+        },
+        "github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_recurrences_handlers_CreateRecurrenceResponseData": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/internal_resources_recurrences_handlers.CreateRecurrenceResponseData"
+                }
+            }
+        },
+        "github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_recurrences_handlers_UpdateRecurrenceResponseData": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/internal_resources_recurrences_handlers.UpdateRecurrenceResponseData"
+                }
+            }
+        },
+        "github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_transactions_handlers_CreateTransactionResponseData": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/internal_resources_transactions_handlers.CreateTransactionResponseData"
+                }
+            }
+        },
+        "github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_transactions_handlers_UpdateTransactionResponseData": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/internal_resources_transactions_handlers.UpdateTransactionResponseData"
+                }
+            }
+        },
+        "github_com_felipe1496_open-wallet_internal_utils_querybuilder.Metadata": {
             "type": "object",
             "properties": {
                 "next_page": {
@@ -1325,14 +1183,6 @@ const docTemplate = `{
             "properties": {
                 "code": {
                     "type": "string"
-                }
-            }
-        },
-        "internal_resources_auth_handlers.LoginGoogleResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "$ref": "#/definitions/internal_resources_auth_handlers.LoginGoogleResponseData"
                 }
             }
         },
@@ -1362,30 +1212,11 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_resources_categories_handlers.CreateCategoryResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "$ref": "#/definitions/internal_resources_categories_handlers.CreateCategoryResponseData"
-                }
-            }
-        },
         "internal_resources_categories_handlers.CreateCategoryResponseData": {
             "type": "object",
             "properties": {
                 "category": {
                     "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_categories_repository.Category"
-                }
-            }
-        },
-        "internal_resources_categories_handlers.ListCategoriesResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "$ref": "#/definitions/internal_resources_categories_handlers.ListCategoriesResponseData"
-                },
-                "query": {
-                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.QueryMeta"
                 }
             }
         },
@@ -1397,17 +1228,6 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_categories_repository.Category"
                     }
-                }
-            }
-        },
-        "internal_resources_categories_handlers.ListCategoryAmountPerPeriodResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "$ref": "#/definitions/internal_resources_categories_handlers.ListCategoryAmountPerPeriodResponseData"
-                },
-                "query": {
-                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.QueryMeta"
                 }
             }
         },
@@ -1432,14 +1252,6 @@ const docTemplate = `{
                     "type": "string",
                     "maxLength": 50,
                     "minLength": 1
-                }
-            }
-        },
-        "internal_resources_categories_handlers.UpdateCategoryResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "$ref": "#/definitions/internal_resources_categories_handlers.UpdateCategoryResponseData"
                 }
             }
         },
@@ -1489,30 +1301,11 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_resources_recurrences_handlers.CreateRecurrenceResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "$ref": "#/definitions/internal_resources_recurrences_handlers.CreateRecurrenceResponseData"
-                }
-            }
-        },
         "internal_resources_recurrences_handlers.CreateRecurrenceResponseData": {
             "type": "object",
             "properties": {
                 "recurrence": {
                     "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_recurrences_repository.Recurrence"
-                }
-            }
-        },
-        "internal_resources_recurrences_handlers.ListRecurrencesResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "$ref": "#/definitions/internal_resources_recurrences_handlers.ListRecurrencesResponseData"
-                },
-                "query": {
-                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.QueryMeta"
                 }
             }
         },
@@ -1559,19 +1352,247 @@ const docTemplate = `{
                 }
             }
         },
-        "internal_resources_recurrences_handlers.UpdateRecurrenceResponse": {
-            "type": "object",
-            "properties": {
-                "data": {
-                    "$ref": "#/definitions/internal_resources_recurrences_handlers.UpdateRecurrenceResponseData"
-                }
-            }
-        },
         "internal_resources_recurrences_handlers.UpdateRecurrenceResponseData": {
             "type": "object",
             "properties": {
                 "recurrence": {
                     "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_recurrences_repository.Recurrence"
+                }
+            }
+        },
+        "internal_resources_transactions_handlers.CreateEntryRequest": {
+            "type": "object",
+            "required": [
+                "amount",
+                "reference_date"
+            ],
+            "properties": {
+                "amount": {
+                    "type": "number",
+                    "maximum": 999999,
+                    "minimum": -999999
+                },
+                "reference_date": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_resources_transactions_handlers.CreateTransactionRequest": {
+            "type": "object",
+            "required": [
+                "entries",
+                "name",
+                "type"
+            ],
+            "properties": {
+                "category_id": {
+                    "type": "string"
+                },
+                "entries": {
+                    "type": "array",
+                    "maxItems": 100,
+                    "minItems": 1,
+                    "items": {
+                        "$ref": "#/definitions/internal_resources_transactions_handlers.CreateEntryRequest"
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 1
+                },
+                "note": {
+                    "type": "string",
+                    "maxLength": 400,
+                    "minLength": 0
+                },
+                "type": {
+                    "enum": [
+                        "installment",
+                        "simple_expense",
+                        "income"
+                    ],
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_resources_transactions_repository.TransactionType"
+                        }
+                    ]
+                }
+            }
+        },
+        "internal_resources_transactions_handlers.CreateTransactionResponseData": {
+            "type": "object",
+            "properties": {
+                "transaction": {
+                    "$ref": "#/definitions/internal_resources_transactions_handlers.TransactionResource"
+                }
+            }
+        },
+        "internal_resources_transactions_handlers.EntryResource": {
+            "type": "object",
+            "required": [
+                "amount",
+                "created_at",
+                "id",
+                "installment",
+                "name",
+                "period",
+                "reference_date",
+                "total_amount",
+                "total_installments",
+                "transaction_id",
+                "type",
+                "user_id"
+            ],
+            "properties": {
+                "amount": {
+                    "type": "number"
+                },
+                "category_color": {
+                    "type": "string"
+                },
+                "category_id": {
+                    "type": "string"
+                },
+                "category_name": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "installment": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "period": {
+                    "type": "string"
+                },
+                "recurrence_id": {
+                    "type": "string"
+                },
+                "reference_date": {
+                    "type": "string"
+                },
+                "total_amount": {
+                    "type": "number"
+                },
+                "total_installments": {
+                    "type": "integer"
+                },
+                "transaction_id": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_resources_transactions_handlers.ListEntriesResponseData": {
+            "type": "object",
+            "properties": {
+                "entries": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/internal_resources_transactions_handlers.EntryResource"
+                    }
+                }
+            }
+        },
+        "internal_resources_transactions_handlers.TransactionResource": {
+            "type": "object",
+            "required": [
+                "created_at",
+                "id",
+                "name",
+                "type",
+                "user_id"
+            ],
+            "properties": {
+                "category_id": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "recurrence_id": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_resources_transactions_handlers.UpdateEntryRequest": {
+            "type": "object",
+            "required": [
+                "amount",
+                "reference_date"
+            ],
+            "properties": {
+                "amount": {
+                    "type": "number",
+                    "maximum": 999999,
+                    "minimum": -999999
+                },
+                "reference_date": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_resources_transactions_handlers.UpdateTransactionRequest": {
+            "type": "object",
+            "properties": {
+                "category_id": {
+                    "type": "string"
+                },
+                "entries": {
+                    "type": "array",
+                    "maxItems": 100,
+                    "minItems": 1,
+                    "items": {
+                        "$ref": "#/definitions/internal_resources_transactions_handlers.UpdateEntryRequest"
+                    }
+                },
+                "name": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 1
+                },
+                "note": {
+                    "type": "string",
+                    "maxLength": 400,
+                    "minLength": 0
+                }
+            }
+        },
+        "internal_resources_transactions_handlers.UpdateTransactionResponseData": {
+            "type": "object",
+            "properties": {
+                "transaction": {
+                    "$ref": "#/definitions/internal_resources_transactions_handlers.TransactionResource"
                 }
             }
         }
