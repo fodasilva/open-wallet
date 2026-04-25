@@ -7,7 +7,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/felipe1496/open-wallet/internal/resources/transactions"
 	"github.com/felipe1496/open-wallet/internal/resources/transactions/usecases"
 	"github.com/felipe1496/open-wallet/internal/utils"
 )
@@ -19,7 +18,7 @@ type UpdateTransactionOptions struct {
 	ID         string
 	UserID     string
 	PassedKeys []string
-	Body       transactions.UpdateTransactionRequest
+	Body       UpdateTransactionRequest
 }
 
 func (o *UpdateTransactionOptions) Complete(ctx *gin.Context) error {
@@ -87,9 +86,9 @@ func (o *UpdateTransactionOptions) Run() error {
 		return err
 	}
 
-	o.Ctx.JSON(http.StatusOK, transactions.UpdateTransactionResponse{
-		Data: transactions.UpdateTransactionResponseData{
-			Transaction: transaction,
+	o.Ctx.JSON(http.StatusOK, utils.ResponseData[UpdateTransactionResponseData]{
+		Data: UpdateTransactionResponseData{
+			Transaction: MapTransactionResource(transaction),
 		},
 	})
 	return nil
@@ -103,8 +102,8 @@ func (o *UpdateTransactionOptions) Run() error {
 // @Accept json
 // @Produce json
 // @Param transaction_id path string true "transaction ID"
-// @Param body body transactions.UpdateTransactionRequest true "Installment payload"
-// @Success 200 {object} transactions.UpdateTransactionResponse "Installment updated"
+// @Param body body UpdateTransactionRequest true "Installment payload"
+// @Success 200 {object} utils.ResponseData[UpdateTransactionResponseData] "Installment updated"
 // @Failure 400 {object} utils.HTTPError "Bad request"
 // @Failure 401 {object} utils.HTTPError "Unauthorized"
 // @Failure 500 {object} utils.HTTPError "Internal server error"
