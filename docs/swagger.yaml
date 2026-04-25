@@ -144,6 +144,8 @@ definitions:
     properties:
       code:
         type: string
+    required:
+    - code
     type: object
   internal_resources_auth_handlers.LoginGoogleResponseData:
     properties:
@@ -151,6 +153,9 @@ definitions:
         type: string
       user:
         $ref: '#/definitions/internal_resources_auth_handlers.UserResource'
+    required:
+    - access_token
+    - user
     type: object
   internal_resources_auth_handlers.UserResource:
     properties:
@@ -164,6 +169,12 @@ definitions:
         type: string
       name:
         type: string
+    required:
+    - avatar_url
+    - created_at
+    - email
+    - id
+    - name
     type: object
   internal_resources_categories_handlers.CategoryAmountPerPeriodResource:
     properties:
@@ -175,6 +186,11 @@ definitions:
         type: string
       total_amount:
         type: number
+    required:
+    - color
+    - id
+    - name
+    - total_amount
     type: object
   internal_resources_categories_handlers.CategoryResource:
     properties:
@@ -188,6 +204,12 @@ definitions:
         type: string
       user_id:
         type: string
+    required:
+    - color
+    - created_at
+    - id
+    - name
+    - user_id
     type: object
   internal_resources_categories_handlers.CreateCategoryRequest:
     properties:
@@ -203,6 +225,8 @@ definitions:
     properties:
       category:
         $ref: '#/definitions/internal_resources_categories_handlers.CategoryResource'
+    required:
+    - category
     type: object
   internal_resources_categories_handlers.ListCategoriesResponseData:
     properties:
@@ -210,6 +234,8 @@ definitions:
         items:
           $ref: '#/definitions/internal_resources_categories_handlers.CategoryResource'
         type: array
+    required:
+    - categories
     type: object
   internal_resources_categories_handlers.ListCategoryAmountPerPeriodResponseData:
     properties:
@@ -217,6 +243,8 @@ definitions:
         items:
           $ref: '#/definitions/internal_resources_categories_handlers.CategoryAmountPerPeriodResource'
         type: array
+    required:
+    - categories
     type: object
   internal_resources_categories_handlers.UpdateCategoryRequest:
     properties:
@@ -231,6 +259,8 @@ definitions:
     properties:
       category:
         $ref: '#/definitions/internal_resources_categories_handlers.CategoryResource'
+    required:
+    - category
     type: object
   internal_resources_recurrences_handlers.CreateRecurrenceRequest:
     properties:
@@ -264,6 +294,8 @@ definitions:
     properties:
       recurrence:
         $ref: '#/definitions/internal_resources_recurrences_handlers.RecurrenceResource'
+    required:
+    - recurrence
     type: object
   internal_resources_recurrences_handlers.ListRecurrencesResponseData:
     properties:
@@ -271,12 +303,18 @@ definitions:
         items:
           $ref: '#/definitions/internal_resources_recurrences_handlers.RecurrenceResource'
         type: array
+    required:
+    - recurrences
     type: object
   internal_resources_recurrences_handlers.RecurrenceResource:
     properties:
       amount:
         type: number
+      category_color:
+        type: string
       category_id:
+        type: string
+      category_name:
         type: string
       created_at:
         type: string
@@ -294,6 +332,14 @@ definitions:
         type: string
       user_id:
         type: string
+    required:
+    - amount
+    - created_at
+    - day_of_month
+    - id
+    - name
+    - start_period
+    - user_id
     type: object
   internal_resources_recurrences_handlers.UpdateRecurrenceRequest:
     properties:
@@ -322,6 +368,8 @@ definitions:
     properties:
       recurrence:
         $ref: '#/definitions/internal_resources_recurrences_handlers.RecurrenceResource'
+    required:
+    - recurrence
     type: object
   internal_resources_transactions_handlers.CreateEntryRequest:
     properties:
@@ -369,6 +417,8 @@ definitions:
     properties:
       transaction:
         $ref: '#/definitions/internal_resources_transactions_handlers.TransactionResource'
+    required:
+    - transaction
     type: object
   internal_resources_transactions_handlers.EntryResource:
     properties:
@@ -426,6 +476,8 @@ definitions:
         items:
           $ref: '#/definitions/internal_resources_transactions_handlers.EntryResource'
         type: array
+    required:
+    - entries
     type: object
   internal_resources_transactions_handlers.MonthlySummaryResource:
     properties:
@@ -454,7 +506,11 @@ definitions:
     type: object
   internal_resources_transactions_handlers.TransactionResource:
     properties:
+      category_color:
+        type: string
       category_id:
+        type: string
+      category_name:
         type: string
       created_at:
         type: string
@@ -512,6 +568,8 @@ definitions:
     properties:
       transaction:
         $ref: '#/definitions/internal_resources_transactions_handlers.TransactionResource'
+    required:
+    - transaction
     type: object
 info:
   contact: {}

@@ -1203,6 +1203,9 @@ const docTemplate = `{
         },
         "internal_resources_auth_handlers.LoginGoogleRequest": {
             "type": "object",
+            "required": [
+                "code"
+            ],
             "properties": {
                 "code": {
                     "type": "string"
@@ -1211,6 +1214,10 @@ const docTemplate = `{
         },
         "internal_resources_auth_handlers.LoginGoogleResponseData": {
             "type": "object",
+            "required": [
+                "access_token",
+                "user"
+            ],
             "properties": {
                 "access_token": {
                     "type": "string"
@@ -1222,6 +1229,13 @@ const docTemplate = `{
         },
         "internal_resources_auth_handlers.UserResource": {
             "type": "object",
+            "required": [
+                "avatar_url",
+                "created_at",
+                "email",
+                "id",
+                "name"
+            ],
             "properties": {
                 "avatar_url": {
                     "type": "string"
@@ -1242,6 +1256,12 @@ const docTemplate = `{
         },
         "internal_resources_categories_handlers.CategoryAmountPerPeriodResource": {
             "type": "object",
+            "required": [
+                "color",
+                "id",
+                "name",
+                "total_amount"
+            ],
             "properties": {
                 "color": {
                     "type": "string"
@@ -1259,6 +1279,13 @@ const docTemplate = `{
         },
         "internal_resources_categories_handlers.CategoryResource": {
             "type": "object",
+            "required": [
+                "color",
+                "created_at",
+                "id",
+                "name",
+                "user_id"
+            ],
             "properties": {
                 "color": {
                     "type": "string"
@@ -1294,6 +1321,9 @@ const docTemplate = `{
         },
         "internal_resources_categories_handlers.CreateCategoryResponseData": {
             "type": "object",
+            "required": [
+                "category"
+            ],
             "properties": {
                 "category": {
                     "$ref": "#/definitions/internal_resources_categories_handlers.CategoryResource"
@@ -1302,6 +1332,9 @@ const docTemplate = `{
         },
         "internal_resources_categories_handlers.ListCategoriesResponseData": {
             "type": "object",
+            "required": [
+                "categories"
+            ],
             "properties": {
                 "categories": {
                     "type": "array",
@@ -1313,6 +1346,9 @@ const docTemplate = `{
         },
         "internal_resources_categories_handlers.ListCategoryAmountPerPeriodResponseData": {
             "type": "object",
+            "required": [
+                "categories"
+            ],
             "properties": {
                 "categories": {
                     "type": "array",
@@ -1337,6 +1373,9 @@ const docTemplate = `{
         },
         "internal_resources_categories_handlers.UpdateCategoryResponseData": {
             "type": "object",
+            "required": [
+                "category"
+            ],
             "properties": {
                 "category": {
                     "$ref": "#/definitions/internal_resources_categories_handlers.CategoryResource"
@@ -1383,6 +1422,9 @@ const docTemplate = `{
         },
         "internal_resources_recurrences_handlers.CreateRecurrenceResponseData": {
             "type": "object",
+            "required": [
+                "recurrence"
+            ],
             "properties": {
                 "recurrence": {
                     "$ref": "#/definitions/internal_resources_recurrences_handlers.RecurrenceResource"
@@ -1391,6 +1433,9 @@ const docTemplate = `{
         },
         "internal_resources_recurrences_handlers.ListRecurrencesResponseData": {
             "type": "object",
+            "required": [
+                "recurrences"
+            ],
             "properties": {
                 "recurrences": {
                     "type": "array",
@@ -1402,11 +1447,26 @@ const docTemplate = `{
         },
         "internal_resources_recurrences_handlers.RecurrenceResource": {
             "type": "object",
+            "required": [
+                "amount",
+                "created_at",
+                "day_of_month",
+                "id",
+                "name",
+                "start_period",
+                "user_id"
+            ],
             "properties": {
                 "amount": {
                     "type": "number"
                 },
+                "category_color": {
+                    "type": "string"
+                },
                 "category_id": {
+                    "type": "string"
+                },
+                "category_name": {
                     "type": "string"
                 },
                 "created_at": {
@@ -1469,6 +1529,9 @@ const docTemplate = `{
         },
         "internal_resources_recurrences_handlers.UpdateRecurrenceResponseData": {
             "type": "object",
+            "required": [
+                "recurrence"
+            ],
             "properties": {
                 "recurrence": {
                     "$ref": "#/definitions/internal_resources_recurrences_handlers.RecurrenceResource"
@@ -1537,6 +1600,9 @@ const docTemplate = `{
         },
         "internal_resources_transactions_handlers.CreateTransactionResponseData": {
             "type": "object",
+            "required": [
+                "transaction"
+            ],
             "properties": {
                 "transaction": {
                     "$ref": "#/definitions/internal_resources_transactions_handlers.TransactionResource"
@@ -1615,6 +1681,9 @@ const docTemplate = `{
         },
         "internal_resources_transactions_handlers.ListEntriesResponseData": {
             "type": "object",
+            "required": [
+                "entries"
+            ],
             "properties": {
                 "entries": {
                     "type": "array",
@@ -1671,7 +1740,13 @@ const docTemplate = `{
                 "user_id"
             ],
             "properties": {
+                "category_color": {
+                    "type": "string"
+                },
                 "category_id": {
+                    "type": "string"
+                },
+                "category_name": {
                     "type": "string"
                 },
                 "created_at": {
@@ -1742,6 +1817,9 @@ const docTemplate = `{
         },
         "internal_resources_transactions_handlers.UpdateTransactionResponseData": {
             "type": "object",
+            "required": [
+                "transaction"
+            ],
             "properties": {
                 "transaction": {
                     "$ref": "#/definitions/internal_resources_transactions_handlers.TransactionResource"
