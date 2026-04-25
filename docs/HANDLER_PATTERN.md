@@ -40,6 +40,41 @@ The updated documentation will be available at `/api-docs/index.html` when runni
 
 ---
 
+## The Resource Pattern & Mapping
+
+To maintain a clean separation between the database schema and the API contract, we follow the **Resource Pattern**. This ensures that changes to the database do not accidentally break the API.
+
+### 1. Dedicated Resource Types
+Every handler package must define dedicated types for API responses in `handlers/types.go`. These types should:
+- Use the **`Resource`** suffix (e.g., `TransactionResource`, `UserResource`).
+- Include only the fields necessary for the API.
+- Use explicit `json` tags.
+- Use **`binding:"required"`** for all mandatory fields. This is critical because our frontend client generator (`swagger-typescript-api`) will otherwise mark these fields as optional (`field?`) in TypeScript, leading to type safety issues.
+
+### 2. Standardized Response Wrappers
+All API responses must be wrapped using the generic structures in `internal/utils`:
+- **Single Item/Action**: `utils.ResponseData[T]`
+- **Lists/Pagination**: `utils.PaginatedResponse[T]`
+
+### 3. Mapper Functions
+Transformation logic (converting repository or use case structs to Resource structs) must be kept out of the main handler logic. 
+- Create a `utils.go` file inside the `handlers/` directory.
+- Implement functions following the naming convention: `Map<Entity>Resource(data repo.Entity) handlers.EntityResource`.
+
+**Example:**
+```go
+// internal/resources/transactions/handlers/utils.go
+func MapTransactionResource(t repository.Transaction) TransactionResource {
+    return TransactionResource{
+        ID:        t.ID,
+        Name:      t.Name,
+        CreatedAt: t.CreatedAt,
+    }
+}
+```
+
+---
+
 ## Handler Templates
 
 ### Template Parameters
@@ -168,8 +203,12 @@ func (o *<Action>Options) Run() error {
 	//     return err
 	// }
 
-	// Send an HTTP success response
-	// o.Ctx.JSON(http.StatusOK, data)
+	// Send an HTTP success response using the generic wrapper
+	// o.Ctx.JSON(http.StatusOK, utils.ResponseData[<Action>ResponseData]{
+	//     Data: <Action>ResponseData{
+	//         <Entity>: Map<Entity>Resource(data),
+	//     },
+	// })
 	return nil
 }
 
@@ -183,7 +222,7 @@ func (o *<Action>Options) Run() error {
 // @Security BearerAuth
 // @Accept json
 // @Produce json
-// @Success <status> {object} <response> "Success"
+// @Success <status> {object} utils.ResponseData[<Action>ResponseData] "Success"
 // @Failure 401 {object} utils.HTTPError "Unauthorized"
 // @Failure 500 {object} utils.HTTPError "Internal server error"
 // @Router <endpoint> [<method>]

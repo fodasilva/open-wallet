@@ -796,6 +796,63 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/v1/transactions/summary": {
+            "get": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Returns total income, expense and balance for each month in the specified period range.\nNote: Only periods with existing transactions/entries will be returned.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "transactions"
+                ],
+                "summary": "Get financial summary grouped by month",
+                "operationId": "v1GetSummary",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "- Required: 'period gte YYYYMM and period lte YYYYMM'\n- Allowed fields \u0026 ops:\n  - period: eq, in, gte, lte\n  - total_expense: eq, gt, gte, lt, lte\n  - total_income: eq, gt, gte, lt, lte\n  - total_balance: eq, gt, gte, lt, lte\n- Rules: gte \u003c= lte, max 12 months range",
+                        "name": "filter",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "example": "period:desc,total_balance:asc",
+                        "description": "Sort field.\n- Allowed: period, total_expense, total_income, total_balance",
+                        "name": "order_by",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Summary data",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_transactions_handlers_SummaryResponseData"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/transactions/{transaction_id}": {
             "delete": {
                 "security": [
@@ -1040,6 +1097,14 @@ const docTemplate = `{
             "properties": {
                 "data": {
                     "$ref": "#/definitions/internal_resources_transactions_handlers.CreateTransactionResponseData"
+                }
+            }
+        },
+        "github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_transactions_handlers_SummaryResponseData": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/internal_resources_transactions_handlers.SummaryResponseData"
                 }
             }
         },
@@ -1490,6 +1555,43 @@ const docTemplate = `{
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/internal_resources_transactions_handlers.EntryResource"
+                    }
+                }
+            }
+        },
+        "internal_resources_transactions_handlers.MonthlySummaryResource": {
+            "type": "object",
+            "required": [
+                "balance",
+                "expense",
+                "income",
+                "period"
+            ],
+            "properties": {
+                "balance": {
+                    "type": "number"
+                },
+                "expense": {
+                    "type": "number"
+                },
+                "income": {
+                    "type": "number"
+                },
+                "period": {
+                    "type": "string"
+                }
+            }
+        },
+        "internal_resources_transactions_handlers.SummaryResponseData": {
+            "type": "object",
+            "required": [
+                "summary"
+            ],
+            "properties": {
+                "summary": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/internal_resources_transactions_handlers.MonthlySummaryResource"
                     }
                 }
             }
