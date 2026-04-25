@@ -422,7 +422,7 @@ func TestE2eTransactions(t *testing.T) {
 			for _, s := range response.Data.Summary {
 				if s.Period == "202601" {
 					assert.Equal(t, 500.0, s.Income)
-					assert.Equal(t, 100.0, s.Expense)
+					assert.Equal(t, -100.0, s.Expense)
 					assert.Equal(t, 400.0, s.Balance)
 					foundJan = true
 				}
