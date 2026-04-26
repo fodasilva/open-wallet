@@ -20,10 +20,10 @@ db-migrate-install:
 	go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@latest
 
 gen-repos:
-	bash scripts/repository/gen-repos.sh
+	go run scripts/gen-repos/main.go
 
 gen-swagger-filters:
-	go run scripts/gen-swagger-filters.go
+	go run scripts/gen-swagger-filters/main.go
 
 gen-docs: gen-swagger-filters
 	swag init -g cmd/api/main.go --parseDependency --parseInternal
@@ -51,7 +51,7 @@ check-docs:
 	@echo "Documentation is up to date."
 	
 check-repos:
-	@bash scripts/repository/gen-repos.sh
+	@go run scripts/gen-repos/main.go
 	@if [ -n "$$(git status -s internal/resources/)" ]; then \
 		echo "Repositories are out of sync!"; \
 		echo "Please run 'make gen-repos' locally and commit the updated files."; \
@@ -61,7 +61,7 @@ check-repos:
 	@echo "Repositories are up to date."
 	
 check-filters:
-	@go run scripts/gen-swagger-filters.go
+	@go run scripts/gen-swagger-filters/main.go
 	@if [ -n "$$(git status -s internal/resources/)" ]; then \
 		echo "Filters documentation is out of sync!"; \
 		echo "Please run 'make gen-swagger-filters' locally and commit the updated files."; \

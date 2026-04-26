@@ -26,6 +26,7 @@ func (r *TransactionsRepoImpl) Delete(ctx context.Context, db utils.Executer) er
 
 	return err
 }
+
 func (r *EntriesRepoImpl) Delete(ctx context.Context, db utils.Executer) error {
 	filter := querybuilder.FromContext(ctx)
 	query := squirrel.Delete("entries").
