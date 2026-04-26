@@ -164,3 +164,37 @@ func (r *Repo) Select(db utils.Executer, filter *querybuilder.Builder) ([]Item, 
     // ... generated code will use querybuilder.ToSquirrel ...
 }
 ```
+
+---
+
+## Swagger Documentation Automation
+
+To keep API documentation in sync with `ParseConfig`, the project uses an automated generator.
+
+### 1. Usage
+
+Annotate your `ParseConfig` variable with `// @gen_swagger_filter`:
+
+```go
+// @gen_swagger_filter
+var MyFilterConfig = querybuilder.ParseConfig{
+    AllowedFields: map[string]querybuilder.FieldConfig{
+        "amount": {AllowedOperators: []string{"eq", "gt"}},
+    },
+    AllowedSortFields: []string{"created_at"},
+}
+```
+
+### 2. Generating
+
+Run the following command to scan the codebase and update the `@Param filter` and `@Param order_by` annotations in your handlers:
+
+```bash
+make gen-swagger-filters
+```
+
+This command is also automatically executed as part of `make gen-docs`.
+
+### 3. CI Enforcement
+
+The CI pipeline runs `make check-filters` to ensure that the documentation in the code matches the actual configuration. If you update a `ParseConfig` but forget to run the generator, the build will fail.
