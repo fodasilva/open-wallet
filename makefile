@@ -71,4 +71,4 @@ check-filters:
 	@echo "Filters documentation is up to date."
 
 check-swagger-ids:
-	@bash scripts/check_swagger_ids.sh
+	@go run scripts/check-swagger-ids/main.go
