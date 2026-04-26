@@ -45,6 +45,7 @@ func (r *TransactionsRepoImpl) Insert(ctx context.Context, db utils.Executer, da
 
 	return err
 }
+
 func (r *EntriesRepoImpl) Insert(ctx context.Context, db utils.Executer, data CreateEntryDTO) error {
 	query := squirrel.Insert("entries").
 		PlaceholderFormat(squirrel.Dollar)

@@ -49,6 +49,7 @@ func (r *TransactionsRepoImpl) Select(ctx context.Context, db utils.Executer) ([
 
 	return results, nil
 }
+
 func (r *EntriesRepoImpl) Select(ctx context.Context, db utils.Executer) ([]ViewEntry, error) {
 	filter := querybuilder.FromContext(ctx)
 	query := squirrel.Select("id", "transaction_id", "name", "description", "amount", "period", "user_id", "category", "total_amount", "installment", "total_installments", "created_at", "reference_date", "category_id", "category_name", "category_color", "recurrence_id").
@@ -98,6 +99,7 @@ func (r *EntriesRepoImpl) Select(ctx context.Context, db utils.Executer) ([]View
 
 	return results, nil
 }
+
 func (r *SummariesRepoImpl) Select(ctx context.Context, db utils.Executer) ([]ViewSummary, error) {
 	filter := querybuilder.FromContext(ctx)
 	query := squirrel.Select("user_id", "period", "total_expense", "total_income", "total_balance").
