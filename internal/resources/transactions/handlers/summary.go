@@ -113,6 +113,7 @@ func (o *SummaryOptions) Run() error {
 
 // @Summary Get financial summary grouped by month
 // @Description Returns total income, expense and balance for each month in the specified period range.
+// @Description REQUIRED: period gte 'YYYYMM' and period lte 'YYYYMM' (max 12 months range)
 // @Description Note: Only periods with existing transactions/entries will be returned.
 // @ID v1GetSummary
 // @Tags transactions
