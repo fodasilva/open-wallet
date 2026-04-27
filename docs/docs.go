@@ -822,7 +822,7 @@ const docTemplate = `{
                         "BearerAuth": []
                     }
                 ],
-                "description": "Returns total income, expense and balance for each month in the specified period range.\nNote: Only periods with existing transactions/entries will be returned.",
+                "description": "Returns total income, expense and balance for each month in the specified period range.\nREQUIRED: period gte 'YYYYMM' and period lte 'YYYYMM' (max 12 months range)\nNote: Only periods with existing transactions/entries will be returned.",
                 "consumes": [
                     "application/json"
                 ],
