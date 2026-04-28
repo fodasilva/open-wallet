@@ -781,7 +781,7 @@ const docTemplate = `{
                     },
                     {
                         "type": "string",
-                        "description": "Filter expression. \n- Allowed fields \u0026 ops:\n  - amount: eq, gt, gte, lt, lte\n  - category_id: eq, in\n  - created_at: eq, gt, gte, lt, lte\n  - id: eq, in\n  - period: eq, in, gte, lte\n  - reference_date: eq, gt, gte, lt, lte\n  - type: eq, in\n  - user_id: eq, in\n",
+                        "description": "Filter expression. \n- Allowed fields \u0026 ops:\n  - amount: eq, gt, gte, lt, lte\n  - category_id: eq, in\n  - created_at: eq, gt, gte, lt, lte\n  - id: eq, in\n  - period: eq, in, gte, lte\n  - reference_date: eq, gt, gte, lt, lte\n  - transaction_id: eq, in\n  - type: eq, in\n  - user_id: eq, in\n",
                         "name": "filter",
                         "in": "query"
                     },

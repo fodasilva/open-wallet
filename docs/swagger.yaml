@@ -1157,7 +1157,8 @@ paths:
       - description: "Filter expression. \n- Allowed fields & ops:\n  - amount: eq,
           gt, gte, lt, lte\n  - category_id: eq, in\n  - created_at: eq, gt, gte,
           lt, lte\n  - id: eq, in\n  - period: eq, in, gte, lte\n  - reference_date:
-          eq, gt, gte, lt, lte\n  - type: eq, in\n  - user_id: eq, in\n"
+          eq, gt, gte, lt, lte\n  - transaction_id: eq, in\n  - type: eq, in\n  -
+          user_id: eq, in\n"
         in: query
         name: filter
         type: string
