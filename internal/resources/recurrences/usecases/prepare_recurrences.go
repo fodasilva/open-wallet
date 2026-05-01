@@ -8,15 +8,15 @@ import (
 
 	transactionRepo "github.com/felipe1496/open-wallet/internal/resources/transactions/repository"
 	"github.com/felipe1496/open-wallet/internal/resources/transactions/usecases"
-	"github.com/felipe1496/open-wallet/internal/utils"
-	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
+	"github.com/felipe1496/open-wallet/internal/util"
+	"github.com/felipe1496/open-wallet/internal/util/querybuilder"
 )
 
 func (uc *RecurrencesUseCasesImpl) PrepareRecurrences(ctx context.Context, userID string, targetPeriod string) error {
 	filterCtx := querybuilder.WithBuilder(ctx, querybuilder.New().And("user_id", "eq", userID))
 	recurrences, err := uc.repo.Select(filterCtx, uc.db)
 	if err != nil {
-		return utils.NewHTTPError(http.StatusInternalServerError, "failed to fetch recurrences")
+		return util.NewHTTPError(http.StatusInternalServerError, "failed to fetch recurrences")
 	}
 
 	for _, rec := range recurrences {
@@ -32,7 +32,7 @@ func (uc *RecurrencesUseCasesImpl) PrepareRecurrences(ctx context.Context, userI
 			And("recurrence_id", "eq", rec.ID))
 		existingTxs, err := uc.transactionsUseCase.ListEntries(txFilterCtx)
 		if err != nil {
-			return utils.NewHTTPError(http.StatusInternalServerError, "failed to check existing transactions")
+			return util.NewHTTPError(http.StatusInternalServerError, "failed to check existing transactions")
 		}
 
 		var targetTxID string
@@ -47,10 +47,10 @@ func (uc *RecurrencesUseCasesImpl) PrepareRecurrences(ctx context.Context, userI
 			_, err := uc.transactionsUseCase.CreateTransaction(ctx, usecases.CreateTransactionDTO{
 				UserID:       userID,
 				Name:         rec.Name,
-				CategoryID:   utils.OptionalNullable[string]{Set: rec.CategoryID != nil, Value: rec.CategoryID},
-				Note:         utils.OptionalNullable[string]{Set: rec.Note != nil, Value: rec.Note},
+				CategoryID:   util.OptionalNullable[string]{Set: rec.CategoryID != nil, Value: rec.CategoryID},
+				Note:         util.OptionalNullable[string]{Set: rec.Note != nil, Value: rec.Note},
 				Type:         transactionRepo.Recurrence,
-				RecurrenceID: utils.OptionalNullable[string]{Set: true, Value: &rec.ID},
+				RecurrenceID: util.OptionalNullable[string]{Set: true, Value: &rec.ID},
 				Entries: []usecases.CreateEntryDTO{{
 					Amount:        rec.Amount,
 					ReferenceDate: newDate,
@@ -88,7 +88,7 @@ func (uc *RecurrencesUseCasesImpl) PrepareRecurrences(ctx context.Context, userI
 			})
 
 			_, err = uc.transactionsUseCase.UpdateTransaction(ctx, targetTxID, userID, usecases.UpdateTransactionDTO{
-				Entries: utils.OptionalNullable[[]usecases.UpdateEntryDTO]{Set: true, Value: &payloadEntries},
+				Entries: util.OptionalNullable[[]usecases.UpdateEntryDTO]{Set: true, Value: &payloadEntries},
 			})
 
 			if err != nil {

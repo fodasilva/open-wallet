@@ -35,8 +35,8 @@ Copy and paste this into your `repository.go` and adjust as needed:
 package repository
 
 import (
-    "github.com/felipe1496/open-wallet/internal/utils"
-    "github.com/felipe1496/open-wallet/internal/utils/querybuilder"
+    "github.com/felipe1496/open-wallet/internal/util"
+    "github.com/felipe1496/open-wallet/internal/util/querybuilder"
 )
 
 // Repository interface. Make sure to include methods

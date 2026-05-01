@@ -4,8 +4,8 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/felipe1496/open-wallet/internal/utils"
-	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
+	"github.com/felipe1496/open-wallet/internal/util"
+	"github.com/felipe1496/open-wallet/internal/util/querybuilder"
 )
 
 func (uc *TransactionsUseCasesImpl) DeleteTransactionById(ctx context.Context, id string, userID string) error {
@@ -13,17 +13,17 @@ func (uc *TransactionsUseCasesImpl) DeleteTransactionById(ctx context.Context, i
 	transactionExists, err := uc.transactionsRepo.Select(filterCtx, uc.db)
 
 	if err != nil {
-		return utils.NewHTTPError(http.StatusInternalServerError, "an error occurred while fetching transactions")
+		return util.NewHTTPError(http.StatusInternalServerError, "an error occurred while fetching transactions")
 	}
 
 	if len(transactionExists) == 0 {
-		return utils.NewHTTPError(http.StatusNotFound, "transaction not found")
+		return util.NewHTTPError(http.StatusNotFound, "transaction not found")
 	}
 
 	err = uc.transactionsRepo.Delete(filterCtx, uc.db)
 
 	if err != nil {
-		return utils.NewHTTPError(http.StatusInternalServerError, "it was not possible to delete the transaction")
+		return util.NewHTTPError(http.StatusInternalServerError, "it was not possible to delete the transaction")
 	}
 
 	return nil

@@ -7,7 +7,7 @@ import (
 	"github.com/oklog/ulid/v2"
 
 	"github.com/felipe1496/open-wallet/internal/resources/categories/repository"
-	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/util"
 )
 
 func (uc *CategoriesUseCasesImpl) Create(ctx context.Context, payload repository.CreateCategoryDTO) (repository.Category, error) {
@@ -18,7 +18,7 @@ func (uc *CategoriesUseCasesImpl) Create(ctx context.Context, payload repository
 	err := uc.repo.Insert(ctx, uc.db, payload)
 
 	if err != nil {
-		return repository.Category{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to create category")
+		return repository.Category{}, util.NewHTTPError(http.StatusInternalServerError, "failed to create category")
 	}
 
 	return repository.Category{

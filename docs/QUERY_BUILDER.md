@@ -117,7 +117,7 @@ r.GET("/items",
 The middleware injects the `querybuilder.Builder` into the Gin context.
 
 ```go
-func (h *Handler) ListItems(ctx *gin.Context) {
+func (h *Handler) ListItems(w http.ResponseWriter, r *http.Request) {
     builder := ctx.MustGet("query_builder").(*querybuilder.Builder)
     
     // Pass it to the usecase/repository

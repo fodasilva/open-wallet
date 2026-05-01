@@ -8,7 +8,7 @@ import (
 	"github.com/oklog/ulid/v2"
 
 	"github.com/felipe1496/open-wallet/internal/resources/users/repository"
-	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
+	"github.com/felipe1496/open-wallet/internal/util/querybuilder"
 )
 
 func (uc *AuthUseCasesImpl) LoginWithGoogle(ctx context.Context, code string) (repository.User, error) {

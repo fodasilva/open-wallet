@@ -10,7 +10,7 @@ import (
 
 	"github.com/joho/godotenv"
 
-	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/util"
 )
 
 type Config struct {
@@ -99,7 +99,7 @@ func (l *loader) loadOrigins() {
 	if val != "" {
 		parts := strings.Split(val, ",")
 		for _, part := range parts {
-			if !utils.IsValidURL(part) {
+			if !util.IsValidURL(part) {
 				l.errs = append(l.errs, fmt.Sprintf("ORIGINS item %s must be a valid url", part))
 			}
 		}

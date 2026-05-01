@@ -4,17 +4,17 @@ import (
 	"time"
 
 	transactionRepo "github.com/felipe1496/open-wallet/internal/resources/transactions/repository"
-	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/util"
 )
 
 type CreateTransactionDTO struct {
 	UserID       string
 	Name         string
-	CategoryID   utils.OptionalNullable[string]
-	Note         utils.OptionalNullable[string]
+	CategoryID   util.OptionalNullable[string]
+	Note         util.OptionalNullable[string]
 	Type         transactionRepo.TransactionType
 	Entries      []CreateEntryDTO
-	RecurrenceID utils.OptionalNullable[string]
+	RecurrenceID util.OptionalNullable[string]
 }
 
 type CreateEntryDTO struct {
@@ -23,11 +23,11 @@ type CreateEntryDTO struct {
 }
 
 type UpdateTransactionDTO struct {
-	Name         utils.OptionalNullable[string]
-	Note         utils.OptionalNullable[string]
-	CategoryID   utils.OptionalNullable[string]
-	Entries      utils.OptionalNullable[[]UpdateEntryDTO]
-	RecurrenceID utils.OptionalNullable[string]
+	Name         util.OptionalNullable[string]
+	Note         util.OptionalNullable[string]
+	CategoryID   util.OptionalNullable[string]
+	Entries      util.OptionalNullable[[]UpdateEntryDTO]
+	RecurrenceID util.OptionalNullable[string]
 }
 
 type UpdateEntryDTO struct {

@@ -1,35 +1,35 @@
 package middlewares
 
 import (
+	"context"
 	"net/http"
 	"strings"
 
-	"github.com/gin-gonic/gin"
-
 	"github.com/felipe1496/open-wallet/internal/services"
-	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/util"
+	"github.com/felipe1496/open-wallet/internal/util/httputil"
 )
 
-func RequireAuthMiddleware(JWTService services.JWTService) gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		authHeader := ctx.GetHeader("Authorization")
-		if authHeader == "" {
-			apiErr := utils.NewHTTPError(http.StatusUnauthorized, "missing token")
-			ctx.JSON(apiErr.StatusCode, apiErr)
-			ctx.Abort()
-			return
-		}
-		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+func RequireAuthMiddleware(JWTService services.JWTService) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			authHeader := r.Header.Get("Authorization")
+			if authHeader == "" {
+				apiErr := util.NewHTTPError(http.StatusUnauthorized, "Missing Authorization header")
+				httputil.JSON(w, apiErr.StatusCode, apiErr)
+				return
+			}
+			tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 
-		userID, err := JWTService.ValidateToken(tokenString)
-		if err != nil {
-			apiErr := err.(*utils.HTTPError)
-			ctx.JSON(apiErr.StatusCode, apiErr)
-			ctx.Abort()
-			return
-		}
+			userID, err := JWTService.ValidateToken(tokenString)
+			if err != nil {
+				apiErr := err.(*util.HTTPError)
+				httputil.JSON(w, apiErr.StatusCode, apiErr)
+				return
+			}
 
-		ctx.Set("user_id", userID)
-		ctx.Next()
+			ctx := context.WithValue(r.Context(), util.ContextKeyUserID, userID)
+			next.ServeHTTP(w, r.WithContext(ctx))
+		})
 	}
 }
