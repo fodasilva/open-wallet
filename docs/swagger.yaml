@@ -11,117 +11,117 @@ definitions:
     - Income
     - Installment
     - Recurrence
-  github_com_felipe1496_open-wallet_internal_utils.HTTPError:
+  github_com_felipe1496_open-wallet_internal_util.HTTPError:
     properties:
       error:
-        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPErrorData'
+        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPErrorData'
       status:
         type: integer
     type: object
-  github_com_felipe1496_open-wallet_internal_utils.HTTPErrorData:
+  github_com_felipe1496_open-wallet_internal_util.HTTPErrorData:
     properties:
       message:
         type: string
       type:
         type: string
     type: object
-  ? github_com_felipe1496_open-wallet_internal_utils.PaginatedResponse-internal_resources_categories_handlers_ListCategoriesResponseData
+  ? github_com_felipe1496_open-wallet_internal_util.PaginatedResponse-internal_resources_categories_handlers_ListCategoriesResponseData
   : properties:
       data:
         $ref: '#/definitions/internal_resources_categories_handlers.ListCategoriesResponseData'
       query:
-        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils_querybuilder.Metadata'
+        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util_querybuilder.Metadata'
     required:
     - data
     - query
     type: object
-  ? github_com_felipe1496_open-wallet_internal_utils.PaginatedResponse-internal_resources_categories_handlers_ListCategoryAmountPerPeriodResponseData
+  ? github_com_felipe1496_open-wallet_internal_util.PaginatedResponse-internal_resources_categories_handlers_ListCategoryAmountPerPeriodResponseData
   : properties:
       data:
         $ref: '#/definitions/internal_resources_categories_handlers.ListCategoryAmountPerPeriodResponseData'
       query:
-        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils_querybuilder.Metadata'
+        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util_querybuilder.Metadata'
     required:
     - data
     - query
     type: object
-  ? github_com_felipe1496_open-wallet_internal_utils.PaginatedResponse-internal_resources_recurrences_handlers_ListRecurrencesResponseData
+  ? github_com_felipe1496_open-wallet_internal_util.PaginatedResponse-internal_resources_recurrences_handlers_ListRecurrencesResponseData
   : properties:
       data:
         $ref: '#/definitions/internal_resources_recurrences_handlers.ListRecurrencesResponseData'
       query:
-        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils_querybuilder.Metadata'
+        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util_querybuilder.Metadata'
     required:
     - data
     - query
     type: object
-  ? github_com_felipe1496_open-wallet_internal_utils.PaginatedResponse-internal_resources_transactions_handlers_ListEntriesResponseData
+  ? github_com_felipe1496_open-wallet_internal_util.PaginatedResponse-internal_resources_transactions_handlers_ListEntriesResponseData
   : properties:
       data:
         $ref: '#/definitions/internal_resources_transactions_handlers.ListEntriesResponseData'
       query:
-        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils_querybuilder.Metadata'
+        $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util_querybuilder.Metadata'
     required:
     - data
     - query
     type: object
-  github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_auth_handlers_LoginGoogleResponseData:
+  github_com_felipe1496_open-wallet_internal_util.ResponseData-internal_resources_auth_handlers_LoginGoogleResponseData:
     properties:
       data:
         $ref: '#/definitions/internal_resources_auth_handlers.LoginGoogleResponseData'
     required:
     - data
     type: object
-  github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_categories_handlers_CreateCategoryResponseData:
+  github_com_felipe1496_open-wallet_internal_util.ResponseData-internal_resources_categories_handlers_CreateCategoryResponseData:
     properties:
       data:
         $ref: '#/definitions/internal_resources_categories_handlers.CreateCategoryResponseData'
     required:
     - data
     type: object
-  github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_categories_handlers_UpdateCategoryResponseData:
+  github_com_felipe1496_open-wallet_internal_util.ResponseData-internal_resources_categories_handlers_UpdateCategoryResponseData:
     properties:
       data:
         $ref: '#/definitions/internal_resources_categories_handlers.UpdateCategoryResponseData'
     required:
     - data
     type: object
-  ? github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_recurrences_handlers_CreateRecurrenceResponseData
+  ? github_com_felipe1496_open-wallet_internal_util.ResponseData-internal_resources_recurrences_handlers_CreateRecurrenceResponseData
   : properties:
       data:
         $ref: '#/definitions/internal_resources_recurrences_handlers.CreateRecurrenceResponseData'
     required:
     - data
     type: object
-  ? github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_recurrences_handlers_UpdateRecurrenceResponseData
+  ? github_com_felipe1496_open-wallet_internal_util.ResponseData-internal_resources_recurrences_handlers_UpdateRecurrenceResponseData
   : properties:
       data:
         $ref: '#/definitions/internal_resources_recurrences_handlers.UpdateRecurrenceResponseData'
     required:
     - data
     type: object
-  ? github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_transactions_handlers_CreateTransactionResponseData
+  ? github_com_felipe1496_open-wallet_internal_util.ResponseData-internal_resources_transactions_handlers_CreateTransactionResponseData
   : properties:
       data:
         $ref: '#/definitions/internal_resources_transactions_handlers.CreateTransactionResponseData'
     required:
     - data
     type: object
-  github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_transactions_handlers_SummaryResponseData:
+  github_com_felipe1496_open-wallet_internal_util.ResponseData-internal_resources_transactions_handlers_SummaryResponseData:
     properties:
       data:
         $ref: '#/definitions/internal_resources_transactions_handlers.SummaryResponseData'
     required:
     - data
     type: object
-  ? github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_transactions_handlers_UpdateTransactionResponseData
+  ? github_com_felipe1496_open-wallet_internal_util.ResponseData-internal_resources_transactions_handlers_UpdateTransactionResponseData
   : properties:
       data:
         $ref: '#/definitions/internal_resources_transactions_handlers.UpdateTransactionResponseData'
     required:
     - data
     type: object
-  github_com_felipe1496_open-wallet_internal_utils_querybuilder.Metadata:
+  github_com_felipe1496_open-wallet_internal_util_querybuilder.Metadata:
     properties:
       next_page:
         type: boolean
@@ -596,15 +596,15 @@ paths:
         "200":
           description: User logged in
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_auth_handlers_LoginGoogleResponseData'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.ResponseData-internal_resources_auth_handlers_LoginGoogleResponseData'
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
       summary: Login with Google
       tags:
       - auth
@@ -646,15 +646,15 @@ paths:
         "200":
           description: List of categories
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.PaginatedResponse-internal_resources_categories_handlers_ListCategoriesResponseData'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.PaginatedResponse-internal_resources_categories_handlers_ListCategoriesResponseData'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
       security:
       - BearerAuth: []
       summary: List categories
@@ -678,15 +678,15 @@ paths:
         "201":
           description: Category created
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_categories_handlers_CreateCategoryResponseData'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.ResponseData-internal_resources_categories_handlers_CreateCategoryResponseData'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
       security:
       - BearerAuth: []
       summary: Create a category
@@ -712,15 +712,15 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
         "404":
           description: Not found
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
       security:
       - BearerAuth: []
       summary: Delete Category By ID
@@ -749,19 +749,19 @@ paths:
         "200":
           description: Category updated
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_categories_handlers_UpdateCategoryResponseData'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.ResponseData-internal_resources_categories_handlers_UpdateCategoryResponseData'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
         "404":
           description: Not found
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
       security:
       - BearerAuth: []
       summary: Update Category By ID
@@ -806,15 +806,15 @@ paths:
         "200":
           description: List of categories with amount per period
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.PaginatedResponse-internal_resources_categories_handlers_ListCategoryAmountPerPeriodResponseData'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.PaginatedResponse-internal_resources_categories_handlers_ListCategoryAmountPerPeriodResponseData'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
       security:
       - BearerAuth: []
       summary: List categories with amount per period
@@ -854,15 +854,15 @@ paths:
         "200":
           description: List of recurrences
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.PaginatedResponse-internal_resources_recurrences_handlers_ListRecurrencesResponseData'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.PaginatedResponse-internal_resources_recurrences_handlers_ListRecurrencesResponseData'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
       security:
       - BearerAuth: []
       summary: List recurrences
@@ -886,19 +886,19 @@ paths:
         "201":
           description: Recurrence created
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_recurrences_handlers_CreateRecurrenceResponseData'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.ResponseData-internal_resources_recurrences_handlers_CreateRecurrenceResponseData'
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
       security:
       - BearerAuth: []
       summary: Create a recurrence
@@ -934,15 +934,15 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
         "404":
           description: Not found
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
       security:
       - BearerAuth: []
       summary: Delete Recurrence By ID
@@ -971,19 +971,19 @@ paths:
         "200":
           description: Recurrence updated
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_recurrences_handlers_UpdateRecurrenceResponseData'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.ResponseData-internal_resources_recurrences_handlers_UpdateRecurrenceResponseData'
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
       security:
       - BearerAuth: []
       summary: Update a recurrence
@@ -1010,15 +1010,15 @@ paths:
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
       security:
       - BearerAuth: []
       summary: Prepare recurrences for a period
@@ -1043,19 +1043,19 @@ paths:
         "201":
           description: Installment updated
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_transactions_handlers_CreateTransactionResponseData'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.ResponseData-internal_resources_transactions_handlers_CreateTransactionResponseData'
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
       security:
       - BearerAuth: []
       summary: Create a transaction
@@ -1081,15 +1081,15 @@ paths:
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
         "404":
           description: Not found
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
       security:
       - BearerAuth: []
       summary: Delete Transaction By ID
@@ -1118,19 +1118,19 @@ paths:
         "200":
           description: Installment updated
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_transactions_handlers_UpdateTransactionResponseData'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.ResponseData-internal_resources_transactions_handlers_UpdateTransactionResponseData'
         "400":
           description: Bad request
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
       security:
       - BearerAuth: []
       summary: Update a transaction
@@ -1172,15 +1172,15 @@ paths:
         "200":
           description: List of entries
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.PaginatedResponse-internal_resources_transactions_handlers_ListEntriesResponseData'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.PaginatedResponse-internal_resources_transactions_handlers_ListEntriesResponseData'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
       security:
       - BearerAuth: []
       summary: List entries
@@ -1214,15 +1214,15 @@ paths:
         "200":
           description: Summary data
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_transactions_handlers_SummaryResponseData'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.ResponseData-internal_resources_transactions_handlers_SummaryResponseData'
         "401":
           description: Unauthorized
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
         "500":
           description: Internal server error
           schema:
-            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError'
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError'
       security:
       - BearerAuth: []
       summary: Get financial summary grouped by month

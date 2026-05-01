@@ -64,7 +64,7 @@ func (o *CreateLoginWithGoogleOptions) Run() error {
 // @Accept json
 // @Produce json
 // @Param body body LoginGoogleRequest true "Login payload"
-// @Success 200 {object} utils.ResponseData[LoginGoogleResponseData] "User logged in"
+// @Success 200 {object} util.ResponseData[LoginGoogleResponseData] "User logged in"
 // @Failure 400 {object} util.HTTPError "Bad request"
 // @Failure 401 {object} util.HTTPError "Unauthorized"
 // @Router /api/v1/auth/login/google [post]
