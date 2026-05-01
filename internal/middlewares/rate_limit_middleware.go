@@ -1,33 +1,30 @@
 package middlewares
 
 import (
-	"context"
 	"fmt"
+	"log"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/redis/go-redis/v9"
 
+	"github.com/felipe1496/open-wallet/internal/services"
 	"github.com/felipe1496/open-wallet/internal/utils"
 )
 
-func NewRateLimitMiddleware(redisClient *redis.Client, maxRequests int, windowMilliseconds int, prefix string) gin.HandlerFunc {
+func NewRateLimitMiddleware(cache services.CacheService, maxRequests int, windowMilliseconds int, prefix string) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		ip := ctx.ClientIP()
-		key := fmt.Sprintf("rate_limit:%s:%s", prefix, ip)
+		key := fmt.Sprintf("%s:%s", prefix, ip)
 
-		val, err := redisClient.Incr(context.Background(), key).Result()
+		currentCount, err := cache.Incr(ctx.Request.Context(), "rate_limit", key, time.Duration(windowMilliseconds)*time.Millisecond)
 		if err != nil {
+			log.Printf("rate limit error: %v\n", err)
 			ctx.Next()
 			return
 		}
 
-		if val == 1 {
-			redisClient.Expire(context.Background(), key, time.Duration(windowMilliseconds)*time.Millisecond)
-		}
-
-		if val > int64(maxRequests) {
+		if currentCount > maxRequests {
 			apiErr := utils.NewHTTPError(http.StatusTooManyRequests, "You have exceeded the rate limit")
 			ctx.JSON(apiErr.StatusCode, apiErr)
 			ctx.Abort()
