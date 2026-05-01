@@ -256,7 +256,9 @@ func generateFiles(repos []*RepoConfig) {
 		sb.WriteString(fmt.Sprintf("package %s\n\n", repos[0].Package))
 		sb.WriteString("import (\n")
 		sb.WriteString("\t\"context\"\n")
+		sb.WriteString("\n")
 		sb.WriteString("\t\"github.com/Masterminds/squirrel\"\n")
+		sb.WriteString("\n")
 		sb.WriteString("\t\"github.com/felipe1496/open-wallet/internal/util\"\n")
 		if name != "insert" {
 			sb.WriteString("\t\"github.com/felipe1496/open-wallet/internal/util/querybuilder\"\n")
