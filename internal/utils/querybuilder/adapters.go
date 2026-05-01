@@ -26,11 +26,19 @@ func ToSquirrel(query squirrel.SelectBuilder, b *Builder) squirrel.SelectBuilder
 	}
 
 	if b.LimitValue != nil {
-		query = query.Limit(uint64(*b.LimitValue))
+		limit := *b.LimitValue
+		if limit < 0 {
+			limit = 0
+		}
+		query = query.Limit(uint64(limit))
 	}
 
 	if b.OffsetValue != nil {
-		query = query.Offset(uint64(*b.OffsetValue))
+		offset := *b.OffsetValue
+		if offset < 0 {
+			offset = 0
+		}
+		query = query.Offset(uint64(offset))
 	}
 
 	for _, order := range b.Orders {
@@ -62,7 +70,11 @@ func ToDeleteSquirrel(query squirrel.DeleteBuilder, b *Builder) squirrel.DeleteB
 	}
 
 	if b.LimitValue != nil {
-		query = query.Limit(uint64(*b.LimitValue))
+		limit := *b.LimitValue
+		if limit < 0 {
+			limit = 0
+		}
+		query = query.Limit(uint64(limit))
 	}
 
 	for _, order := range b.Orders {
@@ -94,7 +106,11 @@ func ToUpdateSquirrel(query squirrel.UpdateBuilder, b *Builder) squirrel.UpdateB
 	}
 
 	if b.LimitValue != nil {
-		query = query.Limit(uint64(*b.LimitValue))
+		limit := *b.LimitValue
+		if limit < 0 {
+			limit = 0
+		}
+		query = query.Limit(uint64(limit))
 	}
 
 	for _, order := range b.Orders {
