@@ -2,7 +2,6 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/redis/go-redis/v9"
 
 	"github.com/felipe1496/open-wallet/infra"
 	"github.com/felipe1496/open-wallet/internal/factory"
@@ -10,7 +9,7 @@ import (
 	"github.com/felipe1496/open-wallet/internal/resources/recurrences/handlers"
 )
 
-func SetupRecurrencesRoutes(r *gin.Engine, f *factory.Factory, redisClient *redis.Client, cfg *infra.Config) {
+func SetupRecurrencesRoutes(r *gin.Engine, f *factory.Factory, cfg *infra.Config) {
 	jwtService := f.JWTService()
 	recurrencesHandler := handlers.NewHandler(f.RecurrencesUseCases())
 
@@ -27,15 +26,15 @@ func SetupRecurrencesRoutes(r *gin.Engine, f *factory.Factory, redisClient *redi
 			recurrencesHandler.Delete)
 		recurrencesGroup.POST("",
 			middlewares.RequireAuthMiddleware(jwtService),
-			middlewares.NewRateLimitMiddleware(redisClient, recMax, recWin, "recurrences:create"),
+			middlewares.NewRateLimitMiddleware(f.CacheService(), recMax, recWin, "recurrences:create"),
 			recurrencesHandler.Create)
 		recurrencesGroup.PATCH("/:id",
 			middlewares.RequireAuthMiddleware(jwtService),
-			middlewares.NewRateLimitMiddleware(redisClient, recMax, recWin, "recurrences:update"),
+			middlewares.NewRateLimitMiddleware(f.CacheService(), recMax, recWin, "recurrences:update"),
 			recurrencesHandler.Update)
 		recurrencesGroup.POST("/:period",
 			middlewares.RequireAuthMiddleware(jwtService),
-			middlewares.NewRateLimitMiddleware(redisClient, prepMax, prepWin, "recurrences:prepare"),
+			middlewares.NewRateLimitMiddleware(f.CacheService(), prepMax, prepWin, "recurrences:prepare"),
 			recurrencesHandler.Prepare)
 	}
 }

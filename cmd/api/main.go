@@ -7,7 +7,6 @@ import (
 	"log"
 
 	"github.com/gin-gonic/gin"
-	"github.com/redis/go-redis/v9"
 	swaggerfiles "github.com/swaggo/files"
 	ginSwagger "github.com/swaggo/gin-swagger"
 
@@ -37,14 +36,16 @@ func main() {
 		gin.SetMode(gin.ReleaseMode)
 	}
 
-	dbConn, redisClient, cleanupPersistence := setupPersistence(cfg)
+	dbConn, cleanupPersistence := setupPersistence(cfg)
 	defer cleanupPersistence()
+
+	f := factory.NewFactory(dbConn, cfg)
 
 	r := gin.New()
 	r.Use(middlewares.DelayMiddleware(cfg))
 	r.Use(middlewares.CorsMiddleware(cfg))
 	globalMax, globalWin := cfg.RateLimits.MD()
-	r.Use(middlewares.NewRateLimitMiddleware(redisClient, globalMax, globalWin, "global"))
+	r.Use(middlewares.NewRateLimitMiddleware(f.CacheService(), globalMax, globalWin, "global"))
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 
@@ -52,28 +53,21 @@ func main() {
 		r.GET("/api-docs/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	}
 
-	f := factory.NewFactory(dbConn, cfg)
-	routes.SetupRoutes(r, f, redisClient, cfg)
+	routes.SetupRoutes(r, f, cfg)
 
 	if err := r.Run(fmt.Sprintf(":%d", cfg.Port)); err != nil {
 		log.Fatalf("failed to start server: %v", err)
 	}
 }
 
-func setupPersistence(cfg *infra.Config) (*sql.DB, *redis.Client, func()) {
+func setupPersistence(cfg *infra.Config) (*sql.DB, func()) {
 	dbConn, err := infra.DBConn(cfg.DatabaseURL)
 	if err != nil {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
 
-	redisClient, err := infra.RedisConn(cfg.RateLimitDBURL)
-	if err != nil {
-		log.Fatalf("failed to connect to redis: %v", err)
-	}
-
-	return dbConn, redisClient, func() {
+	return dbConn, func() {
 		_ = dbConn.Close()
-		_ = redisClient.Close()
 	}
 }
 

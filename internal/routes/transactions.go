@@ -2,7 +2,6 @@ package routes
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/redis/go-redis/v9"
 
 	"github.com/felipe1496/open-wallet/infra"
 	"github.com/felipe1496/open-wallet/internal/factory"
@@ -10,7 +9,7 @@ import (
 	"github.com/felipe1496/open-wallet/internal/resources/transactions/handlers"
 )
 
-func SetupTransactionsRoutes(r *gin.Engine, f *factory.Factory, redisClient *redis.Client, cfg *infra.Config) {
+func SetupTransactionsRoutes(r *gin.Engine, f *factory.Factory, cfg *infra.Config) {
 	jwtService := f.JWTService()
 	transactionsHandler := handlers.NewHandler(f.TransactionsUseCases())
 	transactionsGroup := r.Group("/api/v1/transactions")
@@ -29,11 +28,11 @@ func SetupTransactionsRoutes(r *gin.Engine, f *factory.Factory, redisClient *red
 			transactionsHandler.DeleteTransaction)
 		transactionsGroup.POST("",
 			middlewares.RequireAuthMiddleware(jwtService),
-			middlewares.NewRateLimitMiddleware(redisClient, txMax, txWin, "transactions:create"),
+			middlewares.NewRateLimitMiddleware(f.CacheService(), txMax, txWin, "transactions:create"),
 			transactionsHandler.CreateTransaction)
 		transactionsGroup.PATCH("/:transaction_id",
 			middlewares.RequireAuthMiddleware(jwtService),
-			middlewares.NewRateLimitMiddleware(redisClient, txMax, txWin, "transactions:update"),
+			middlewares.NewRateLimitMiddleware(f.CacheService(), txMax, txWin, "transactions:update"),
 			transactionsHandler.UpdateTransaction)
 	}
 }
