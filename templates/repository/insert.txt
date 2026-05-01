@@ -1,4 +1,4 @@
-func (r *{{RepoName}}) {{MethodName}}(ctx context.Context, db utils.Executer, data {{PayloadType}}) error {
+func (r *{{RepoName}}) {{MethodName}}(ctx context.Context, db util.Executer, data {{PayloadType}}) error {
 	query := squirrel.Insert("{{TableName}}").
 		PlaceholderFormat(squirrel.Dollar)
 

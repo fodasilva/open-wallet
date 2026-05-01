@@ -1,5 +1,5 @@
-func (r *{{RepoName}}) {{MethodName}}(ctx context.Context, db utils.Executer) ({{ReturnType}}, error) {
-	filter := querybuilder.FromContext(ctx)
+func (r *{{RepoName}}) {{MethodName}}(ctx context.Context, db util.Executer) ({{ReturnType}}, error) {
+	filter := querybuilder.Get(ctx)
 	query := squirrel.Select({{Columns}}).
 		From("{{TableName}}").
 		PlaceholderFormat(squirrel.Dollar)

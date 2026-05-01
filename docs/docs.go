@@ -44,19 +44,19 @@ const docTemplate = `{
                     "200": {
                         "description": "User logged in",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_auth_handlers_LoginGoogleResponseData"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.ResponseData-internal_resources_auth_handlers_LoginGoogleResponseData"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     }
                 }
@@ -120,19 +120,19 @@ const docTemplate = `{
                     "200": {
                         "description": "List of categories",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.PaginatedResponse-internal_resources_categories_handlers_ListCategoriesResponseData"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.PaginatedResponse-internal_resources_categories_handlers_ListCategoriesResponseData"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     }
                 }
@@ -170,19 +170,19 @@ const docTemplate = `{
                     "201": {
                         "description": "Category created",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_categories_handlers_CreateCategoryResponseData"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.ResponseData-internal_resources_categories_handlers_CreateCategoryResponseData"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     }
                 }
@@ -223,19 +223,19 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     },
                     "404": {
                         "description": "Not found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     }
                 }
@@ -280,25 +280,25 @@ const docTemplate = `{
                     "200": {
                         "description": "Category updated",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_categories_handlers_UpdateCategoryResponseData"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.ResponseData-internal_resources_categories_handlers_UpdateCategoryResponseData"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     },
                     "404": {
                         "description": "Not found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     }
                 }
@@ -363,19 +363,19 @@ const docTemplate = `{
                     "200": {
                         "description": "List of categories with amount per period",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.PaginatedResponse-internal_resources_categories_handlers_ListCategoryAmountPerPeriodResponseData"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.PaginatedResponse-internal_resources_categories_handlers_ListCategoryAmountPerPeriodResponseData"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     }
                 }
@@ -433,19 +433,19 @@ const docTemplate = `{
                     "200": {
                         "description": "List of recurrences",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.PaginatedResponse-internal_resources_recurrences_handlers_ListRecurrencesResponseData"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.PaginatedResponse-internal_resources_recurrences_handlers_ListRecurrencesResponseData"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     }
                 }
@@ -483,25 +483,25 @@ const docTemplate = `{
                     "201": {
                         "description": "Recurrence created",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_recurrences_handlers_CreateRecurrenceResponseData"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.ResponseData-internal_resources_recurrences_handlers_CreateRecurrenceResponseData"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     }
                 }
@@ -553,19 +553,19 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     },
                     "404": {
                         "description": "Not found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     }
                 }
@@ -610,25 +610,25 @@ const docTemplate = `{
                     "200": {
                         "description": "Recurrence updated",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_recurrences_handlers_UpdateRecurrenceResponseData"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.ResponseData-internal_resources_recurrences_handlers_UpdateRecurrenceResponseData"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     }
                 }
@@ -669,19 +669,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     }
                 }
@@ -721,25 +721,25 @@ const docTemplate = `{
                     "201": {
                         "description": "Installment updated",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_transactions_handlers_CreateTransactionResponseData"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.ResponseData-internal_resources_transactions_handlers_CreateTransactionResponseData"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     }
                 }
@@ -797,19 +797,19 @@ const docTemplate = `{
                     "200": {
                         "description": "List of entries",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.PaginatedResponse-internal_resources_transactions_handlers_ListEntriesResponseData"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.PaginatedResponse-internal_resources_transactions_handlers_ListEntriesResponseData"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     }
                 }
@@ -853,19 +853,19 @@ const docTemplate = `{
                     "200": {
                         "description": "Summary data",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_transactions_handlers_SummaryResponseData"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.ResponseData-internal_resources_transactions_handlers_SummaryResponseData"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     }
                 }
@@ -906,19 +906,19 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     },
                     "404": {
                         "description": "Not found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     }
                 }
@@ -963,25 +963,25 @@ const docTemplate = `{
                     "200": {
                         "description": "Installment updated",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_transactions_handlers_UpdateTransactionResponseData"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.ResponseData-internal_resources_transactions_handlers_UpdateTransactionResponseData"
                         }
                     },
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
                         }
                     }
                 }
@@ -1004,18 +1004,18 @@ const docTemplate = `{
                 "Recurrence"
             ]
         },
-        "github_com_felipe1496_open-wallet_internal_utils.HTTPError": {
+        "github_com_felipe1496_open-wallet_internal_util.HTTPError": {
             "type": "object",
             "properties": {
                 "error": {
-                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils.HTTPErrorData"
+                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPErrorData"
                 },
                 "status": {
                     "type": "integer"
                 }
             }
         },
-        "github_com_felipe1496_open-wallet_internal_utils.HTTPErrorData": {
+        "github_com_felipe1496_open-wallet_internal_util.HTTPErrorData": {
             "type": "object",
             "properties": {
                 "message": {
@@ -1026,7 +1026,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_felipe1496_open-wallet_internal_utils.PaginatedResponse-internal_resources_categories_handlers_ListCategoriesResponseData": {
+        "github_com_felipe1496_open-wallet_internal_util.PaginatedResponse-internal_resources_categories_handlers_ListCategoriesResponseData": {
             "type": "object",
             "required": [
                 "data",
@@ -1037,11 +1037,11 @@ const docTemplate = `{
                     "$ref": "#/definitions/internal_resources_categories_handlers.ListCategoriesResponseData"
                 },
                 "query": {
-                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils_querybuilder.Metadata"
+                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_querybuilder.Metadata"
                 }
             }
         },
-        "github_com_felipe1496_open-wallet_internal_utils.PaginatedResponse-internal_resources_categories_handlers_ListCategoryAmountPerPeriodResponseData": {
+        "github_com_felipe1496_open-wallet_internal_util.PaginatedResponse-internal_resources_categories_handlers_ListCategoryAmountPerPeriodResponseData": {
             "type": "object",
             "required": [
                 "data",
@@ -1052,11 +1052,11 @@ const docTemplate = `{
                     "$ref": "#/definitions/internal_resources_categories_handlers.ListCategoryAmountPerPeriodResponseData"
                 },
                 "query": {
-                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils_querybuilder.Metadata"
+                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_querybuilder.Metadata"
                 }
             }
         },
-        "github_com_felipe1496_open-wallet_internal_utils.PaginatedResponse-internal_resources_recurrences_handlers_ListRecurrencesResponseData": {
+        "github_com_felipe1496_open-wallet_internal_util.PaginatedResponse-internal_resources_recurrences_handlers_ListRecurrencesResponseData": {
             "type": "object",
             "required": [
                 "data",
@@ -1067,11 +1067,11 @@ const docTemplate = `{
                     "$ref": "#/definitions/internal_resources_recurrences_handlers.ListRecurrencesResponseData"
                 },
                 "query": {
-                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils_querybuilder.Metadata"
+                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_querybuilder.Metadata"
                 }
             }
         },
-        "github_com_felipe1496_open-wallet_internal_utils.PaginatedResponse-internal_resources_transactions_handlers_ListEntriesResponseData": {
+        "github_com_felipe1496_open-wallet_internal_util.PaginatedResponse-internal_resources_transactions_handlers_ListEntriesResponseData": {
             "type": "object",
             "required": [
                 "data",
@@ -1082,11 +1082,11 @@ const docTemplate = `{
                     "$ref": "#/definitions/internal_resources_transactions_handlers.ListEntriesResponseData"
                 },
                 "query": {
-                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_utils_querybuilder.Metadata"
+                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_querybuilder.Metadata"
                 }
             }
         },
-        "github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_auth_handlers_LoginGoogleResponseData": {
+        "github_com_felipe1496_open-wallet_internal_util.ResponseData-internal_resources_auth_handlers_LoginGoogleResponseData": {
             "type": "object",
             "required": [
                 "data"
@@ -1097,7 +1097,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_categories_handlers_CreateCategoryResponseData": {
+        "github_com_felipe1496_open-wallet_internal_util.ResponseData-internal_resources_categories_handlers_CreateCategoryResponseData": {
             "type": "object",
             "required": [
                 "data"
@@ -1108,7 +1108,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_categories_handlers_UpdateCategoryResponseData": {
+        "github_com_felipe1496_open-wallet_internal_util.ResponseData-internal_resources_categories_handlers_UpdateCategoryResponseData": {
             "type": "object",
             "required": [
                 "data"
@@ -1119,7 +1119,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_recurrences_handlers_CreateRecurrenceResponseData": {
+        "github_com_felipe1496_open-wallet_internal_util.ResponseData-internal_resources_recurrences_handlers_CreateRecurrenceResponseData": {
             "type": "object",
             "required": [
                 "data"
@@ -1130,7 +1130,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_recurrences_handlers_UpdateRecurrenceResponseData": {
+        "github_com_felipe1496_open-wallet_internal_util.ResponseData-internal_resources_recurrences_handlers_UpdateRecurrenceResponseData": {
             "type": "object",
             "required": [
                 "data"
@@ -1141,7 +1141,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_transactions_handlers_CreateTransactionResponseData": {
+        "github_com_felipe1496_open-wallet_internal_util.ResponseData-internal_resources_transactions_handlers_CreateTransactionResponseData": {
             "type": "object",
             "required": [
                 "data"
@@ -1152,7 +1152,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_transactions_handlers_SummaryResponseData": {
+        "github_com_felipe1496_open-wallet_internal_util.ResponseData-internal_resources_transactions_handlers_SummaryResponseData": {
             "type": "object",
             "required": [
                 "data"
@@ -1163,7 +1163,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_felipe1496_open-wallet_internal_utils.ResponseData-internal_resources_transactions_handlers_UpdateTransactionResponseData": {
+        "github_com_felipe1496_open-wallet_internal_util.ResponseData-internal_resources_transactions_handlers_UpdateTransactionResponseData": {
             "type": "object",
             "required": [
                 "data"
@@ -1174,7 +1174,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_felipe1496_open-wallet_internal_utils_querybuilder.Metadata": {
+        "github_com_felipe1496_open-wallet_internal_util_querybuilder.Metadata": {
             "type": "object",
             "required": [
                 "next_page",
