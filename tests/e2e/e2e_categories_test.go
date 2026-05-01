@@ -13,7 +13,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/oklog/ulid/v2"
-	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/felipe1496/open-wallet/infra"
@@ -23,14 +22,14 @@ import (
 	"github.com/felipe1496/open-wallet/internal/utils"
 )
 
-func setupCategoryTestServer(pg *sql.DB, redisClient *redis.Client, cfg *infra.Config) (*gin.Engine, *factory.Factory) {
+func setupCategoryTestServer(pg *sql.DB, db *sql.DB, cfg *infra.Config) (*gin.Engine, *factory.Factory) {
 	gin.SetMode(gin.TestMode)
 	router := gin.New()
 
 	f := factory.NewFactory(pg, cfg)
 
 	// Reuse actual routing logic
-	routes.SetupCategoriesRoutes(router, f, redisClient, cfg)
+	routes.SetupCategoriesRoutes(router, f, cfg)
 
 	return router, f
 }
@@ -38,7 +37,6 @@ func setupCategoryTestServer(pg *sql.DB, redisClient *redis.Client, cfg *infra.C
 func TestE2eCategories(t *testing.T) {
 	res := SetupTestResources(t)
 	defer func() { _ = res.PostgresContainer.Terminate(context.Background()) }()
-	defer func() { _ = res.RedisContainer.Terminate(context.Background()) }()
 	defer func() { _ = res.DB.Close() }()
 
 	cfg := &infra.Config{
@@ -51,7 +49,7 @@ func TestE2eCategories(t *testing.T) {
 
 	testUser, token := SetupTestUser(t, res.DB, cfg)
 
-	router, _ := setupCategoryTestServer(res.DB, res.RedisClient, cfg)
+	router, _ := setupCategoryTestServer(res.DB, res.DB, cfg)
 
 	t.Run("Authentication Enforcement", func(t *testing.T) {
 		endpoints := []struct {
