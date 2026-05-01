@@ -1,6 +1,7 @@
 package e2e
 
 import (
+	"database/sql"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -8,11 +9,11 @@ import (
 
 	"github.com/Masterminds/squirrel"
 	"github.com/gin-gonic/gin"
-	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/felipe1496/open-wallet/infra"
+	"github.com/felipe1496/open-wallet/internal/factory"
 	"github.com/felipe1496/open-wallet/internal/middlewares"
 	"github.com/felipe1496/open-wallet/internal/utils"
 	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
@@ -26,13 +27,13 @@ type QueryBuilderTestData struct {
 }
 
 // SetupTestEngine replicates the real application's middleware stack from cmd/api/main.go
-func SetupTestEngine(cfg *infra.Config, redisClient *redis.Client) *gin.Engine {
+func SetupTestEngine(cfg *infra.Config, db *sql.DB, f *factory.Factory) *gin.Engine {
 	gin.SetMode(gin.TestMode)
 	r := gin.New()
 	r.Use(middlewares.DelayMiddleware(cfg))
 	r.Use(middlewares.CorsMiddleware(cfg))
 	max, win := cfg.RateLimits.MD()
-	r.Use(middlewares.NewRateLimitMiddleware(redisClient, max, win, "global"))
+	r.Use(middlewares.NewRateLimitMiddleware(f.CacheService(), max, win, "global"))
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
 	return r
@@ -143,10 +144,9 @@ func TestQueryBuilderE2E(t *testing.T) {
 	}
 
 	cfg := &infra.Config{
-		Environment:    "test",
-		Delay:          0,
-		Origins:        []string{"http://localhost:3000"},
-		RateLimitDBURL: resources.RedisConnStr,
+		Environment: "test",
+		Delay:       0,
+		Origins:     []string{"http://localhost:3000"},
 		RateLimits: infra.RateLimits{
 			MD: func() (int, int) { return 1000, 60000 },
 			XS: func() (int, int) { return 10, 60000 },
@@ -156,7 +156,7 @@ func TestQueryBuilderE2E(t *testing.T) {
 		},
 	}
 
-	r := SetupTestEngine(cfg, resources.RedisClient)
+	r := SetupTestEngine(cfg, resources.DB, factory.NewFactory(resources.DB, cfg))
 	RegisterQueryBuilderTestRoutes(r, resources)
 
 	tests := []struct {

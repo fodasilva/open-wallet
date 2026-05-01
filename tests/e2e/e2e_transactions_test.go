@@ -13,7 +13,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/oklog/ulid/v2"
-	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/felipe1496/open-wallet/infra"
@@ -23,13 +22,13 @@ import (
 	"github.com/felipe1496/open-wallet/internal/utils"
 )
 
-func setupTransactionTestServer(pg *sql.DB, redisClient *redis.Client, cfg *infra.Config) (*gin.Engine, *factory.Factory) {
+func setupTransactionTestServer(pg *sql.DB, db *sql.DB, cfg *infra.Config) (*gin.Engine, *factory.Factory) {
 	gin.SetMode(gin.TestMode)
 	router := gin.New()
 
 	f := factory.NewFactory(pg, cfg)
 
-	routes.SetupTransactionsRoutes(router, f, redisClient, cfg)
+	routes.SetupTransactionsRoutes(router, f, cfg)
 
 	return router, f
 }
@@ -37,7 +36,6 @@ func setupTransactionTestServer(pg *sql.DB, redisClient *redis.Client, cfg *infr
 func TestE2eTransactions(t *testing.T) {
 	res := SetupTestResources(t)
 	defer func() { _ = res.PostgresContainer.Terminate(context.Background()) }()
-	defer func() { _ = res.RedisContainer.Terminate(context.Background()) }()
 	defer func() { _ = res.DB.Close() }()
 
 	cfg := &infra.Config{
@@ -50,7 +48,7 @@ func TestE2eTransactions(t *testing.T) {
 	AssertTableIsEmpty(t, res.DB, "entries")
 
 	testUser, token := SetupTestUser(t, res.DB, cfg)
-	router, _ := setupTransactionTestServer(res.DB, res.RedisClient, cfg)
+	router, _ := setupTransactionTestServer(res.DB, res.DB, cfg)
 
 	t.Run("Authentication Enforcement", func(t *testing.T) {
 		endpoints := []struct {

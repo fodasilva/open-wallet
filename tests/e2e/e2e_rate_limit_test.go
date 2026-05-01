@@ -14,12 +14,12 @@ import (
 
 	"github.com/felipe1496/open-wallet/infra"
 	"github.com/felipe1496/open-wallet/internal/middlewares"
+	"github.com/felipe1496/open-wallet/internal/services"
 )
 
 func TestRateLimitE2E(t *testing.T) {
 	res := SetupTestResources(t)
 	defer func() { _ = res.PostgresContainer.Terminate(context.Background()) }()
-	defer func() { _ = res.RedisContainer.Terminate(context.Background()) }()
 	defer func() { _ = res.DB.Close() }()
 
 	gin.SetMode(gin.TestMode)
@@ -61,7 +61,7 @@ func TestRateLimitE2E(t *testing.T) {
 			prefix := fmt.Sprintf("test_limit_%d", i)
 
 			r := gin.New()
-			r.GET(path, middlewares.NewRateLimitMiddleware(res.RedisClient, tt.maxRequests, tt.windowMs, prefix), func(c *gin.Context) {
+			r.GET(path, middlewares.NewRateLimitMiddleware(services.NewCacheService(res.DB), tt.maxRequests, tt.windowMs, prefix), func(c *gin.Context) {
 				c.Status(http.StatusOK)
 			})
 
@@ -87,7 +87,6 @@ func TestRateLimitE2E(t *testing.T) {
 func TestRateLimitTShirtSizeIntegration(t *testing.T) {
 	res := SetupTestResources(t)
 	defer func() { _ = res.PostgresContainer.Terminate(context.Background()) }()
-	defer func() { _ = res.RedisContainer.Terminate(context.Background()) }()
 
 	cfg := &infra.Config{}
 	cfg.RateLimits.XS = func() (int, int) { return 1, 3600000 }
@@ -96,7 +95,7 @@ func TestRateLimitTShirtSizeIntegration(t *testing.T) {
 
 	gin.SetMode(gin.TestMode)
 	r := gin.New()
-	r.GET("/xs", middlewares.NewRateLimitMiddleware(res.RedisClient, max, win, "xs"), func(c *gin.Context) {
+	r.GET("/xs", middlewares.NewRateLimitMiddleware(services.NewCacheService(res.DB), max, win, "xs"), func(c *gin.Context) {
 		c.Status(http.StatusOK)
 	})
 

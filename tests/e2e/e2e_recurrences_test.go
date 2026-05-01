@@ -13,7 +13,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/oklog/ulid/v2"
-	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/felipe1496/open-wallet/infra"
@@ -23,13 +22,13 @@ import (
 	"github.com/felipe1496/open-wallet/internal/utils"
 )
 
-func setupRecurrenceTestServer(pg *sql.DB, redisClient *redis.Client, cfg *infra.Config) (*gin.Engine, *factory.Factory) {
+func setupRecurrenceTestServer(pg *sql.DB, db *sql.DB, cfg *infra.Config) (*gin.Engine, *factory.Factory) {
 	gin.SetMode(gin.TestMode)
 	router := gin.New()
 
 	f := factory.NewFactory(pg, cfg)
 
-	routes.SetupRecurrencesRoutes(router, f, redisClient, cfg)
+	routes.SetupRecurrencesRoutes(router, f, cfg)
 
 	return router, f
 }
@@ -37,7 +36,6 @@ func setupRecurrenceTestServer(pg *sql.DB, redisClient *redis.Client, cfg *infra
 func TestE2eRecurrences(t *testing.T) {
 	res := SetupTestResources(t)
 	defer func() { _ = res.PostgresContainer.Terminate(context.Background()) }()
-	defer func() { _ = res.RedisContainer.Terminate(context.Background()) }()
 	defer func() { _ = res.DB.Close() }()
 
 	cfg := &infra.Config{
@@ -51,7 +49,7 @@ func TestE2eRecurrences(t *testing.T) {
 	AssertTableIsEmpty(t, res.DB, "recurrences")
 
 	testUser, token := SetupTestUser(t, res.DB, cfg)
-	router, _ := setupRecurrenceTestServer(res.DB, res.RedisClient, cfg)
+	router, _ := setupRecurrenceTestServer(res.DB, res.DB, cfg)
 
 	t.Run("Authentication Enforcement", func(t *testing.T) {
 		endpoints := []struct {
@@ -228,8 +226,8 @@ func TestE2eRecurrences(t *testing.T) {
 		_, _ = res.DB.Exec("INSERT INTO recurrences (id, user_id, name, amount, day_of_month, start_period, end_period, category_id) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
 			recWithEnd, testUser.ID, "With End Rec", -100.0, 15, "202604", "202606", categoryID)
 
-		tr, f := setupRecurrenceTestServer(res.DB, res.RedisClient, cfg)
-		routes.SetupTransactionsRoutes(tr, f, res.RedisClient, cfg)
+		tr, f := setupRecurrenceTestServer(res.DB, res.DB, cfg)
+		routes.SetupTransactionsRoutes(tr, f, cfg)
 
 		// Helper to query transaction count for a recurrence in a period
 		getTxCount := func(recID, period string) int {

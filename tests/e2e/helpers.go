@@ -17,7 +17,6 @@ import (
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/oklog/ulid/v2"
-	"github.com/redis/go-redis/v9"
 	"github.com/stretchr/testify/assert"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
@@ -28,11 +27,8 @@ import (
 
 type TestResources struct {
 	PostgresContainer testcontainers.Container
-	RedisContainer    testcontainers.Container
 	DB                *sql.DB
-	RedisClient       *redis.Client
 	PostgresConnStr   string
-	RedisConnStr      string
 }
 
 func SetupTestResources(t *testing.T) *TestResources {
@@ -73,37 +69,10 @@ func SetupTestResources(t *testing.T) *TestResources {
 		t.Fatalf("failed to run migrations: %v", err)
 	}
 
-	// 2. Setup Redis
-	redisReq := testcontainers.ContainerRequest{
-		Image:        "redis:7-alpine",
-		ExposedPorts: []string{"6379/tcp"},
-		WaitingFor:   wait.ForListeningPort("6379/tcp"),
-	}
-	redisContainer, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
-		ContainerRequest: redisReq,
-		Started:          true,
-	})
-
-	if err != nil {
-		t.Fatalf("failed to start redis container: %v", err)
-	}
-
-	redisHost, _ := redisContainer.Host(ctx)
-	redisPort, _ := redisContainer.MappedPort(ctx, nat.Port("6379/tcp"))
-	redisConnStr := fmt.Sprintf("redis://%s:%s", redisHost, redisPort.Port())
-
-	redisClient, err := infra.RedisConn(redisConnStr)
-	if err != nil {
-		t.Fatalf("failed to init Redis using infra.RedisConn: %v", err)
-	}
-
 	return &TestResources{
 		PostgresContainer: pgContainer,
-		RedisContainer:    redisContainer,
 		DB:                dbConn,
-		RedisClient:       redisClient,
 		PostgresConnStr:   pgConnStr,
-		RedisConnStr:      redisConnStr,
 	}
 }
 
@@ -200,6 +169,7 @@ func SetupTestUser(t *testing.T, db *sql.DB, cfg *infra.Config) (TestUser, strin
 // AssertTableIsEmpty verifies that a given table is empty.
 func AssertTableIsEmpty(t *testing.T, db *sql.DB, tableName string) {
 	var count int
+	// #nosec G201 -- this is a test helper where tableName is controlled
 	query := fmt.Sprintf("SELECT COUNT(*) FROM %s", tableName)
 	err := db.QueryRow(query).Scan(&count)
 	assert.NoError(t, err)

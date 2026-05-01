@@ -1,4 +1,5 @@
 //go:build migrations
+
 package e2e
 
 import (
