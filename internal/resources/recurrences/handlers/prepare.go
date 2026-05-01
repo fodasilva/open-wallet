@@ -8,6 +8,7 @@ import (
 
 	"github.com/felipe1496/open-wallet/internal/resources/recurrences/usecases"
 	"github.com/felipe1496/open-wallet/internal/util"
+	"github.com/felipe1496/open-wallet/internal/util/httputil"
 )
 
 type PrepareOptions struct {
@@ -30,7 +31,7 @@ func (o *PrepareOptions) Complete(w http.ResponseWriter, r *http.Request) error 
 
 func (o *PrepareOptions) Validate() error {
 	if len(o.Period) != 6 {
-		return util.NewHTTPError(http.StatusBadRequest, "invalid period format. Expected YYYYMM.")
+		return httputil.NewHTTPError(http.StatusBadRequest, "invalid period format. Expected YYYYMM.")
 	}
 	return nil
 }
@@ -61,9 +62,9 @@ func (o *PrepareOptions) Run() error {
 // @Produce json
 // @Param period path string true "Period in YYYYMM format (e.g. 202603)"
 // @Success 204 "Recurrences prepared"
-// @Failure 400 {object} util.HTTPError "Bad request"
-// @Failure 401 {object} util.HTTPError "Unauthorized"
-// @Failure 500 {object} util.HTTPError "Internal server error"
+// @Failure 400 {object} httputil.HTTPError "Bad request"
+// @Failure 401 {object} httputil.HTTPError "Unauthorized"
+// @Failure 500 {object} httputil.HTTPError "Internal server error"
 // @Router /api/v1/recurrences/{period} [post]
 func (api *API) Prepare(w http.ResponseWriter, r *http.Request) {
 	cmd := &PrepareOptions{

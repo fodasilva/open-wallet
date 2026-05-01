@@ -1,4 +1,18 @@
-package util
+package httputil
+
+import (
+	"errors"
+	"net/http"
+)
+
+var StatusMessages = map[int]string{
+	400: "bad request",
+	401: "unauthorized",
+	403: "forbidden",
+	404: "not found",
+	429: "too many requests",
+	500: "internal server error",
+}
 
 type HTTPErrorData struct {
 	Type    string `json:"type"`
@@ -21,5 +35,15 @@ func NewHTTPError(statusCode int, message string) *HTTPError {
 			Type:    StatusMessages[statusCode],
 			Message: message,
 		},
+	}
+}
+
+func GetApiErr(err error) *HTTPError {
+	var apiErr *HTTPError
+
+	if errors.As(err, &apiErr) {
+		return apiErr
+	} else {
+		return NewHTTPError(http.StatusInternalServerError, "an unexpected error occurred")
 	}
 }

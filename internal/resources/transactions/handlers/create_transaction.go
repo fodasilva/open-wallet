@@ -24,7 +24,7 @@ func (o *CreateTransactionOptions) Complete(w http.ResponseWriter, r *http.Reque
 	o.UserID = util.GetString(r.Context(), util.ContextKeyUserID)
 
 	if err := httputil.BindJSON(r, &o.Body); err != nil {
-		return util.NewHTTPError(http.StatusBadRequest, err.Error())
+		return httputil.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	return nil
@@ -32,17 +32,17 @@ func (o *CreateTransactionOptions) Complete(w http.ResponseWriter, r *http.Reque
 
 func (o *CreateTransactionOptions) Validate() error {
 	if len(o.Body.Name) == 0 {
-		return util.NewHTTPError(http.StatusBadRequest, "name is required")
+		return httputil.NewHTTPError(http.StatusBadRequest, "name is required")
 	}
 	if string(o.Body.Type) == "" {
-		return util.NewHTTPError(http.StatusBadRequest, "type is required")
+		return httputil.NewHTTPError(http.StatusBadRequest, "type is required")
 	}
 	if len(o.Body.Entries) == 0 {
-		return util.NewHTTPError(http.StatusBadRequest, "entries are required")
+		return httputil.NewHTTPError(http.StatusBadRequest, "entries are required")
 	}
 	for _, e := range o.Body.Entries {
 		if e.ReferenceDate == "" {
-			return util.NewHTTPError(http.StatusBadRequest, "reference_date is required for all entries")
+			return httputil.NewHTTPError(http.StatusBadRequest, "reference_date is required for all entries")
 		}
 	}
 	return nil
@@ -92,9 +92,9 @@ func (o *CreateTransactionOptions) Run() error {
 // @Produce json
 // @Param body body CreateTransactionRequest true "Transaction payload"
 // @Success 201 {object} util.ResponseData[CreateTransactionResponseData] "Installment updated"
-// @Failure 400 {object} util.HTTPError "Bad request"
-// @Failure 401 {object} util.HTTPError "Unauthorized"
-// @Failure 500 {object} util.HTTPError "Internal server error"
+// @Failure 400 {object} httputil.HTTPError "Bad request"
+// @Failure 401 {object} httputil.HTTPError "Unauthorized"
+// @Failure 500 {object} httputil.HTTPError "Internal server error"
 // @Router /api/v1/transactions [post]
 func (api *API) CreateTransaction(w http.ResponseWriter, r *http.Request) {
 	cmd := &CreateTransactionOptions{

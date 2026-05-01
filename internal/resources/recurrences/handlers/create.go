@@ -25,14 +25,14 @@ func (o *CreateOptions) Complete(w http.ResponseWriter, r *http.Request) error {
 	o.R = r
 	o.UserID = util.GetString(r.Context(), util.ContextKeyUserID)
 
-	keys, err := util.GetJSONKeys(r)
+	keys, err := httputil.GetJSONKeys(r)
 	if err != nil {
-		return util.NewHTTPError(http.StatusBadRequest, err.Error())
+		return httputil.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	o.PassedKeys = keys
 
 	if err := httputil.BindJSON(r, &o.Body); err != nil {
-		return util.NewHTTPError(http.StatusBadRequest, err.Error())
+		return httputil.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	return nil
@@ -40,10 +40,10 @@ func (o *CreateOptions) Complete(w http.ResponseWriter, r *http.Request) error {
 
 func (o *CreateOptions) Validate() error {
 	if len(o.Body.Name) == 0 {
-		return util.NewHTTPError(http.StatusBadRequest, "name is required")
+		return httputil.NewHTTPError(http.StatusBadRequest, "name is required")
 	}
 	if o.Body.Amount == 0 {
-		return util.NewHTTPError(http.StatusBadRequest, "amount is required")
+		return httputil.NewHTTPError(http.StatusBadRequest, "amount is required")
 	}
 	return nil
 }
@@ -83,9 +83,9 @@ func (o *CreateOptions) Run() error {
 // @Produce json
 // @Param body body CreateRecurrenceRequest true "Recurrence payload"
 // @Success 201 {object} util.ResponseData[CreateRecurrenceResponseData] "Recurrence created"
-// @Failure 400 {object} util.HTTPError "Bad request"
-// @Failure 401 {object} util.HTTPError "Unauthorized"
-// @Failure 500 {object} util.HTTPError "Internal server error"
+// @Failure 400 {object} httputil.HTTPError "Bad request"
+// @Failure 401 {object} httputil.HTTPError "Unauthorized"
+// @Failure 500 {object} httputil.HTTPError "Internal server error"
 // @Router /api/v1/recurrences [post]
 func (api *API) Create(w http.ResponseWriter, r *http.Request) {
 	cmd := &CreateOptions{

@@ -15,7 +15,7 @@ func RequireAuthMiddleware(JWTService services.JWTService) func(http.Handler) ht
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			authHeader := r.Header.Get("Authorization")
 			if authHeader == "" {
-				apiErr := util.NewHTTPError(http.StatusUnauthorized, "Missing Authorization header")
+				apiErr := httputil.NewHTTPError(http.StatusUnauthorized, "Missing Authorization header")
 				httputil.JSON(w, apiErr.StatusCode, apiErr)
 				return
 			}
@@ -23,7 +23,7 @@ func RequireAuthMiddleware(JWTService services.JWTService) func(http.Handler) ht
 
 			userID, err := JWTService.ValidateToken(tokenString)
 			if err != nil {
-				apiErr := err.(*util.HTTPError)
+				apiErr := err.(*httputil.HTTPError)
 				httputil.JSON(w, apiErr.StatusCode, apiErr)
 				return
 			}

@@ -90,8 +90,8 @@ func (o *ListAmountPerPeriodOptions) Run() error {
 // @Param filter query string false "Filter expression. \n- Allowed fields & ops:\n  - color: eq, in\n  - id: eq, in\n  - name: eq, like, in\n  - period: eq, in\n  - total_amount: eq, gt, gte, lt, lte\n  - user_id: eq, in\n"
 // @Param order_by query string false "Sort field. \n- Allowed: name, total_amount, period, id" example(name:asc)
 // @Success 200 {object} util.PaginatedResponse[ListCategoryAmountPerPeriodResponseData] "List of categories with amount per period"
-// @Failure 401 {object} util.HTTPError "Unauthorized"
-// @Failure 500 {object} util.HTTPError "Internal server error"
+// @Failure 401 {object} httputil.HTTPError "Unauthorized"
+// @Failure 500 {object} httputil.HTTPError "Internal server error"
 // @Router /api/v1/categories/{period} [get]
 func (api *API) ListCategoryAmountPerPeriod(w http.ResponseWriter, r *http.Request) {
 	cmd := &ListAmountPerPeriodOptions{

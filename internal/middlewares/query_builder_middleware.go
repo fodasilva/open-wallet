@@ -20,7 +20,7 @@ func QueryBuilderMiddleware(config querybuilder.ParseConfig) func(http.Handler) 
 				config,
 			)
 			if err != nil {
-				apiErr := util.NewHTTPError(http.StatusBadRequest, err.Error())
+				apiErr := httputil.NewHTTPError(http.StatusBadRequest, err.Error())
 				httputil.JSON(w, apiErr.StatusCode, apiErr)
 				return
 			}

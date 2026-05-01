@@ -7,7 +7,7 @@ import (
 	"go.opentelemetry.io/otel"
 
 	transactionRepo "github.com/felipe1496/open-wallet/internal/resources/transactions/repository"
-	"github.com/felipe1496/open-wallet/internal/util"
+	"github.com/felipe1496/open-wallet/internal/util/httputil"
 )
 
 func (uc *TransactionsUseCasesImpl) ListEntries(ctx context.Context) ([]transactionRepo.ViewEntry, error) {
@@ -19,7 +19,7 @@ func (uc *TransactionsUseCasesImpl) ListEntries(ctx context.Context) ([]transact
 
 	if err != nil {
 		span.RecordError(err)
-		return []transactionRepo.ViewEntry{}, util.NewHTTPError(http.StatusInternalServerError, "failed to fetch entries")
+		return []transactionRepo.ViewEntry{}, httputil.NewHTTPError(http.StatusInternalServerError, "failed to fetch entries")
 	}
 
 	return entries, nil

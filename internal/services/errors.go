@@ -3,9 +3,9 @@ package services
 import (
 	"net/http"
 
-	"github.com/felipe1496/open-wallet/internal/util"
+	"github.com/felipe1496/open-wallet/internal/util/httputil"
 )
 
 var (
-	FailedGoogleAuthenticationErr = util.NewHTTPError(http.StatusUnauthorized, "google authentication failed")
+	FailedGoogleAuthenticationErr = httputil.NewHTTPError(http.StatusUnauthorized, "google authentication failed")
 )

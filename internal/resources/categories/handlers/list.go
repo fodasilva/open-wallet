@@ -93,8 +93,8 @@ func (o *ListOptions) Run() error {
 // @Param filter query string false "Filter expression. \n- Allowed fields & ops:\n  - color: eq, in\n  - created_at: eq, gt, gte, lt, lte\n  - id: eq, in\n  - name: eq, like, in\n  - user_id: eq, in\n"
 // @Param name query string false "A category name to filter by"
 // @Success 200 {object} util.PaginatedResponse[ListCategoriesResponseData] "List of categories"
-// @Failure 401 {object} util.HTTPError "Unauthorized"
-// @Failure 500 {object} util.HTTPError "Internal server error"
+// @Failure 401 {object} httputil.HTTPError "Unauthorized"
+// @Failure 500 {object} httputil.HTTPError "Internal server error"
 // @Router /api/v1/categories [get]
 func (api *API) List(w http.ResponseWriter, r *http.Request) {
 	cmd := &ListOptions{

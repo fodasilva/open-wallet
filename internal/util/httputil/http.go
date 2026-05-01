@@ -1,7 +1,9 @@
 package httputil
 
 import (
+	"bytes"
 	"encoding/json"
+	"io"
 	"net/http"
 )
 
@@ -23,4 +25,25 @@ func Chain(handler http.HandlerFunc, middlewares ...func(http.Handler) http.Hand
 		h = middlewares[i](h)
 	}
 	return h
+}
+
+func GetJSONKeys(r *http.Request) ([]string, error) {
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	r.Body = io.NopCloser(bytes.NewBuffer(body))
+
+	var jsonData map[string]interface{}
+	if err := json.Unmarshal(body, &jsonData); err != nil {
+		return nil, err
+	}
+
+	keys := make([]string, 0, len(jsonData))
+	for key := range jsonData {
+		keys = append(keys, key)
+	}
+
+	return keys, nil
 }

@@ -23,7 +23,7 @@ func (o *CreateLoginWithGoogleOptions) Complete(w http.ResponseWriter, r *http.R
 	o.R = r
 
 	if err := httputil.BindJSON(r, &o.Body); err != nil {
-		return util.NewHTTPError(http.StatusBadRequest, "it was not possible to process the request body")
+		return httputil.NewHTTPError(http.StatusBadRequest, "it was not possible to process the request body")
 	}
 
 	return nil
@@ -31,7 +31,7 @@ func (o *CreateLoginWithGoogleOptions) Complete(w http.ResponseWriter, r *http.R
 
 func (o *CreateLoginWithGoogleOptions) Validate() error {
 	if len(o.Body.Code) == 0 {
-		return util.NewHTTPError(http.StatusBadRequest, "code is required")
+		return httputil.NewHTTPError(http.StatusBadRequest, "code is required")
 	}
 	return nil
 }
@@ -65,8 +65,8 @@ func (o *CreateLoginWithGoogleOptions) Run() error {
 // @Produce json
 // @Param body body LoginGoogleRequest true "Login payload"
 // @Success 200 {object} util.ResponseData[LoginGoogleResponseData] "User logged in"
-// @Failure 400 {object} util.HTTPError "Bad request"
-// @Failure 401 {object} util.HTTPError "Unauthorized"
+// @Failure 400 {object} httputil.HTTPError "Bad request"
+// @Failure 401 {object} httputil.HTTPError "Unauthorized"
 // @Router /api/v1/auth/login/google [post]
 func (api *API) CreateLoginWithGoogle(w http.ResponseWriter, r *http.Request) {
 	cmd := &CreateLoginWithGoogleOptions{
