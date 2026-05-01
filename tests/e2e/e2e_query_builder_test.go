@@ -8,15 +8,15 @@ import (
 	"testing"
 
 	"github.com/Masterminds/squirrel"
-	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/felipe1496/open-wallet/infra"
 	"github.com/felipe1496/open-wallet/internal/factory"
 	"github.com/felipe1496/open-wallet/internal/middlewares"
-	"github.com/felipe1496/open-wallet/internal/utils"
-	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
+	"github.com/felipe1496/open-wallet/internal/util"
+	"github.com/felipe1496/open-wallet/internal/util/httputil"
+	"github.com/felipe1496/open-wallet/internal/util/querybuilder"
 )
 
 type QueryBuilderTestData struct {
@@ -27,19 +27,12 @@ type QueryBuilderTestData struct {
 }
 
 // SetupTestEngine replicates the real application's middleware stack from cmd/api/main.go
-func SetupTestEngine(cfg *infra.Config, db *sql.DB, f *factory.Factory) *gin.Engine {
-	gin.SetMode(gin.TestMode)
-	r := gin.New()
-	r.Use(middlewares.DelayMiddleware(cfg))
-	r.Use(middlewares.CorsMiddleware(cfg))
-	max, win := cfg.RateLimits.MD()
-	r.Use(middlewares.NewRateLimitMiddleware(f.CacheService(), max, win, "global"))
-	r.Use(gin.Logger())
-	r.Use(gin.Recovery())
+func SetupTestEngine(cfg *infra.Config, db *sql.DB, f *factory.Factory) *http.ServeMux {
+	r := http.NewServeMux()
 	return r
 }
 
-func RegisterQueryBuilderTestRoutes(r *gin.Engine, resources *TestResources) {
+func RegisterQueryBuilderTestRoutes(r *http.ServeMux, resources *TestResources, cfg *infra.Config, f *factory.Factory) {
 	config := querybuilder.ParseConfig{
 		AllowedFields: map[string]querybuilder.FieldConfig{
 			"name":      {AllowedOperators: []string{"eq", "ne", "like", "in"}},
@@ -50,61 +43,74 @@ func RegisterQueryBuilderTestRoutes(r *gin.Engine, resources *TestResources) {
 		AllowedSortFields: []string{"name", "age", "id"},
 	}
 
-	r.GET("/test-query-builder", middlewares.QueryBuilderMiddleware(config), func(c *gin.Context) {
-		builder := c.MustGet("query_builder").(*querybuilder.Builder)
+	max, win := cfg.RateLimits.MD()
 
-		// 1. Data Query
-		query := squirrel.Select("*").From("query_builder_tests").PlaceholderFormat(squirrel.Dollar)
-		query = querybuilder.ToSquirrel(query, builder)
+	handler := httputil.Chain(
+		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			builder := querybuilder.Get(r.Context())
 
-		sqlStr, args, err := query.ToSql()
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
+			// 1. Data Query
+			query := squirrel.Select("*").From("query_builder_tests").PlaceholderFormat(squirrel.Dollar)
+			query = querybuilder.ToSquirrel(query, builder)
 
-		rows, err := resources.DB.QueryContext(c.Request.Context(), sqlStr, args...)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-		defer func() { _ = rows.Close() }()
-
-		var results []QueryBuilderTestData
-		for rows.Next() {
-			var d QueryBuilderTestData
-			err := rows.Scan(&d.ID, &d.Name, &d.Age, &d.IsActive)
+			sqlStr, args, err := query.ToSql()
 			if err != nil {
-				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+				httputil.JSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
 				return
 			}
-			results = append(results, d)
-		}
 
-		// 2. Count Query (respecting filters)
-		countBuilder := querybuilder.ForCount(builder)
-		countQuery := squirrel.Select("COUNT(*)").From("query_builder_tests").PlaceholderFormat(squirrel.Dollar)
-		countQuery = querybuilder.ToSquirrel(countQuery, countBuilder)
+			rows, err := resources.DB.QueryContext(r.Context(), sqlStr, args...)
+			if err != nil {
+				httputil.JSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+				return
+			}
+			defer func() { _ = rows.Close() }()
 
-		countSql, countArgs, err := countQuery.ToSql()
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
+			var results []QueryBuilderTestData
+			for rows.Next() {
+				var d QueryBuilderTestData
+				err := rows.Scan(&d.ID, &d.Name, &d.Age, &d.IsActive)
+				if err != nil {
+					httputil.JSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+					return
+				}
+				results = append(results, d)
+			}
 
-		var totalItems int
-		err = resources.DB.QueryRowContext(c.Request.Context(), countSql, countArgs...).Scan(&totalItems)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
+			// 2. Count Query (respecting filters)
+			countBuilder := querybuilder.ForCount(builder)
+			countQuery := squirrel.Select("COUNT(*)").From("query_builder_tests").PlaceholderFormat(squirrel.Dollar)
+			countQuery = querybuilder.ToSquirrel(countQuery, countBuilder)
 
-		// 3. Return Paginated Response
-		c.JSON(http.StatusOK, utils.PaginatedResponse[[]QueryBuilderTestData]{
-			Data:  results,
-			Query: querybuilder.BuildMetadata(c.GetInt("page"), c.GetInt("per_page"), totalItems),
-		})
-	})
+			countSql, countArgs, err := countQuery.ToSql()
+			if err != nil {
+				httputil.JSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+				return
+			}
+
+			var totalItems int
+			err = resources.DB.QueryRowContext(r.Context(), countSql, countArgs...).Scan(&totalItems)
+			if err != nil {
+				httputil.JSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+				return
+			}
+
+			// 3. Return Paginated Response
+			page := util.GetInt(r.Context(), util.ContextKeyPage)
+			perPage := util.GetInt(r.Context(), util.ContextKeyPerPage)
+
+			httputil.JSON(w, http.StatusOK, util.PaginatedResponse[[]QueryBuilderTestData]{
+				Data:  results,
+				Query: querybuilder.BuildMetadata(page, perPage, totalItems),
+			})
+		}),
+		middlewares.QueryBuilderMiddleware(config),
+		middlewares.NewRateLimitMiddleware(f.CacheService(), max, win, "global"),
+		middlewares.CorsMiddleware(cfg),
+		middlewares.DelayMiddleware(cfg),
+	)
+
+	r.Handle("GET /test-query-builder", handler)
 }
 
 func stringPtr(s string) *string { return &s }
@@ -156,21 +162,22 @@ func TestQueryBuilderE2E(t *testing.T) {
 		},
 	}
 
-	r := SetupTestEngine(cfg, resources.DB, factory.NewFactory(resources.DB, cfg))
-	RegisterQueryBuilderTestRoutes(r, resources)
+	f := factory.NewFactory(resources.DB, cfg)
+	r := SetupTestEngine(cfg, resources.DB, f)
+	RegisterQueryBuilderTestRoutes(r, resources, cfg, f)
 
 	tests := []struct {
 		name           string
 		queryParams    string
 		expectedIDs    []string
 		expectedStatus int
-		verifyMetadata func(*testing.T, utils.PaginatedResponse[[]QueryBuilderTestData])
+		verifyMetadata func(*testing.T, util.PaginatedResponse[[]QueryBuilderTestData])
 	}{
 		{
 			name:        "Metadata: Filtered Count - age eq 25",
 			queryParams: "filter=age eq 25&page=1&per_page=1",
 			expectedIDs: []string{"01"}, // Alice
-			verifyMetadata: func(t *testing.T, res utils.PaginatedResponse[[]QueryBuilderTestData]) {
+			verifyMetadata: func(t *testing.T, res util.PaginatedResponse[[]QueryBuilderTestData]) {
 				assert.Equal(t, 2, res.Query.TotalItems) // Alice and Eve
 				assert.Equal(t, 2, res.Query.TotalPages)
 				assert.Equal(t, true, res.Query.NextPage)
@@ -180,7 +187,7 @@ func TestQueryBuilderE2E(t *testing.T) {
 			name:        "Metadata: Filtered Count - is_active eq true",
 			queryParams: "filter=is_active eq true&per_page=10",
 			expectedIDs: []string{"01", "03", "05"},
-			verifyMetadata: func(t *testing.T, res utils.PaginatedResponse[[]QueryBuilderTestData]) {
+			verifyMetadata: func(t *testing.T, res util.PaginatedResponse[[]QueryBuilderTestData]) {
 				assert.Equal(t, 3, res.Query.TotalItems)
 				assert.Equal(t, 1, res.Query.TotalPages)
 				assert.Equal(t, false, res.Query.NextPage)
@@ -190,7 +197,7 @@ func TestQueryBuilderE2E(t *testing.T) {
 			name:        "Metadata: Last Page",
 			queryParams: "filter=age eq 25&page=2&per_page=1",
 			expectedIDs: []string{"05"}, // Eve
-			verifyMetadata: func(t *testing.T, res utils.PaginatedResponse[[]QueryBuilderTestData]) {
+			verifyMetadata: func(t *testing.T, res util.PaginatedResponse[[]QueryBuilderTestData]) {
 				assert.Equal(t, 2, res.Query.TotalItems)
 				assert.Equal(t, 2, res.Query.TotalPages)
 				assert.Equal(t, false, res.Query.NextPage)
@@ -316,7 +323,7 @@ func TestQueryBuilderE2E(t *testing.T) {
 
 			assert.Equal(t, http.StatusOK, w.Code)
 
-			var res utils.PaginatedResponse[[]QueryBuilderTestData]
+			var res util.PaginatedResponse[[]QueryBuilderTestData]
 			err := json.Unmarshal(w.Body.Bytes(), &res)
 			require.NoError(t, err)
 

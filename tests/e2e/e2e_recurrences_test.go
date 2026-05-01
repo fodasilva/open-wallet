@@ -11,7 +11,6 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/gin-gonic/gin"
 	"github.com/oklog/ulid/v2"
 	"github.com/stretchr/testify/assert"
 
@@ -19,12 +18,11 @@ import (
 	"github.com/felipe1496/open-wallet/internal/factory"
 	"github.com/felipe1496/open-wallet/internal/resources/recurrences/handlers"
 	"github.com/felipe1496/open-wallet/internal/routes"
-	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/util"
 )
 
-func setupRecurrenceTestServer(pg *sql.DB, db *sql.DB, cfg *infra.Config) (*gin.Engine, *factory.Factory) {
-	gin.SetMode(gin.TestMode)
-	router := gin.New()
+func setupRecurrenceTestServer(pg *sql.DB, db *sql.DB, cfg *infra.Config) (*http.ServeMux, *factory.Factory) {
+	router := http.NewServeMux()
 
 	f := factory.NewFactory(pg, cfg)
 
@@ -158,7 +156,7 @@ func TestE2eRecurrences(t *testing.T) {
 		router.ServeHTTP(w, req)
 
 		assert.Equal(t, http.StatusOK, w.Code)
-		var response utils.PaginatedResponse[handlers.ListRecurrencesResponseData]
+		var response util.PaginatedResponse[handlers.ListRecurrencesResponseData]
 		err = json.Unmarshal(w.Body.Bytes(), &response)
 		assert.NoError(t, err)
 		assert.Len(t, response.Data.Recurrences, 1)
@@ -202,7 +200,7 @@ func TestE2eRecurrences(t *testing.T) {
 				router.ServeHTTP(w, req)
 
 				assert.Equal(t, http.StatusOK, w.Code)
-				var response utils.PaginatedResponse[handlers.ListRecurrencesResponseData]
+				var response util.PaginatedResponse[handlers.ListRecurrencesResponseData]
 				err := json.Unmarshal(w.Body.Bytes(), &response)
 				assert.NoError(t, err)
 				assert.Len(t, response.Data.Recurrences, tc.expectedCount)

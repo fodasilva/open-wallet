@@ -9,7 +9,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gin-gonic/gin"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -22,18 +21,15 @@ import (
 	"github.com/felipe1496/open-wallet/internal/services/mocks"
 )
 
-func setupTestServer(db *sql.DB, googleService services.GoogleService, jwtService services.JWTService) *gin.Engine {
-	gin.SetMode(gin.TestMode)
-	router := gin.New()
+func setupTestServer(db *sql.DB, googleService services.GoogleService, jwtService services.JWTService) *http.ServeMux {
+	router := http.NewServeMux()
 
 	usersRepo := repository.NewUsersRepo()
 	usersUseCase := usersUseCases.NewUsersUseCases(usersRepo, db)
 	authUseCase := authUseCases.NewAuthUseCases(googleService, usersUseCase)
 	handler := handlers.NewHandler(authUseCase, jwtService)
-	authGroup := router.Group("/api/v1/auth")
-	{
-		authGroup.POST("/login/google", handler.CreateLoginWithGoogle)
-	}
+
+	router.HandleFunc("POST /api/v1/auth/login/google", handler.CreateLoginWithGoogle)
 
 	return router
 }
