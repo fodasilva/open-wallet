@@ -6,15 +6,15 @@ import (
 	"reflect"
 	"slices"
 
-	"github.com/gin-gonic/gin"
-
 	"github.com/felipe1496/open-wallet/internal/resources/recurrences/repository"
 	"github.com/felipe1496/open-wallet/internal/resources/recurrences/usecases"
-	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/util"
+	"github.com/felipe1496/open-wallet/internal/util/httputil"
 )
 
 type UpdateOptions struct {
-	Ctx      *gin.Context
+	W        http.ResponseWriter
+	R        *http.Request
 	UseCases usecases.RecurrencesUseCases
 
 	ID         string
@@ -23,19 +23,20 @@ type UpdateOptions struct {
 	Body       UpdateRecurrenceRequest
 }
 
-func (o *UpdateOptions) Complete(ctx *gin.Context) error {
-	o.Ctx = ctx
-	o.ID = ctx.Param("id")
-	o.UserID = ctx.GetString("user_id")
+func (o *UpdateOptions) Complete(w http.ResponseWriter, r *http.Request) error {
+	o.W = w
+	o.R = r
+	o.ID = r.PathValue("id")
+	o.UserID = util.GetString(r.Context(), util.ContextKeyUserID)
 
-	keys, err := utils.GetJSONKeys(ctx)
+	keys, err := util.GetJSONKeys(r)
 	if err != nil {
-		return utils.NewHTTPError(http.StatusBadRequest, err.Error())
+		return util.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	o.PassedKeys = keys
 
-	if err := ctx.ShouldBindJSON(&o.Body); err != nil {
-		return utils.NewHTTPError(http.StatusBadRequest, err.Error())
+	if err := httputil.BindJSON(r, &o.Body); err != nil {
+		return util.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	return nil
@@ -43,7 +44,7 @@ func (o *UpdateOptions) Complete(ctx *gin.Context) error {
 
 func (o *UpdateOptions) Validate() error {
 	if len(o.PassedKeys) == 0 {
-		return utils.NewHTTPError(http.StatusBadRequest, "At least one field must be provided for update")
+		return util.NewHTTPError(http.StatusBadRequest, "At least one field must be provided for update")
 	}
 
 	nonNullable := map[string]interface{}{
@@ -55,8 +56,12 @@ func (o *UpdateOptions) Validate() error {
 
 	for _, key := range o.PassedKeys {
 		if val, ok := nonNullable[key]; ok && (val == nil || reflect.ValueOf(val).IsNil()) {
-			return utils.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("%s cannot be null", key))
+			return util.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("%s cannot be null", key))
 		}
+	}
+
+	if slices.Contains(o.PassedKeys, "name") && o.Body.Name != nil && len(*o.Body.Name) == 0 {
+		return util.NewHTTPError(http.StatusBadRequest, "name cannot be empty")
 	}
 
 	return nil
@@ -64,21 +69,21 @@ func (o *UpdateOptions) Validate() error {
 
 func (o *UpdateOptions) Run() error {
 	payload := repository.UpdateRecurrenceDTO{
-		Name:        utils.OptionalNullable[string]{Set: slices.Contains(o.PassedKeys, "name"), Value: o.Body.Name},
-		CategoryID:  utils.OptionalNullable[string]{Set: slices.Contains(o.PassedKeys, "category_id"), Value: o.Body.CategoryID},
-		Note:        utils.OptionalNullable[string]{Set: slices.Contains(o.PassedKeys, "note"), Value: o.Body.Note},
-		Amount:      utils.OptionalNullable[float64]{Set: slices.Contains(o.PassedKeys, "amount"), Value: o.Body.Amount},
-		DayOfMonth:  utils.OptionalNullable[int]{Set: slices.Contains(o.PassedKeys, "day_of_month"), Value: o.Body.DayOfMonth},
-		StartPeriod: utils.OptionalNullable[string]{Set: slices.Contains(o.PassedKeys, "start_period"), Value: o.Body.StartPeriod},
-		EndPeriod:   utils.OptionalNullable[string]{Set: slices.Contains(o.PassedKeys, "end_period"), Value: o.Body.EndPeriod},
+		Name:        util.OptionalNullable[string]{Set: slices.Contains(o.PassedKeys, "name"), Value: o.Body.Name},
+		CategoryID:  util.OptionalNullable[string]{Set: slices.Contains(o.PassedKeys, "category_id"), Value: o.Body.CategoryID},
+		Note:        util.OptionalNullable[string]{Set: slices.Contains(o.PassedKeys, "note"), Value: o.Body.Note},
+		Amount:      util.OptionalNullable[float64]{Set: slices.Contains(o.PassedKeys, "amount"), Value: o.Body.Amount},
+		DayOfMonth:  util.OptionalNullable[int]{Set: slices.Contains(o.PassedKeys, "day_of_month"), Value: o.Body.DayOfMonth},
+		StartPeriod: util.OptionalNullable[string]{Set: slices.Contains(o.PassedKeys, "start_period"), Value: o.Body.StartPeriod},
+		EndPeriod:   util.OptionalNullable[string]{Set: slices.Contains(o.PassedKeys, "end_period"), Value: o.Body.EndPeriod},
 	}
 
-	rec, err := o.UseCases.Update(o.Ctx.Request.Context(), o.ID, o.UserID, payload)
+	rec, err := o.UseCases.Update(o.R.Context(), o.ID, o.UserID, payload)
 	if err != nil {
 		return err
 	}
 
-	o.Ctx.JSON(http.StatusOK, utils.ResponseData[UpdateRecurrenceResponseData]{
+	httputil.JSON(o.W, http.StatusOK, util.ResponseData[UpdateRecurrenceResponseData]{
 		Data: UpdateRecurrenceResponseData{
 			Recurrence: MapRecurrenceResource(rec),
 		},
@@ -95,14 +100,14 @@ func (o *UpdateOptions) Run() error {
 // @Produce json
 // @Param id path string true "recurrence ID"
 // @Param body body UpdateRecurrenceRequest true "Recurrence payload"
-// @Success 200 {object} utils.ResponseData[UpdateRecurrenceResponseData] "Recurrence updated"
-// @Failure 400 {object} utils.HTTPError "Bad request"
-// @Failure 401 {object} utils.HTTPError "Unauthorized"
-// @Failure 500 {object} utils.HTTPError "Internal server error"
+// @Success 200 {object} util.ResponseData[UpdateRecurrenceResponseData] "Recurrence updated"
+// @Failure 400 {object} util.HTTPError "Bad request"
+// @Failure 401 {object} util.HTTPError "Unauthorized"
+// @Failure 500 {object} util.HTTPError "Internal server error"
 // @Router /api/v1/recurrences/{id} [patch]
-func (api *API) Update(ctx *gin.Context) {
+func (api *API) Update(w http.ResponseWriter, r *http.Request) {
 	cmd := &UpdateOptions{
 		UseCases: api.recurrencesUseCases,
 	}
-	utils.RunCommand(ctx, cmd)
+	util.RunCommand(w, r, cmd)
 }

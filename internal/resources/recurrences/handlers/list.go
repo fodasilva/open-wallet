@@ -3,13 +3,13 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 
 	"github.com/felipe1496/open-wallet/internal/resources/recurrences/usecases"
-	"github.com/felipe1496/open-wallet/internal/utils"
-	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
+	"github.com/felipe1496/open-wallet/internal/util"
+	"github.com/felipe1496/open-wallet/internal/util/httputil"
+	"github.com/felipe1496/open-wallet/internal/util/querybuilder"
 )
 
 // @gen_swagger_filter
@@ -26,7 +26,8 @@ var RecurrencesFilterConfig = querybuilder.ParseConfig{
 }
 
 type ListOptions struct {
-	Ctx      *gin.Context
+	W        http.ResponseWriter
+	R        *http.Request
 	UseCases usecases.RecurrencesUseCases
 
 	UserID  string
@@ -35,12 +36,13 @@ type ListOptions struct {
 	Builder *querybuilder.Builder
 }
 
-func (o *ListOptions) Complete(ctx *gin.Context) error {
-	o.Ctx = ctx
-	o.UserID = ctx.GetString("user_id")
-	o.Page = ctx.GetInt("page")
-	o.PerPage = ctx.GetInt("per_page")
-	o.Builder = ctx.MustGet("query_builder").(*querybuilder.Builder).And("user_id", "eq", o.UserID)
+func (o *ListOptions) Complete(w http.ResponseWriter, r *http.Request) error {
+	o.W = w
+	o.R = r
+	o.UserID = util.GetString(r.Context(), util.ContextKeyUserID)
+	o.Page = util.GetInt(r.Context(), util.ContextKeyPage)
+	o.PerPage = util.GetInt(r.Context(), util.ContextKeyPerPage)
+	o.Builder = querybuilder.Get(r.Context()).And("user_id", "eq", o.UserID)
 
 	return nil
 }
@@ -51,7 +53,7 @@ func (o *ListOptions) Validate() error {
 
 func (o *ListOptions) Run() error {
 	tracer := otel.Tracer("handler")
-	tCtx, span := tracer.Start(o.Ctx.Request.Context(), "RecurrencesHandler.List")
+	tCtx, span := tracer.Start(o.R.Context(), "RecurrencesHandler.List")
 	defer span.End()
 
 	span.SetAttributes(attribute.String("user.id", o.UserID))
@@ -75,7 +77,7 @@ func (o *ListOptions) Run() error {
 		recurrencesResource[i] = MapRecurrenceResource(r)
 	}
 
-	o.Ctx.JSON(http.StatusOK, utils.PaginatedResponse[ListRecurrencesResponseData]{
+	httputil.JSON(o.W, http.StatusOK, util.PaginatedResponse[ListRecurrencesResponseData]{
 		Data: ListRecurrencesResponseData{
 			Recurrences: recurrencesResource,
 		},
@@ -96,13 +98,13 @@ func (o *ListOptions) Run() error {
 // @Param per_page query int false "Items per page" default(10)
 // @Param filter query string false "Filter expression. \n- Allowed fields & ops:\n  - amount: eq, gt, gte, lt, lte\n  - category_id: eq, in\n  - created_at: eq, gt, gte, lt, lte\n  - id: eq, in\n  - name: eq, like, in\n  - user_id: eq, in\n"
 // @Param order_by query string false "Sort field. \n- Allowed: name, created_at, id" example(name:asc)
-// @Success 200 {object} utils.PaginatedResponse[ListRecurrencesResponseData] "List of recurrences"
-// @Failure 401 {object} utils.HTTPError "Unauthorized"
-// @Failure 500 {object} utils.HTTPError "Internal server error"
+// @Success 200 {object} util.PaginatedResponse[ListRecurrencesResponseData] "List of recurrences"
+// @Failure 401 {object} util.HTTPError "Unauthorized"
+// @Failure 500 {object} util.HTTPError "Internal server error"
 // @Router /api/v1/recurrences [get]
-func (api *API) List(ctx *gin.Context) {
+func (api *API) List(w http.ResponseWriter, r *http.Request) {
 	cmd := &ListOptions{
 		UseCases: api.recurrencesUseCases,
 	}
-	utils.RunCommand(ctx, cmd)
+	util.RunCommand(w, r, cmd)
 }

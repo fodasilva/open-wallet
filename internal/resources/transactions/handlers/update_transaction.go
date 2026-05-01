@@ -5,14 +5,14 @@ import (
 	"slices"
 	"time"
 
-	"github.com/gin-gonic/gin"
-
 	"github.com/felipe1496/open-wallet/internal/resources/transactions/usecases"
-	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/util"
+	"github.com/felipe1496/open-wallet/internal/util/httputil"
 )
 
 type UpdateTransactionOptions struct {
-	Ctx      *gin.Context
+	W        http.ResponseWriter
+	R        *http.Request
 	UseCases usecases.TransactionsUseCases
 
 	ID         string
@@ -21,34 +21,50 @@ type UpdateTransactionOptions struct {
 	Body       UpdateTransactionRequest
 }
 
-func (o *UpdateTransactionOptions) Complete(ctx *gin.Context) error {
-	o.Ctx = ctx
-	o.ID = ctx.Param("transaction_id")
-	o.UserID = ctx.GetString("user_id")
+func (o *UpdateTransactionOptions) Complete(w http.ResponseWriter, r *http.Request) error {
+	o.W = w
+	o.R = r
+	o.ID = r.PathValue("transaction_id")
+	o.UserID = util.GetString(r.Context(), util.ContextKeyUserID)
 
-	passedKeys, err := utils.GetJSONKeys(ctx)
+	passedKeys, err := util.GetJSONKeys(r)
 	if err != nil {
-		return utils.NewHTTPError(http.StatusBadRequest, err.Error())
+		return util.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	if len(passedKeys) == 0 {
-		return utils.NewHTTPError(http.StatusBadRequest, "At least one field must be provided for update")
+		return util.NewHTTPError(http.StatusBadRequest, "At least one field must be provided for update")
 	}
 	o.PassedKeys = passedKeys
 
-	if err := ctx.ShouldBindJSON(&o.Body); err != nil {
-		return utils.NewHTTPError(http.StatusBadRequest, err.Error())
+	if err := httputil.BindJSON(r, &o.Body); err != nil {
+		return util.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	return nil
 }
 
 func (o *UpdateTransactionOptions) Validate() error {
-	if slices.Contains(o.PassedKeys, "name") && o.Body.Name == nil {
-		return utils.NewHTTPError(http.StatusBadRequest, "name cannot be null")
+	if slices.Contains(o.PassedKeys, "name") {
+		if o.Body.Name == nil {
+			return util.NewHTTPError(http.StatusBadRequest, "name cannot be null")
+		}
+		if len(*o.Body.Name) == 0 {
+			return util.NewHTTPError(http.StatusBadRequest, "name cannot be empty")
+		}
 	}
-	if slices.Contains(o.PassedKeys, "entries") && o.Body.Entries == nil {
-		return utils.NewHTTPError(http.StatusBadRequest, "entries cannot be null")
+	if slices.Contains(o.PassedKeys, "entries") {
+		if o.Body.Entries == nil {
+			return util.NewHTTPError(http.StatusBadRequest, "entries cannot be null")
+		}
+		if len(*o.Body.Entries) == 0 {
+			return util.NewHTTPError(http.StatusBadRequest, "entries cannot be empty")
+		}
+		for _, e := range *o.Body.Entries {
+			if e.ReferenceDate == "" {
+				return util.NewHTTPError(http.StatusBadRequest, "reference_date is required for all entries")
+			}
+		}
 	}
 	return nil
 }
@@ -57,15 +73,15 @@ func (o *UpdateTransactionOptions) Run() error {
 	var payload usecases.UpdateTransactionDTO
 
 	if slices.Contains(o.PassedKeys, "name") {
-		payload.Name = utils.OptionalNullable[string]{Set: true, Value: o.Body.Name}
+		payload.Name = util.OptionalNullable[string]{Set: true, Value: o.Body.Name}
 	}
 
 	if slices.Contains(o.PassedKeys, "note") {
-		payload.Note = utils.OptionalNullable[string]{Set: true, Value: o.Body.Note}
+		payload.Note = util.OptionalNullable[string]{Set: true, Value: o.Body.Note}
 	}
 
 	if slices.Contains(o.PassedKeys, "category_id") {
-		payload.CategoryID = utils.OptionalNullable[string]{Set: true, Value: o.Body.CategoryID}
+		payload.CategoryID = util.OptionalNullable[string]{Set: true, Value: o.Body.CategoryID}
 	}
 
 	if slices.Contains(o.PassedKeys, "entries") {
@@ -77,16 +93,16 @@ func (o *UpdateTransactionOptions) Run() error {
 				ReferenceDate: t,
 			}
 		}
-		payload.Entries = utils.OptionalNullable[[]usecases.UpdateEntryDTO]{Set: true, Value: &updatedEntries}
+		payload.Entries = util.OptionalNullable[[]usecases.UpdateEntryDTO]{Set: true, Value: &updatedEntries}
 	}
 
-	transaction, err := o.UseCases.UpdateTransaction(o.Ctx.Request.Context(), o.ID, o.UserID, payload)
+	transaction, err := o.UseCases.UpdateTransaction(o.R.Context(), o.ID, o.UserID, payload)
 
 	if err != nil {
 		return err
 	}
 
-	o.Ctx.JSON(http.StatusOK, utils.ResponseData[UpdateTransactionResponseData]{
+	httputil.JSON(o.W, http.StatusOK, util.ResponseData[UpdateTransactionResponseData]{
 		Data: UpdateTransactionResponseData{
 			Transaction: MapTransactionResource(transaction),
 		},
@@ -103,14 +119,14 @@ func (o *UpdateTransactionOptions) Run() error {
 // @Produce json
 // @Param transaction_id path string true "transaction ID"
 // @Param body body UpdateTransactionRequest true "Installment payload"
-// @Success 200 {object} utils.ResponseData[UpdateTransactionResponseData] "Installment updated"
-// @Failure 400 {object} utils.HTTPError "Bad request"
-// @Failure 401 {object} utils.HTTPError "Unauthorized"
-// @Failure 500 {object} utils.HTTPError "Internal server error"
+// @Success 200 {object} util.ResponseData[UpdateTransactionResponseData] "Installment updated"
+// @Failure 400 {object} util.HTTPError "Bad request"
+// @Failure 401 {object} util.HTTPError "Unauthorized"
+// @Failure 500 {object} util.HTTPError "Internal server error"
 // @Router /api/v1/transactions/{transaction_id} [patch]
-func (api *API) UpdateTransaction(ctx *gin.Context) {
+func (api *API) UpdateTransaction(w http.ResponseWriter, r *http.Request) {
 	cmd := &UpdateTransactionOptions{
 		UseCases: api.transactionsUseCases,
 	}
-	utils.RunCommand(ctx, cmd)
+	util.RunCommand(w, r, cmd)
 }

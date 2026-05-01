@@ -3,13 +3,13 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 
 	"github.com/felipe1496/open-wallet/internal/resources/transactions/usecases"
-	"github.com/felipe1496/open-wallet/internal/utils"
-	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
+	"github.com/felipe1496/open-wallet/internal/util"
+	"github.com/felipe1496/open-wallet/internal/util/httputil"
+	"github.com/felipe1496/open-wallet/internal/util/querybuilder"
 )
 
 // @gen_swagger_filter
@@ -28,7 +28,8 @@ var TransactionsFilterConfig = querybuilder.ParseConfig{
 }
 
 type ListEntriesOptions struct {
-	Ctx      *gin.Context
+	W        http.ResponseWriter
+	R        *http.Request
 	UseCases usecases.TransactionsUseCases
 
 	UserID  string
@@ -37,12 +38,13 @@ type ListEntriesOptions struct {
 	Builder *querybuilder.Builder
 }
 
-func (o *ListEntriesOptions) Complete(ctx *gin.Context) error {
-	o.Ctx = ctx
-	o.UserID = ctx.GetString("user_id")
-	o.Page = ctx.GetInt("page")
-	o.PerPage = ctx.GetInt("per_page")
-	o.Builder = ctx.MustGet("query_builder").(*querybuilder.Builder).And("user_id", "eq", o.UserID)
+func (o *ListEntriesOptions) Complete(w http.ResponseWriter, r *http.Request) error {
+	o.W = w
+	o.R = r
+	o.UserID = util.GetString(r.Context(), util.ContextKeyUserID)
+	o.Page = util.GetInt(r.Context(), util.ContextKeyPage)
+	o.PerPage = util.GetInt(r.Context(), util.ContextKeyPerPage)
+	o.Builder = querybuilder.Get(r.Context()).And("user_id", "eq", o.UserID)
 
 	return nil
 }
@@ -53,7 +55,7 @@ func (o *ListEntriesOptions) Validate() error {
 
 func (o *ListEntriesOptions) Run() error {
 	tracer := otel.Tracer("handler")
-	tCtx, span := tracer.Start(o.Ctx.Request.Context(), "TransactionsHandler.ListEntries")
+	tCtx, span := tracer.Start(o.R.Context(), "TransactionsHandler.ListEntries")
 	defer span.End()
 	span.SetAttributes(attribute.String("user.id", o.UserID))
 
@@ -78,7 +80,7 @@ func (o *ListEntriesOptions) Run() error {
 		entriesResource[i] = MapEntryResource(e)
 	}
 
-	o.Ctx.JSON(http.StatusOK, utils.PaginatedResponse[ListEntriesResponseData]{
+	httputil.JSON(o.W, http.StatusOK, util.PaginatedResponse[ListEntriesResponseData]{
 		Data: ListEntriesResponseData{
 			Entries: entriesResource,
 		},
@@ -98,13 +100,13 @@ func (o *ListEntriesOptions) Run() error {
 // @Param per_page query int false "Items per page" default(10)
 // @Param filter query string false "Filter expression. \n- Allowed fields & ops:\n  - amount: eq, gt, gte, lt, lte\n  - category_id: eq, in\n  - created_at: eq, gt, gte, lt, lte\n  - id: eq, in\n  - period: eq, in, gte, lte\n  - reference_date: eq, gt, gte, lt, lte\n  - type: eq, in\n  - user_id: eq, in\n"
 // @Param order_by query string false "Sort field. \n- Allowed: reference_date, amount, id, created_at" example(reference_date:asc)
-// @Success 200 {object} utils.PaginatedResponse[ListEntriesResponseData] "List of entries"
-// @Failure 401 {object} utils.HTTPError "Unauthorized"
-// @Failure 500 {object} utils.HTTPError "Internal server error"
+// @Success 200 {object} util.PaginatedResponse[ListEntriesResponseData] "List of entries"
+// @Failure 401 {object} util.HTTPError "Unauthorized"
+// @Failure 500 {object} util.HTTPError "Internal server error"
 // @Router /api/v1/transactions/entries [get]
-func (api *API) ListEntries(ctx *gin.Context) {
+func (api *API) ListEntries(w http.ResponseWriter, r *http.Request) {
 	cmd := &ListEntriesOptions{
 		UseCases: api.transactionsUseCases,
 	}
-	utils.RunCommand(ctx, cmd)
+	util.RunCommand(w, r, cmd)
 }

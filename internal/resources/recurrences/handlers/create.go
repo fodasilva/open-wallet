@@ -4,15 +4,15 @@ import (
 	"net/http"
 	"slices"
 
-	"github.com/gin-gonic/gin"
-
 	"github.com/felipe1496/open-wallet/internal/resources/recurrences/repository"
 	"github.com/felipe1496/open-wallet/internal/resources/recurrences/usecases"
-	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/util"
+	"github.com/felipe1496/open-wallet/internal/util/httputil"
 )
 
 type CreateOptions struct {
-	Ctx      *gin.Context
+	W        http.ResponseWriter
+	R        *http.Request
 	UseCases usecases.RecurrencesUseCases
 
 	UserID     string
@@ -20,24 +20,31 @@ type CreateOptions struct {
 	Body       CreateRecurrenceRequest
 }
 
-func (o *CreateOptions) Complete(ctx *gin.Context) error {
-	o.Ctx = ctx
-	o.UserID = ctx.GetString("user_id")
+func (o *CreateOptions) Complete(w http.ResponseWriter, r *http.Request) error {
+	o.W = w
+	o.R = r
+	o.UserID = util.GetString(r.Context(), util.ContextKeyUserID)
 
-	keys, err := utils.GetJSONKeys(ctx)
+	keys, err := util.GetJSONKeys(r)
 	if err != nil {
-		return utils.NewHTTPError(http.StatusBadRequest, err.Error())
+		return util.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	o.PassedKeys = keys
 
-	if err := ctx.ShouldBindJSON(&o.Body); err != nil {
-		return utils.NewHTTPError(http.StatusBadRequest, err.Error())
+	if err := httputil.BindJSON(r, &o.Body); err != nil {
+		return util.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	return nil
 }
 
 func (o *CreateOptions) Validate() error {
+	if len(o.Body.Name) == 0 {
+		return util.NewHTTPError(http.StatusBadRequest, "name is required")
+	}
+	if o.Body.Amount == 0 {
+		return util.NewHTTPError(http.StatusBadRequest, "amount is required")
+	}
 	return nil
 }
 
@@ -45,20 +52,20 @@ func (o *CreateOptions) Run() error {
 	payload := repository.CreateRecurrenceDTO{
 		UserID:      o.UserID,
 		Name:        o.Body.Name,
-		CategoryID:  utils.OptionalNullable[string]{Set: slices.Contains(o.PassedKeys, "category_id"), Value: o.Body.CategoryID},
-		Note:        utils.OptionalNullable[string]{Set: slices.Contains(o.PassedKeys, "note"), Value: o.Body.Note},
+		CategoryID:  util.OptionalNullable[string]{Set: slices.Contains(o.PassedKeys, "category_id"), Value: o.Body.CategoryID},
+		Note:        util.OptionalNullable[string]{Set: slices.Contains(o.PassedKeys, "note"), Value: o.Body.Note},
 		Amount:      o.Body.Amount,
 		DayOfMonth:  o.Body.DayOfMonth,
 		StartPeriod: o.Body.StartPeriod,
-		EndPeriod:   utils.OptionalNullable[string]{Set: slices.Contains(o.PassedKeys, "end_period"), Value: o.Body.EndPeriod},
+		EndPeriod:   util.OptionalNullable[string]{Set: slices.Contains(o.PassedKeys, "end_period"), Value: o.Body.EndPeriod},
 	}
 
-	res, err := o.UseCases.Create(o.Ctx.Request.Context(), payload)
+	res, err := o.UseCases.Create(o.R.Context(), payload)
 	if err != nil {
 		return err
 	}
 
-	o.Ctx.JSON(http.StatusCreated, utils.ResponseData[CreateRecurrenceResponseData]{
+	httputil.JSON(o.W, http.StatusCreated, util.ResponseData[CreateRecurrenceResponseData]{
 		Data: CreateRecurrenceResponseData{
 			Recurrence: MapRecurrenceResource(res),
 		},
@@ -75,14 +82,14 @@ func (o *CreateOptions) Run() error {
 // @Accept json
 // @Produce json
 // @Param body body CreateRecurrenceRequest true "Recurrence payload"
-// @Success 201 {object} utils.ResponseData[CreateRecurrenceResponseData] "Recurrence created"
-// @Failure 400 {object} utils.HTTPError "Bad request"
-// @Failure 401 {object} utils.HTTPError "Unauthorized"
-// @Failure 500 {object} utils.HTTPError "Internal server error"
+// @Success 201 {object} util.ResponseData[CreateRecurrenceResponseData] "Recurrence created"
+// @Failure 400 {object} util.HTTPError "Bad request"
+// @Failure 401 {object} util.HTTPError "Unauthorized"
+// @Failure 500 {object} util.HTTPError "Internal server error"
 // @Router /api/v1/recurrences [post]
-func (api *API) Create(ctx *gin.Context) {
+func (api *API) Create(w http.ResponseWriter, r *http.Request) {
 	cmd := &CreateOptions{
 		UseCases: api.recurrencesUseCases,
 	}
-	utils.RunCommand(ctx, cmd)
+	util.RunCommand(w, r, cmd)
 }

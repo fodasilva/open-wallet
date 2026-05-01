@@ -3,38 +3,45 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
-
 	"github.com/felipe1496/open-wallet/internal/resources/categories/repository"
 	"github.com/felipe1496/open-wallet/internal/resources/categories/usecases"
-	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/util"
+	"github.com/felipe1496/open-wallet/internal/util/httputil"
 )
 
 type CreateOptions struct {
-	Ctx      *gin.Context
+	W        http.ResponseWriter
+	R        *http.Request
 	UseCases usecases.CategoriesUseCases
 
 	UserID string
 	Body   CreateCategoryRequest
 }
 
-func (o *CreateOptions) Complete(ctx *gin.Context) error {
-	o.Ctx = ctx
-	o.UserID = ctx.GetString("user_id")
+func (o *CreateOptions) Complete(w http.ResponseWriter, r *http.Request) error {
+	o.W = w
+	o.R = r
+	o.UserID = util.GetString(r.Context(), util.ContextKeyUserID)
 
-	if err := ctx.ShouldBindJSON(&o.Body); err != nil {
-		return utils.NewHTTPError(http.StatusBadRequest, err.Error())
+	if err := httputil.BindJSON(r, &o.Body); err != nil {
+		return util.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	return nil
 }
 
 func (o *CreateOptions) Validate() error {
+	if len(o.Body.Name) == 0 {
+		return util.NewHTTPError(http.StatusBadRequest, "name is required")
+	}
+	if o.Body.Color == "" {
+		return util.NewHTTPError(http.StatusBadRequest, "color is required")
+	}
 	return nil
 }
 
 func (o *CreateOptions) Run() error {
-	category, err := o.UseCases.Create(o.Ctx.Request.Context(), repository.CreateCategoryDTO{
+	category, err := o.UseCases.Create(o.R.Context(), repository.CreateCategoryDTO{
 		UserID: o.UserID,
 		Name:   o.Body.Name,
 		Color:  o.Body.Color,
@@ -44,7 +51,7 @@ func (o *CreateOptions) Run() error {
 		return err
 	}
 
-	o.Ctx.JSON(http.StatusCreated, utils.ResponseData[CreateCategoryResponseData]{
+	httputil.JSON(o.W, http.StatusCreated, util.ResponseData[CreateCategoryResponseData]{
 		Data: CreateCategoryResponseData{
 			Category: MapCategoryResource(category),
 		},
@@ -60,13 +67,13 @@ func (o *CreateOptions) Run() error {
 // @Accept json
 // @Produce json
 // @Param body body CreateCategoryRequest true "Category payload"
-// @Success 201 {object} utils.ResponseData[CreateCategoryResponseData] "Category created"
-// @Failure 401 {object} utils.HTTPError "Unauthorized"
-// @Failure 500 {object} utils.HTTPError "Internal server error"
+// @Success 201 {object} util.ResponseData[CreateCategoryResponseData] "Category created"
+// @Failure 401 {object} util.HTTPError "Unauthorized"
+// @Failure 500 {object} util.HTTPError "Internal server error"
 // @Router /api/v1/categories [post]
-func (api *API) Create(ctx *gin.Context) {
+func (api *API) Create(w http.ResponseWriter, r *http.Request) {
 	cmd := &CreateOptions{
 		UseCases: api.categoriesUseCases,
 	}
-	utils.RunCommand(ctx, cmd)
+	util.RunCommand(w, r, cmd)
 }
