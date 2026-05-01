@@ -5,10 +5,10 @@ package repository
 import (
 	"context"
 	"github.com/Masterminds/squirrel"
-	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/util"
 )
 
-func (r *TransactionsRepoImpl) Insert(ctx context.Context, db utils.Executer, data CreateTransactionDTO) error {
+func (r *TransactionsRepoImpl) Insert(ctx context.Context, db util.Executer, data CreateTransactionDTO) error {
 	query := squirrel.Insert("transactions").
 		PlaceholderFormat(squirrel.Dollar)
 
@@ -46,7 +46,7 @@ func (r *TransactionsRepoImpl) Insert(ctx context.Context, db utils.Executer, da
 	return err
 }
 
-func (r *EntriesRepoImpl) Insert(ctx context.Context, db utils.Executer, data CreateEntryDTO) error {
+func (r *EntriesRepoImpl) Insert(ctx context.Context, db util.Executer, data CreateEntryDTO) error {
 	query := squirrel.Insert("entries").
 		PlaceholderFormat(squirrel.Dollar)
 

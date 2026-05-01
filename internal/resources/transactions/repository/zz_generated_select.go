@@ -5,12 +5,12 @@ package repository
 import (
 	"context"
 	"github.com/Masterminds/squirrel"
-	"github.com/felipe1496/open-wallet/internal/utils"
-	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
+	"github.com/felipe1496/open-wallet/internal/util"
+	"github.com/felipe1496/open-wallet/internal/util/querybuilder"
 )
 
-func (r *TransactionsRepoImpl) Select(ctx context.Context, db utils.Executer) ([]Transaction, error) {
-	filter := querybuilder.FromContext(ctx)
+func (r *TransactionsRepoImpl) Select(ctx context.Context, db util.Executer) ([]Transaction, error) {
+	filter := querybuilder.Get(ctx)
 	query := squirrel.Select("id", "user_id", "category", "name", "description", "created_at", "category_id", "recurrence_id").
 		From("transactions").
 		PlaceholderFormat(squirrel.Dollar)
@@ -50,8 +50,8 @@ func (r *TransactionsRepoImpl) Select(ctx context.Context, db utils.Executer) ([
 	return results, nil
 }
 
-func (r *EntriesRepoImpl) Select(ctx context.Context, db utils.Executer) ([]ViewEntry, error) {
-	filter := querybuilder.FromContext(ctx)
+func (r *EntriesRepoImpl) Select(ctx context.Context, db util.Executer) ([]ViewEntry, error) {
+	filter := querybuilder.Get(ctx)
 	query := squirrel.Select("id", "transaction_id", "name", "description", "amount", "period", "user_id", "category", "total_amount", "installment", "total_installments", "created_at", "reference_date", "category_id", "category_name", "category_color", "recurrence_id").
 		From("v_entries").
 		PlaceholderFormat(squirrel.Dollar)
@@ -100,8 +100,8 @@ func (r *EntriesRepoImpl) Select(ctx context.Context, db utils.Executer) ([]View
 	return results, nil
 }
 
-func (r *SummariesRepoImpl) Select(ctx context.Context, db utils.Executer) ([]ViewSummary, error) {
-	filter := querybuilder.FromContext(ctx)
+func (r *SummariesRepoImpl) Select(ctx context.Context, db util.Executer) ([]ViewSummary, error) {
+	filter := querybuilder.Get(ctx)
 	query := squirrel.Select("user_id", "period", "total_expense", "total_income", "total_balance").
 		From("v_summaries").
 		PlaceholderFormat(squirrel.Dollar)

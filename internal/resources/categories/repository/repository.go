@@ -5,20 +5,20 @@ import (
 
 	"github.com/Masterminds/squirrel"
 
-	"github.com/felipe1496/open-wallet/internal/utils"
-	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
+	"github.com/felipe1496/open-wallet/internal/util"
+	"github.com/felipe1496/open-wallet/internal/util/querybuilder"
 )
 
 // Repository interface. Make sure to only include methods
 // that you defined with @method tags in types.go
 type CategoriesRepo interface {
-	Select(ctx context.Context, db utils.Executer) ([]Category, error)
-	Insert(ctx context.Context, db utils.Executer, data CreateCategoryDTO) error
-	Update(ctx context.Context, db utils.Executer, data UpdateCategoryDTO) error
-	Delete(ctx context.Context, db utils.Executer) error
-	Count(ctx context.Context, db utils.Executer) (int, error)
-	CountCategoryAmountPerPeriod(ctx context.Context, db utils.Executer, period string) (int, error)
-	ListCategoryAmountPerPeriod(ctx context.Context, db utils.Executer, period string) ([]CategoryAmountPerPeriod, error)
+	Select(ctx context.Context, db util.Executer) ([]Category, error)
+	Insert(ctx context.Context, db util.Executer, data CreateCategoryDTO) error
+	Update(ctx context.Context, db util.Executer, data UpdateCategoryDTO) error
+	Delete(ctx context.Context, db util.Executer) error
+	Count(ctx context.Context, db util.Executer) (int, error)
+	CountCategoryAmountPerPeriod(ctx context.Context, db util.Executer, period string) (int, error)
+	ListCategoryAmountPerPeriod(ctx context.Context, db util.Executer, period string) ([]CategoryAmountPerPeriod, error)
 }
 
 // Implementation struct. Name must match @name tag in types.go
@@ -29,8 +29,8 @@ func NewCategoriesRepo() CategoriesRepo {
 	return &CategoriesRepoImpl{}
 }
 
-func (r *CategoriesRepoImpl) CountCategoryAmountPerPeriod(ctx context.Context, db utils.Executer, period string) (int, error) {
-	filter := querybuilder.FromContext(ctx)
+func (r *CategoriesRepoImpl) CountCategoryAmountPerPeriod(ctx context.Context, db util.Executer, period string) (int, error) {
+	filter := querybuilder.Get(ctx)
 	countQuery := squirrel.
 		Select("COUNT(*)").
 		From("fn_category_amount_per_period(?)").
@@ -55,8 +55,8 @@ func (r *CategoriesRepoImpl) CountCategoryAmountPerPeriod(ctx context.Context, d
 	return count, nil
 }
 
-func (r *CategoriesRepoImpl) ListCategoryAmountPerPeriod(ctx context.Context, db utils.Executer, period string) ([]CategoryAmountPerPeriod, error) {
-	filter := querybuilder.FromContext(ctx)
+func (r *CategoriesRepoImpl) ListCategoryAmountPerPeriod(ctx context.Context, db util.Executer, period string) ([]CategoryAmountPerPeriod, error) {
+	filter := querybuilder.Get(ctx)
 	query := squirrel.
 		Select("id", "user_id", "name", "color", "period", "total_amount").
 		From("fn_category_amount_per_period(?)").

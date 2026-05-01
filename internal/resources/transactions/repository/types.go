@@ -3,7 +3,7 @@ package repository
 import (
 	"time"
 
-	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/util"
 )
 
 // @gen_repo
@@ -30,17 +30,17 @@ type CreateTransactionDTO struct {
 	ID           string
 	UserID       string
 	Name         string
-	CategoryID   utils.OptionalNullable[string]
-	Note         utils.OptionalNullable[string]
+	CategoryID   util.OptionalNullable[string]
+	Note         util.OptionalNullable[string]
 	Type         TransactionType
-	RecurrenceID utils.OptionalNullable[string]
+	RecurrenceID util.OptionalNullable[string]
 }
 
 type UpdateTransactionDTO struct {
-	Name         utils.OptionalNullable[string]
-	Note         utils.OptionalNullable[string]
-	CategoryID   utils.OptionalNullable[string]
-	RecurrenceID utils.OptionalNullable[string]
+	Name         util.OptionalNullable[string]
+	Note         util.OptionalNullable[string]
+	CategoryID   util.OptionalNullable[string]
+	RecurrenceID util.OptionalNullable[string]
 }
 
 // @gen_repo
@@ -66,8 +66,8 @@ type CreateEntryDTO struct {
 }
 
 type UpdateEntryDTO struct {
-	Amount        utils.OptionalNullable[float64]
-	ReferenceDate utils.OptionalNullable[time.Time]
+	Amount        util.OptionalNullable[float64]
+	ReferenceDate util.OptionalNullable[time.Time]
 }
 
 // @gen_repo

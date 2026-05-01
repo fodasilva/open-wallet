@@ -5,10 +5,10 @@ package repository
 import (
 	"context"
 	"github.com/Masterminds/squirrel"
-	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/util"
 )
 
-func (r *CategoriesRepoImpl) Insert(ctx context.Context, db utils.Executer, data CreateCategoryDTO) error {
+func (r *CategoriesRepoImpl) Insert(ctx context.Context, db util.Executer, data CreateCategoryDTO) error {
 	query := squirrel.Insert("categories").
 		PlaceholderFormat(squirrel.Dollar)
 

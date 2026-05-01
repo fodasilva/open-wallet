@@ -3,16 +3,16 @@ package repository
 import (
 	"context"
 
-	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/util"
 )
 
 // Repository interface. Make sure to include methods
 // that you defined with @method tags in types.go and any other methods you need.
 type TransactionsRepo interface {
-	Select(ctx context.Context, db utils.Executer) ([]Transaction, error)
-	Insert(ctx context.Context, db utils.Executer, data CreateTransactionDTO) error
-	Update(ctx context.Context, db utils.Executer, data UpdateTransactionDTO) error
-	Delete(ctx context.Context, db utils.Executer) error
+	Select(ctx context.Context, db util.Executer) ([]Transaction, error)
+	Insert(ctx context.Context, db util.Executer, data CreateTransactionDTO) error
+	Update(ctx context.Context, db util.Executer, data UpdateTransactionDTO) error
+	Delete(ctx context.Context, db util.Executer) error
 }
 
 // Implementation struct. Name must match @name tag in types.go
@@ -26,10 +26,10 @@ func NewTransactionsRepo() TransactionsRepo {
 // Repository interface. Make sure to include methods
 // that you defined with @method tags in types.go and any other methods you need.
 type EntriesRepo interface {
-	Select(ctx context.Context, db utils.Executer) ([]ViewEntry, error)
-	Insert(ctx context.Context, db utils.Executer, data CreateEntryDTO) error
-	Delete(ctx context.Context, db utils.Executer) error
-	Count(ctx context.Context, db utils.Executer) (int, error)
+	Select(ctx context.Context, db util.Executer) ([]ViewEntry, error)
+	Insert(ctx context.Context, db util.Executer, data CreateEntryDTO) error
+	Delete(ctx context.Context, db util.Executer) error
+	Count(ctx context.Context, db util.Executer) (int, error)
 }
 
 // Implementation struct. Name must match @name tag in types.go
@@ -41,7 +41,7 @@ func NewEntriesRepo() EntriesRepo {
 }
 
 type SummariesRepo interface {
-	Select(ctx context.Context, db utils.Executer) ([]ViewSummary, error)
+	Select(ctx context.Context, db util.Executer) ([]ViewSummary, error)
 }
 
 type SummariesRepoImpl struct {

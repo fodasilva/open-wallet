@@ -3,7 +3,7 @@ package repository
 import (
 	"time"
 
-	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/util"
 )
 
 // @gen_repo
@@ -40,20 +40,20 @@ type CreateRecurrenceDTO struct {
 	ID          string
 	UserID      string
 	Name        string
-	CategoryID  utils.OptionalNullable[string]
-	Note        utils.OptionalNullable[string]
+	CategoryID  util.OptionalNullable[string]
+	Note        util.OptionalNullable[string]
 	Amount      float64
 	DayOfMonth  int
 	StartPeriod string
-	EndPeriod   utils.OptionalNullable[string]
+	EndPeriod   util.OptionalNullable[string]
 }
 
 type UpdateRecurrenceDTO struct {
-	Name        utils.OptionalNullable[string]
-	CategoryID  utils.OptionalNullable[string]
-	Note        utils.OptionalNullable[string]
-	Amount      utils.OptionalNullable[float64]
-	DayOfMonth  utils.OptionalNullable[int]
-	StartPeriod utils.OptionalNullable[string]
-	EndPeriod   utils.OptionalNullable[string]
+	Name        util.OptionalNullable[string]
+	CategoryID  util.OptionalNullable[string]
+	Note        util.OptionalNullable[string]
+	Amount      util.OptionalNullable[float64]
+	DayOfMonth  util.OptionalNullable[int]
+	StartPeriod util.OptionalNullable[string]
+	EndPeriod   util.OptionalNullable[string]
 }

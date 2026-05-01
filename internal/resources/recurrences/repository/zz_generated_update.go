@@ -5,12 +5,12 @@ package repository
 import (
 	"context"
 	"github.com/Masterminds/squirrel"
-	"github.com/felipe1496/open-wallet/internal/utils"
-	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
+	"github.com/felipe1496/open-wallet/internal/util"
+	"github.com/felipe1496/open-wallet/internal/util/querybuilder"
 )
 
-func (r *RecurrencesRepoImpl) Update(ctx context.Context, db utils.Executer, data UpdateRecurrenceDTO) error {
-	filter := querybuilder.FromContext(ctx)
+func (r *RecurrencesRepoImpl) Update(ctx context.Context, db util.Executer, data UpdateRecurrenceDTO) error {
+	filter := querybuilder.Get(ctx)
 	query := squirrel.Update("recurrences").
 		PlaceholderFormat(squirrel.Dollar)
 
