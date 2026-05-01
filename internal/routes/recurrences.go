@@ -1,40 +1,43 @@
 package routes
 
 import (
-	"github.com/gin-gonic/gin"
+	"net/http"
 
 	"github.com/felipe1496/open-wallet/infra"
 	"github.com/felipe1496/open-wallet/internal/factory"
 	"github.com/felipe1496/open-wallet/internal/middlewares"
 	"github.com/felipe1496/open-wallet/internal/resources/recurrences/handlers"
+	"github.com/felipe1496/open-wallet/internal/util/httputil"
 )
 
-func SetupRecurrencesRoutes(r *gin.Engine, f *factory.Factory, cfg *infra.Config) {
+func SetupRecurrencesRoutes(mux *http.ServeMux, f *factory.Factory, cfg *infra.Config) {
 	jwtService := f.JWTService()
 	recurrencesHandler := handlers.NewHandler(f.RecurrencesUseCases())
-
-	recurrencesGroup := r.Group("/api/v1/recurrences")
 	recMax, recWin := cfg.RateLimits.XS()
 	prepMax, prepWin := cfg.RateLimits.SM()
-	{
-		recurrencesGroup.GET("",
-			middlewares.RequireAuthMiddleware(jwtService),
-			middlewares.QueryBuilderMiddleware(handlers.RecurrencesFilterConfig),
-			recurrencesHandler.List)
-		recurrencesGroup.DELETE("/:id",
-			middlewares.RequireAuthMiddleware(jwtService),
-			recurrencesHandler.Delete)
-		recurrencesGroup.POST("",
-			middlewares.RequireAuthMiddleware(jwtService),
-			middlewares.NewRateLimitMiddleware(f.CacheService(), recMax, recWin, "recurrences:create"),
-			recurrencesHandler.Create)
-		recurrencesGroup.PATCH("/:id",
-			middlewares.RequireAuthMiddleware(jwtService),
-			middlewares.NewRateLimitMiddleware(f.CacheService(), recMax, recWin, "recurrences:update"),
-			recurrencesHandler.Update)
-		recurrencesGroup.POST("/:period",
-			middlewares.RequireAuthMiddleware(jwtService),
-			middlewares.NewRateLimitMiddleware(f.CacheService(), prepMax, prepWin, "recurrences:prepare"),
-			recurrencesHandler.Prepare)
-	}
+
+	mux.Handle("GET /api/v1/recurrences", httputil.Chain(
+		recurrencesHandler.List,
+		middlewares.RequireAuthMiddleware(jwtService),
+		middlewares.QueryBuilderMiddleware(handlers.RecurrencesFilterConfig),
+	))
+	mux.Handle("DELETE /api/v1/recurrences/{id}", httputil.Chain(
+		recurrencesHandler.Delete,
+		middlewares.RequireAuthMiddleware(jwtService),
+	))
+	mux.Handle("POST /api/v1/recurrences", httputil.Chain(
+		recurrencesHandler.Create,
+		middlewares.RequireAuthMiddleware(jwtService),
+		middlewares.NewRateLimitMiddleware(f.CacheService(), recMax, recWin, "recurrences:create"),
+	))
+	mux.Handle("PATCH /api/v1/recurrences/{id}", httputil.Chain(
+		recurrencesHandler.Update,
+		middlewares.RequireAuthMiddleware(jwtService),
+		middlewares.NewRateLimitMiddleware(f.CacheService(), recMax, recWin, "recurrences:update"),
+	))
+	mux.Handle("POST /api/v1/recurrences/{period}", httputil.Chain(
+		recurrencesHandler.Prepare,
+		middlewares.RequireAuthMiddleware(jwtService),
+		middlewares.NewRateLimitMiddleware(f.CacheService(), prepMax, prepWin, "recurrences:prepare"),
+	))
 }
