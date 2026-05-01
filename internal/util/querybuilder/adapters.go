@@ -1,0 +1,167 @@
+package querybuilder
+
+import (
+	"fmt"
+	"strings"
+
+	"github.com/Masterminds/squirrel"
+)
+
+func ToSquirrel(query squirrel.SelectBuilder, b *Builder) squirrel.SelectBuilder {
+	if b == nil {
+		return query
+	}
+
+	for _, andCondition := range b.AndConditions {
+		query = query.Where(conditionToSquirrel(andCondition))
+	}
+
+	for _, orGroup := range b.OrGroups {
+		orSqlizers := squirrel.Or{}
+		for _, condition := range orGroup {
+			orSqlizers = append(orSqlizers, conditionToSquirrel(condition))
+		}
+
+		query = query.Where(orSqlizers)
+	}
+
+	if b.LimitValue != nil {
+		limit := *b.LimitValue
+		if limit < 0 {
+			limit = 0
+		}
+		query = query.Limit(uint64(limit))
+	}
+
+	if b.OffsetValue != nil {
+		offset := *b.OffsetValue
+		if offset < 0 {
+			offset = 0
+		}
+		query = query.Offset(uint64(offset))
+	}
+
+	for _, order := range b.Orders {
+		if order.Dir == "asc" {
+			query = query.OrderBy(order.Field + " ASC")
+		} else {
+			query = query.OrderBy(order.Field + " DESC")
+		}
+	}
+
+	return query
+}
+
+func ToDeleteSquirrel(query squirrel.DeleteBuilder, b *Builder) squirrel.DeleteBuilder {
+	if b == nil {
+		return query
+	}
+
+	for _, andCondition := range b.AndConditions {
+		query = query.Where(conditionToSquirrel(andCondition))
+	}
+
+	for _, orGroup := range b.OrGroups {
+		orSqlizers := squirrel.Or{}
+		for _, condition := range orGroup {
+			orSqlizers = append(orSqlizers, conditionToSquirrel(condition))
+		}
+		query = query.Where(orSqlizers)
+	}
+
+	if b.LimitValue != nil {
+		limit := *b.LimitValue
+		if limit < 0 {
+			limit = 0
+		}
+		query = query.Limit(uint64(limit))
+	}
+
+	for _, order := range b.Orders {
+		if order.Dir == "asc" {
+			query = query.OrderBy(order.Field + " ASC")
+		} else {
+			query = query.OrderBy(order.Field + " DESC")
+		}
+	}
+
+	return query
+}
+
+func ToUpdateSquirrel(query squirrel.UpdateBuilder, b *Builder) squirrel.UpdateBuilder {
+	if b == nil {
+		return query
+	}
+
+	for _, andCondition := range b.AndConditions {
+		query = query.Where(conditionToSquirrel(andCondition))
+	}
+
+	for _, orGroup := range b.OrGroups {
+		orSqlizers := squirrel.Or{}
+		for _, condition := range orGroup {
+			orSqlizers = append(orSqlizers, conditionToSquirrel(condition))
+		}
+		query = query.Where(orSqlizers)
+	}
+
+	if b.LimitValue != nil {
+		limit := *b.LimitValue
+		if limit < 0 {
+			limit = 0
+		}
+		query = query.Limit(uint64(limit))
+	}
+
+	for _, order := range b.Orders {
+		if order.Dir == "asc" {
+			query = query.OrderBy(order.Field + " ASC")
+		} else {
+			query = query.OrderBy(order.Field + " DESC")
+		}
+	}
+
+	return query
+}
+
+func conditionToSquirrel(condition Condition) squirrel.Sqlizer {
+	switch condition.Operator {
+	case "eq", "in":
+		if slice, ok := condition.Value.([]any); ok {
+			var nonNulls []any
+			hasNull := false
+			for _, v := range slice {
+				if v == nil {
+					hasNull = true
+				} else {
+					nonNulls = append(nonNulls, v)
+				}
+			}
+
+			if hasNull {
+				if len(nonNulls) == 0 {
+					return squirrel.Eq{condition.Field: nil}
+				}
+				return squirrel.Or{
+					squirrel.Eq{condition.Field: nonNulls},
+					squirrel.Eq{condition.Field: nil},
+				}
+			}
+		}
+		return squirrel.Eq{condition.Field: condition.Value}
+	case "ne":
+		return squirrel.NotEq{condition.Field: condition.Value}
+	case "lt":
+		return squirrel.Lt{condition.Field: condition.Value}
+	case "lte":
+		return squirrel.LtOrEq{condition.Field: condition.Value}
+	case "gt":
+		return squirrel.Gt{condition.Field: condition.Value}
+	case "gte":
+		return squirrel.GtOrEq{condition.Field: condition.Value}
+	case "like":
+		return squirrel.Like{fmt.Sprintf("upper(%s)", condition.Field): strings.ToUpper(fmt.Sprintf("%%%s%%", condition.Value))}
+	default:
+		return nil
+	}
+}
