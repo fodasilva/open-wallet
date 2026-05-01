@@ -7,11 +7,14 @@ linters:
     - staticcheck
     - revive
     - gofmt
+    - goimports
     - gci
     - whitespace
 
 linters-settings:
   unused: {}
+  goimports:
+    local-prefixes: github.com/felipe1496/open-wallet
   gci:
     sections:
       - standard
