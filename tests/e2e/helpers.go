@@ -12,7 +12,6 @@ import (
 	"testing"
 
 	"github.com/docker/go-connections/nat"
-	"github.com/gin-gonic/gin"
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
@@ -177,9 +176,9 @@ func AssertTableIsEmpty(t *testing.T, db *sql.DB, tableName string) {
 }
 
 // AssertUnauthorized verifies that a request to a protected endpoint returns 401 when unauthenticated.
-func AssertUnauthorized(t *testing.T, engine *gin.Engine, method string, url string, body io.Reader) {
+func AssertUnauthorized(t *testing.T, mux *http.ServeMux, method string, url string, body io.Reader) {
 	req := httptest.NewRequest(method, url, body)
 	w := httptest.NewRecorder()
-	engine.ServeHTTP(w, req)
+	mux.ServeHTTP(w, req)
 	assert.Equal(t, http.StatusUnauthorized, w.Code, "Endpoint %s %s should require authentication", method, url)
 }

@@ -11,7 +11,6 @@ import (
 	"net/url"
 	"testing"
 
-	"github.com/gin-gonic/gin"
 	"github.com/oklog/ulid/v2"
 	"github.com/stretchr/testify/assert"
 
@@ -19,12 +18,11 @@ import (
 	"github.com/felipe1496/open-wallet/internal/factory"
 	"github.com/felipe1496/open-wallet/internal/resources/categories/handlers"
 	"github.com/felipe1496/open-wallet/internal/routes"
-	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/util"
 )
 
-func setupCategoryTestServer(pg *sql.DB, db *sql.DB, cfg *infra.Config) (*gin.Engine, *factory.Factory) {
-	gin.SetMode(gin.TestMode)
-	router := gin.New()
+func setupCategoryTestServer(pg *sql.DB, db *sql.DB, cfg *infra.Config) (*http.ServeMux, *factory.Factory) {
+	router := http.NewServeMux()
 
 	f := factory.NewFactory(pg, cfg)
 
@@ -156,7 +154,7 @@ func TestE2eCategories(t *testing.T) {
 		}
 		assert.Equal(t, http.StatusOK, w.Code)
 
-		var response utils.PaginatedResponse[handlers.ListCategoriesResponseData]
+		var response util.PaginatedResponse[handlers.ListCategoriesResponseData]
 		err = json.Unmarshal(w.Body.Bytes(), &response)
 		assert.NoError(t, err)
 		assert.GreaterOrEqual(t, len(response.Data.Categories), 2)
@@ -204,7 +202,7 @@ func TestE2eCategories(t *testing.T) {
 				router.ServeHTTP(w, req)
 
 				assert.Equal(t, http.StatusOK, w.Code)
-				var response utils.PaginatedResponse[handlers.ListCategoriesResponseData]
+				var response util.PaginatedResponse[handlers.ListCategoriesResponseData]
 				err := json.Unmarshal(w.Body.Bytes(), &response)
 				assert.NoError(t, err)
 				assert.Len(t, response.Data.Categories, tc.expectedCount)
@@ -243,7 +241,7 @@ func TestE2eCategories(t *testing.T) {
 		}
 		assert.Equal(t, http.StatusOK, w.Code)
 
-		var response utils.PaginatedResponse[handlers.ListCategoryAmountPerPeriodResponseData]
+		var response util.PaginatedResponse[handlers.ListCategoryAmountPerPeriodResponseData]
 		err = json.Unmarshal(w.Body.Bytes(), &response)
 		assert.NoError(t, err)
 

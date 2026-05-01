@@ -8,7 +8,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -21,8 +20,6 @@ func TestRateLimitE2E(t *testing.T) {
 	res := SetupTestResources(t)
 	defer func() { _ = res.PostgresContainer.Terminate(context.Background()) }()
 	defer func() { _ = res.DB.Close() }()
-
-	gin.SetMode(gin.TestMode)
 
 	tests := []struct {
 		name          string
@@ -60,10 +57,11 @@ func TestRateLimitE2E(t *testing.T) {
 			path := fmt.Sprintf("/test-limit-%d", i)
 			prefix := fmt.Sprintf("test_limit_%d", i)
 
-			r := gin.New()
-			r.GET(path, middlewares.NewRateLimitMiddleware(services.NewCacheService(res.DB), tt.maxRequests, tt.windowMs, prefix), func(c *gin.Context) {
-				c.Status(http.StatusOK)
-			})
+			r := http.NewServeMux()
+			handler := middlewares.NewRateLimitMiddleware(services.NewCacheService(res.DB), tt.maxRequests, tt.windowMs, prefix)(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				w.WriteHeader(http.StatusOK)
+			}))
+			r.Handle(fmt.Sprintf("GET %s", path), handler)
 
 			for i := 0; i < tt.numRequests; i++ {
 				req := httptest.NewRequest(http.MethodGet, path, nil)
@@ -93,11 +91,11 @@ func TestRateLimitTShirtSizeIntegration(t *testing.T) {
 
 	max, win := cfg.RateLimits.XS()
 
-	gin.SetMode(gin.TestMode)
-	r := gin.New()
-	r.GET("/xs", middlewares.NewRateLimitMiddleware(services.NewCacheService(res.DB), max, win, "xs"), func(c *gin.Context) {
-		c.Status(http.StatusOK)
-	})
+	r := http.NewServeMux()
+	handler := middlewares.NewRateLimitMiddleware(services.NewCacheService(res.DB), max, win, "xs")(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+	}))
+	r.Handle("GET /xs", handler)
 
 	// First request - OK
 	w1 := httptest.NewRecorder()
