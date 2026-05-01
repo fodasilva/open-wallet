@@ -1,33 +1,35 @@
 package middlewares
 
 import (
+	"context"
 	"net/http"
 
-	"github.com/gin-gonic/gin"
-
-	"github.com/felipe1496/open-wallet/internal/utils"
-	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
+	"github.com/felipe1496/open-wallet/internal/util"
+	"github.com/felipe1496/open-wallet/internal/util/httputil"
+	"github.com/felipe1496/open-wallet/internal/util/querybuilder"
 )
 
-func QueryBuilderMiddleware(config querybuilder.ParseConfig) gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		results, err := querybuilder.ParseRequest(
-			ctx.Query("filter"),
-			ctx.Query("page"),
-			ctx.Query("per_page"),
-			ctx.Query("order_by"),
-			config,
-		)
-		if err != nil {
-			apiErr := utils.NewHTTPError(http.StatusBadRequest, err.Error())
-			ctx.JSON(apiErr.StatusCode, apiErr)
-			ctx.Abort()
-			return
-		}
+func QueryBuilderMiddleware(config querybuilder.ParseConfig) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			results, err := querybuilder.ParseRequest(
+				r.URL.Query().Get("filter"),
+				r.URL.Query().Get("page"),
+				r.URL.Query().Get("per_page"),
+				r.URL.Query().Get("order_by"),
+				config,
+			)
+			if err != nil {
+				apiErr := util.NewHTTPError(http.StatusBadRequest, err.Error())
+				httputil.JSON(w, apiErr.StatusCode, apiErr)
+				return
+			}
 
-		ctx.Set("page", results.Page)
-		ctx.Set("per_page", results.PerPage)
-		ctx.Set("query_builder", results.Builder)
-		ctx.Next()
+			ctx := context.WithValue(r.Context(), util.ContextKeyPage, results.Page)
+			ctx = context.WithValue(ctx, util.ContextKeyPerPage, results.PerPage)
+			ctx = querybuilder.WithBuilder(ctx, results.Builder)
+
+			next.ServeHTTP(w, r.WithContext(ctx))
+		})
 	}
 }

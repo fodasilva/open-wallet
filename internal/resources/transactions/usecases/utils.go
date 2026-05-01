@@ -5,7 +5,7 @@ import (
 	"time"
 
 	transactionRepo "github.com/felipe1496/open-wallet/internal/resources/transactions/repository"
-	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/util"
 )
 
 type validateTransactionPropsEntry struct {
@@ -33,11 +33,11 @@ func validateEntriesCount(entries []validateTransactionPropsEntry, tType transac
 			if tType == transactionRepo.Income {
 				msg = "income must have only one entry"
 			}
-			return utils.NewHTTPError(http.StatusBadRequest, msg)
+			return util.NewHTTPError(http.StatusBadRequest, msg)
 		}
 	case transactionRepo.Installment:
 		if len(entries) < 2 {
-			return utils.NewHTTPError(http.StatusBadRequest, "installment must have at least two entries")
+			return util.NewHTTPError(http.StatusBadRequest, "installment must have at least two entries")
 		}
 	}
 	return nil
@@ -48,7 +48,7 @@ func validatePeriodsUniqueness(entries []validateTransactionPropsEntry) error {
 	for _, entry := range entries {
 		period := entry.ReferenceDate.Format("200601")
 		if periods[period] {
-			return utils.NewHTTPError(http.StatusBadRequest, "entries must be in different periods")
+			return util.NewHTTPError(http.StatusBadRequest, "entries must be in different periods")
 		}
 		periods[period] = true
 	}
@@ -66,11 +66,11 @@ func validateAmountsSigns(entries []validateTransactionPropsEntry, tType transac
 				} else if tType == transactionRepo.Recurrence {
 					msg = "recurrence entries must have amount lower than zero"
 				}
-				return utils.NewHTTPError(http.StatusBadRequest, msg)
+				return util.NewHTTPError(http.StatusBadRequest, msg)
 			}
 		case transactionRepo.Income:
 			if entry.Amount <= 0 {
-				return utils.NewHTTPError(http.StatusBadRequest, "income entry must have amount greater than zero")
+				return util.NewHTTPError(http.StatusBadRequest, "income entry must have amount greater than zero")
 			}
 		}
 	}

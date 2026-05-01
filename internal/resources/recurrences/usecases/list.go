@@ -7,7 +7,7 @@ import (
 	"go.opentelemetry.io/otel"
 
 	"github.com/felipe1496/open-wallet/internal/resources/recurrences/repository"
-	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/util"
 )
 
 func (uc *RecurrencesUseCasesImpl) List(ctx context.Context) ([]repository.Recurrence, error) {
@@ -18,7 +18,7 @@ func (uc *RecurrencesUseCasesImpl) List(ctx context.Context) ([]repository.Recur
 	items, err := uc.repo.Select(ctx, uc.db)
 	if err != nil {
 		span.RecordError(err)
-		return nil, utils.NewHTTPError(http.StatusInternalServerError, "failed to list recurrences")
+		return nil, util.NewHTTPError(http.StatusInternalServerError, "failed to list recurrences")
 	}
 
 	return items, nil

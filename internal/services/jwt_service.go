@@ -8,7 +8,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 
 	"github.com/felipe1496/open-wallet/infra"
-	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/util"
 )
 
 type JWTService interface {
@@ -38,7 +38,7 @@ func (s *JWTServiceImpl) GenerateToken(userID string) (string, error) {
 	signedToken, err := token.SignedString([]byte(s.cfg.JWTSecret))
 
 	if err != nil {
-		return "", utils.NewHTTPError(http.StatusInternalServerError, "failed to generate JWT token")
+		return "", util.NewHTTPError(http.StatusInternalServerError, "failed to generate JWT token")
 	}
 
 	return signedToken, nil
@@ -53,25 +53,25 @@ func (s *JWTServiceImpl) ValidateToken(tokenString string) (string, error) {
 	})
 
 	if err != nil {
-		return "", utils.NewHTTPError(http.StatusInternalServerError, "failed to parse JWT token")
+		return "", util.NewHTTPError(http.StatusInternalServerError, "failed to parse JWT token")
 	}
 
 	if !token.Valid {
-		return "", utils.NewHTTPError(http.StatusUnauthorized, "invalid token")
+		return "", util.NewHTTPError(http.StatusUnauthorized, "invalid token")
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
-		return "", utils.NewHTTPError(http.StatusInternalServerError, "failed to extract claims from token")
+		return "", util.NewHTTPError(http.StatusInternalServerError, "failed to extract claims from token")
 	}
 
 	if iss, ok := claims["iss"].(string); !ok || iss != "money-api" {
-		return "", utils.NewHTTPError(http.StatusUnauthorized, "invalid issuer")
+		return "", util.NewHTTPError(http.StatusUnauthorized, "invalid issuer")
 	}
 
 	userID, ok := claims["sub"].(string)
 	if !ok {
-		return "", utils.NewHTTPError(http.StatusInternalServerError, "failed to extract sub claim from token")
+		return "", util.NewHTTPError(http.StatusInternalServerError, "failed to extract sub claim from token")
 	}
 
 	return userID, nil

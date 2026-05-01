@@ -8,14 +8,14 @@ import (
 	"github.com/oklog/ulid/v2"
 
 	transactionRepo "github.com/felipe1496/open-wallet/internal/resources/transactions/repository"
-	"github.com/felipe1496/open-wallet/internal/utils"
-	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
+	"github.com/felipe1496/open-wallet/internal/util"
+	"github.com/felipe1496/open-wallet/internal/util/querybuilder"
 )
 
 func (uc *TransactionsUseCasesImpl) UpdateTransaction(ctx context.Context, transactionID string, userID string, payload UpdateTransactionDTO) (t transactionRepo.Transaction, err error) {
 	tx, err := uc.db.Begin()
 	if err != nil {
-		return transactionRepo.Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to start transaction")
+		return transactionRepo.Transaction{}, util.NewHTTPError(http.StatusInternalServerError, "failed to start transaction")
 	}
 
 	defer func() {
@@ -31,11 +31,11 @@ func (uc *TransactionsUseCasesImpl) UpdateTransaction(ctx context.Context, trans
 		And("user_id", "eq", userID))
 	exists, err := uc.entriesRepo.Select(filterCtx, tx)
 	if err != nil {
-		return transactionRepo.Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to check if transaction exists")
+		return transactionRepo.Transaction{}, util.NewHTTPError(http.StatusInternalServerError, "failed to check if transaction exists")
 	}
 
 	if len(exists) == 0 {
-		return transactionRepo.Transaction{}, utils.NewHTTPError(http.StatusNotFound, "transaction not found")
+		return transactionRepo.Transaction{}, util.NewHTTPError(http.StatusNotFound, "transaction not found")
 	}
 
 	if err := uc.validateCategory(ctx, userID, payload.CategoryID); err != nil {
@@ -53,7 +53,7 @@ func (uc *TransactionsUseCasesImpl) UpdateTransaction(ctx context.Context, trans
 	createdCtx := querybuilder.WithBuilder(ctx, querybuilder.New().And("id", "eq", transactionID))
 	created, err := uc.transactionsRepo.Select(createdCtx, tx)
 	if err != nil || len(created) == 0 {
-		return transactionRepo.Transaction{}, utils.NewHTTPError(http.StatusInternalServerError, "failed to fetch updated transaction")
+		return transactionRepo.Transaction{}, util.NewHTTPError(http.StatusInternalServerError, "failed to fetch updated transaction")
 	}
 
 	return created[0], nil
@@ -73,13 +73,13 @@ func (uc *TransactionsUseCasesImpl) updateTransactionMetadata(ctx context.Contex
 	})
 
 	if err != nil {
-		return utils.NewHTTPError(http.StatusInternalServerError, "failed to update transaction")
+		return util.NewHTTPError(http.StatusInternalServerError, "failed to update transaction")
 	}
 
 	return nil
 }
 
-func (uc *TransactionsUseCasesImpl) syncTransactionEntries(ctx context.Context, tx *sql.Tx, transactionID string, tType transactionRepo.TransactionType, entriesOpt utils.OptionalNullable[[]UpdateEntryDTO]) error {
+func (uc *TransactionsUseCasesImpl) syncTransactionEntries(ctx context.Context, tx *sql.Tx, transactionID string, tType transactionRepo.TransactionType, entriesOpt util.OptionalNullable[[]UpdateEntryDTO]) error {
 	if !entriesOpt.Set || entriesOpt.Value == nil {
 		return nil
 	}
@@ -97,7 +97,7 @@ func (uc *TransactionsUseCasesImpl) syncTransactionEntries(ctx context.Context, 
 	deleteCtx := querybuilder.WithBuilder(ctx, querybuilder.New().And("transaction_id", "eq", transactionID))
 	err := uc.entriesRepo.Delete(deleteCtx, tx)
 	if err != nil {
-		return utils.NewHTTPError(http.StatusInternalServerError, "failed to delete previous entries")
+		return util.NewHTTPError(http.StatusInternalServerError, "failed to delete previous entries")
 	}
 
 	for _, entry := range entries {
@@ -108,7 +108,7 @@ func (uc *TransactionsUseCasesImpl) syncTransactionEntries(ctx context.Context, 
 			ReferenceDate: entry.ReferenceDate,
 		})
 		if err != nil {
-			return utils.NewHTTPError(http.StatusInternalServerError, "failed to create entry")
+			return util.NewHTTPError(http.StatusInternalServerError, "failed to create entry")
 		}
 	}
 

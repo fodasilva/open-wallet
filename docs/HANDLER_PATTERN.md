@@ -6,9 +6,9 @@ By using this standardized structure, we avoid massive, undocumented monolithic 
 
 ## The Lifecycle
 
-Instead of writing everything inside an `api.MyHandler(ctx *gin.Context)` function, every handler must define and execute an options struct that implements `utils.HandlerCommand`:
+Instead of writing everything inside an `api.MyHandler(w http.ResponseWriter, r *http.Request)` function, every handler must define and execute an options struct that implements `utils.HandlerCommand`:
 
-1. **`Complete(ctx *gin.Context) error`**: Extracts everything needed from the HTTP request (params, queries, headers, JSON body payloads) and assigns them to the fields of the struct.
+1. **`Complete(w http.ResponseWriter, r *http.Request) error`**: Extracts everything needed from the HTTP request (params, queries, headers, JSON body payloads) and assigns them to the fields of the struct.
 2. **`Validate() error`**: Verifies that the populated data is correct and makes sense (e.g., minimum character length, mutually exclusive fields).
 3. **`Run() error`**: Executes the core business logic using the `UseCases` layer and responds back via the Context.
 
@@ -52,7 +52,7 @@ Every handler package must define dedicated types for API responses in `handlers
 - Use **`binding:"required"`** for all mandatory fields. This is critical because our frontend client generator (`swagger-typescript-api`) will otherwise mark these fields as optional (`field?`) in TypeScript, leading to type safety issues.
 
 ### 2. Standardized Response Wrappers
-All API responses must be wrapped using the generic structures in `internal/utils`:
+All API responses must be wrapped using the generic structures in `internal/util`:
 - **Single Item/Action**: `utils.ResponseData[T]`
 - **Lists/Pagination**: `utils.PaginatedResponse[T]`
 
@@ -142,8 +142,8 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
-	"github.com/felipe1496/open-wallet/internal/utils"
+	"net/http"
+	"github.com/felipe1496/open-wallet/internal/util"
 
 	// Replace the following import with your actual resource use cases:
 	// "github.com/felipe1496/open-wallet/internal/resources/<entities>/usecases"
@@ -155,7 +155,8 @@ import (
 
 type <Action>Options struct {
 	// Base Dependencies
-	Ctx      *gin.Context
+	W        http.ResponseWriter
+	R        *http.Request
 	UseCases interface{} // Replace with e.g., usecases.<Entities>UseCases
 
 	// Request State (extracted later by Complete)
@@ -171,7 +172,7 @@ type <Action>Options struct {
 // -------------------------------------------------------------------------
 
 // Complete extracts and parses data from the Context
-func (o *<Action>Options) Complete(ctx *gin.Context) error {
+func (o *<Action>Options) Complete(w http.ResponseWriter, r *http.Request) error {
 	o.Ctx = ctx
 	o.UserID = ctx.GetString("user_id")
 
@@ -226,7 +227,7 @@ func (o *<Action>Options) Run() error {
 // @Failure 401 {object} utils.HTTPError "Unauthorized"
 // @Failure 500 {object} utils.HTTPError "Internal server error"
 // @Router <endpoint> [<method>]
-func (api *API) <Action>(ctx *gin.Context) {
+func (api *API) <Action>(w http.ResponseWriter, r *http.Request) {
 	cmd := &<Action>Options{
 		UseCases: api.<entities>UseCases,
 	}

@@ -5,16 +5,16 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"net/http"
 
-	"github.com/gin-gonic/gin"
-	swaggerfiles "github.com/swaggo/files"
-	ginSwagger "github.com/swaggo/gin-swagger"
+	httpSwagger "github.com/swaggo/http-swagger"
 
 	_ "github.com/felipe1496/open-wallet/docs"
 	"github.com/felipe1496/open-wallet/infra"
 	"github.com/felipe1496/open-wallet/internal/factory"
 	"github.com/felipe1496/open-wallet/internal/middlewares"
 	"github.com/felipe1496/open-wallet/internal/routes"
+	"github.com/felipe1496/open-wallet/internal/util/httputil"
 )
 
 // @title Open Wallet API
@@ -32,30 +32,31 @@ func main() {
 	cleanupTracer := setupTracer(cfg)
 	defer cleanupTracer()
 
-	if cfg.Environment == "prod" {
-		gin.SetMode(gin.ReleaseMode)
-	}
-
 	dbConn, cleanupPersistence := setupPersistence(cfg)
 	defer cleanupPersistence()
 
 	f := factory.NewFactory(dbConn, cfg)
 
-	r := gin.New()
-	r.Use(middlewares.DelayMiddleware(cfg))
-	r.Use(middlewares.CorsMiddleware(cfg))
-	globalMax, globalWin := cfg.RateLimits.MD()
-	r.Use(middlewares.NewRateLimitMiddleware(f.CacheService(), globalMax, globalWin, "global"))
-	r.Use(gin.Logger())
-	r.Use(gin.Recovery())
+	mux := http.NewServeMux()
 
 	if cfg.Environment == "dev" {
-		r.GET("/api-docs/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
+		mux.Handle("GET /api-docs/", httpSwagger.WrapHandler)
 	}
 
-	routes.SetupRoutes(r, f, cfg)
+	routes.SetupRoutes(mux, f, cfg)
 
-	if err := r.Run(fmt.Sprintf(":%d", cfg.Port)); err != nil {
+	globalMax, globalWin := cfg.RateLimits.MD()
+
+	handler := httputil.Chain(
+		mux.ServeHTTP,
+		middlewares.RecoveryMiddleware(),
+		middlewares.DelayMiddleware(cfg),
+		middlewares.CorsMiddleware(cfg),
+		middlewares.NewRateLimitMiddleware(f.CacheService(), globalMax, globalWin, "global"),
+	)
+
+	log.Printf("Starting server on port %d", cfg.Port)
+	if err := http.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), handler); err != nil {
 		log.Fatalf("failed to start server: %v", err)
 	}
 }

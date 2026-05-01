@@ -9,7 +9,7 @@ To ensure true application testing capability, this project uses `testcontainers
 1. **`SetupTestResources(t *testing.T)`**: Spins up Postgres and Redis containers, runs standard database migrations, and initializes singleton clients. This function ensures your environment is fresh but authentic.
 2. **`SetupTestUser(t *testing.T, db *sql.DB, cfg *infra.Config)`**: Seeds a mock user into the DB and dynamically mints a valid JWT validation token required by the API. Returns a `TestUser` struct and `Token` string.
 3. **`AssertTableIsEmpty(t *testing.T, db *sql.DB, tableName string)`**: A fast teardown utility checking equality counts per test table ensuring there's zero contamination across module tests.
-4. **`AssertUnauthorized(t *testing.T, engine *gin.Engine, method string, url string, body io.Reader)`**: Automatically probes an endpoint and verifies that it returns a rigid `401 Unauthorized` without a valid JWT token. 
+4. **`AssertUnauthorized(t *testing.T, mux *http.ServeMux, method string, url string, body io.Reader)`**: Automatically probes an endpoint and verifies that it returns a rigid `401 Unauthorized` without a valid JWT token.
 
 ## Architectural Testing Patterns
 

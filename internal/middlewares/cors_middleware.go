@@ -1,21 +1,20 @@
 package middlewares
 
 import (
-	"time"
+	"net/http"
 
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
+	"github.com/rs/cors"
 
 	"github.com/felipe1496/open-wallet/infra"
 )
 
-func CorsMiddleware(cfg *infra.Config) gin.HandlerFunc {
-	return cors.New(cors.Config{
-		AllowOrigins:     cfg.Origins,
-		AllowMethods:     []string{"POST", "GET", "OPTIONS", "PUT", "DELETE", "PATCH"},
-		AllowHeaders:     []string{"Content-Type", "Authorization"},
-		ExposeHeaders:    []string{"Content-Length"},
+func CorsMiddleware(cfg *infra.Config) func(http.Handler) http.Handler {
+	c := cors.New(cors.Options{
+		AllowedOrigins:   cfg.Origins,
+		AllowedMethods:   []string{"POST", "GET", "OPTIONS", "PUT", "DELETE", "PATCH"},
+		AllowedHeaders:   []string{"Content-Type", "Authorization"},
+		ExposedHeaders:   []string{"Content-Length"},
 		AllowCredentials: true,
-		MaxAge:           12 * time.Hour,
 	})
+	return c.Handler
 }
