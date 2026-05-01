@@ -24,7 +24,6 @@ type Config struct {
 	GoogleSecret     string
 	LoginRedirectURI string
 	JWTSecret        string
-	RateLimitDBURL   string
 	RateLimits       RateLimits
 }
 
@@ -149,8 +148,6 @@ func (l *loader) loadJWTConfig() {
 }
 
 func (l *loader) loadRateLimitConfig() {
-	l.cfg.RateLimitDBURL = l.getRequired("RATE_LIMIT_DB_URL")
-
 	type params struct {
 		max    int
 		window int

@@ -36,28 +36,7 @@ services:
     networks:
       - app-network
 
-  redis:
-    image: redis:7-alpine
-    container_name: open-wallet-redis
-    restart: always
-    ports:
-      - 6379:6379
-    command: redis-server --maxmemory 30mb --maxmemory-policy allkeys-lru
-    networks:
-      - app-network
 
-  redis-insight:
-    image: redis/redisinsight:latest
-    container_name: redis-insight
-    restart: always
-    ports:
-      - "8001:8001"
-    environment:
-      - RI_APP_PORT=8001
-      - RI_APP_HOST=0.0.0.0
-    networks:
-      - app-network
-      
 networks:
   app-network:
     driver: bridge
