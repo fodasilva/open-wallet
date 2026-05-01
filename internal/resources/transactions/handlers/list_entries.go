@@ -13,7 +13,7 @@ import (
 )
 
 // @gen_swagger_filter
-var TransactionsFilterConfig = querybuilder.ParseConfig{
+var EntriesFilterConfig = querybuilder.ParseConfig{
 	AllowedFields: map[string]querybuilder.FieldConfig{
 		"category_id":    {AllowedOperators: []string{"eq", "in"}},
 		"type":           {AllowedOperators: []string{"eq", "in"}},
@@ -23,6 +23,7 @@ var TransactionsFilterConfig = querybuilder.ParseConfig{
 		"user_id":        {AllowedOperators: []string{"eq", "in"}},
 		"period":         {AllowedOperators: []string{"eq", "in", "gte", "lte"}},
 		"created_at":     {AllowedOperators: []string{"eq", "gt", "gte", "lt", "lte"}},
+		"transaction_id": {AllowedOperators: []string{"eq", "in"}},
 	},
 	AllowedSortFields: []string{"reference_date", "amount", "id", "created_at"},
 }
@@ -96,7 +97,7 @@ func (o *ListEntriesOptions) Run() error {
 // @Produce json
 // @Param page query int false "Page number" default(1)
 // @Param per_page query int false "Items per page" default(10)
-// @Param filter query string false "Filter expression. \n- Allowed fields & ops:\n  - amount: eq, gt, gte, lt, lte\n  - category_id: eq, in\n  - created_at: eq, gt, gte, lt, lte\n  - id: eq, in\n  - period: eq, in, gte, lte\n  - reference_date: eq, gt, gte, lt, lte\n  - type: eq, in\n  - user_id: eq, in\n"
+// @Param filter query string false "Filter expression. \n- Allowed fields & ops:\n  - amount: eq, gt, gte, lt, lte\n  - category_id: eq, in\n  - created_at: eq, gt, gte, lt, lte\n  - id: eq, in\n  - period: eq, in, gte, lte\n  - reference_date: eq, gt, gte, lt, lte\n  - transaction_id: eq, in\n  - type: eq, in\n  - user_id: eq, in\n"
 // @Param order_by query string false "Sort field. \n- Allowed: reference_date, amount, id, created_at" example(reference_date:asc)
 // @Success 200 {object} utils.PaginatedResponse[ListEntriesResponseData] "List of entries"
 // @Failure 401 {object} utils.HTTPError "Unauthorized"
