@@ -3,15 +3,15 @@ package repository
 import (
 	"context"
 
-	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/util"
 )
 
 type UsersRepo interface {
-	Select(ctx context.Context, db utils.Executer) ([]User, error)
-	Insert(ctx context.Context, db utils.Executer, data CreateUserDTO) error
-	Update(ctx context.Context, db utils.Executer, data UpdateUserDTO) error
-	Delete(ctx context.Context, db utils.Executer) error
-	Count(ctx context.Context, db utils.Executer) (int, error)
+	Select(ctx context.Context, db util.Executer) ([]User, error)
+	Insert(ctx context.Context, db util.Executer, data CreateUserDTO) error
+	Update(ctx context.Context, db util.Executer, data UpdateUserDTO) error
+	Delete(ctx context.Context, db util.Executer) error
+	Count(ctx context.Context, db util.Executer) (int, error)
 }
 
 type UsersRepoImpl struct{}

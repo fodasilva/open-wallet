@@ -5,12 +5,12 @@ package repository
 import (
 	"context"
 	"github.com/Masterminds/squirrel"
-	"github.com/felipe1496/open-wallet/internal/utils"
-	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
+	"github.com/felipe1496/open-wallet/internal/util"
+	"github.com/felipe1496/open-wallet/internal/util/querybuilder"
 )
 
-func (r *RecurrencesRepoImpl) Select(ctx context.Context, db utils.Executer) ([]Recurrence, error) {
-	filter := querybuilder.FromContext(ctx)
+func (r *RecurrencesRepoImpl) Select(ctx context.Context, db util.Executer) ([]Recurrence, error) {
+	filter := querybuilder.Get(ctx)
 	query := squirrel.Select("id", "user_id", "name", "note", "amount", "day_of_month", "category_id", "category_name", "category_color", "start_period", "end_period", "created_at").
 		From("v_recurrences").
 		PlaceholderFormat(squirrel.Dollar)

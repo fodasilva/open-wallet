@@ -5,12 +5,12 @@ package repository
 import (
 	"context"
 	"github.com/Masterminds/squirrel"
-	"github.com/felipe1496/open-wallet/internal/utils"
-	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
+	"github.com/felipe1496/open-wallet/internal/util"
+	"github.com/felipe1496/open-wallet/internal/util/querybuilder"
 )
 
-func (r *CategoriesRepoImpl) Select(ctx context.Context, db utils.Executer) ([]Category, error) {
-	filter := querybuilder.FromContext(ctx)
+func (r *CategoriesRepoImpl) Select(ctx context.Context, db util.Executer) ([]Category, error) {
+	filter := querybuilder.Get(ctx)
 	query := squirrel.Select("id", "user_id", "name", "color", "created_at").
 		From("categories").
 		PlaceholderFormat(squirrel.Dollar)

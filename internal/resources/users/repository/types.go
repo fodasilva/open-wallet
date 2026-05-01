@@ -3,7 +3,7 @@ package repository
 import (
 	"time"
 
-	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/util"
 )
 
 // @gen_repo
@@ -34,8 +34,8 @@ type CreateUserDTO struct {
 }
 
 type UpdateUserDTO struct {
-	Name      utils.OptionalNullable[string]
-	Email     utils.OptionalNullable[string]
-	AvatarURL utils.OptionalNullable[string]
-	Username  utils.OptionalNullable[string]
+	Name      util.OptionalNullable[string]
+	Email     util.OptionalNullable[string]
+	AvatarURL util.OptionalNullable[string]
+	Username  util.OptionalNullable[string]
 }

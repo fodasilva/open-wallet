@@ -5,12 +5,12 @@ package repository
 import (
 	"context"
 	"github.com/Masterminds/squirrel"
-	"github.com/felipe1496/open-wallet/internal/utils"
-	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
+	"github.com/felipe1496/open-wallet/internal/util"
+	"github.com/felipe1496/open-wallet/internal/util/querybuilder"
 )
 
-func (r *TransactionsRepoImpl) Delete(ctx context.Context, db utils.Executer) error {
-	filter := querybuilder.FromContext(ctx)
+func (r *TransactionsRepoImpl) Delete(ctx context.Context, db util.Executer) error {
+	filter := querybuilder.Get(ctx)
 	query := squirrel.Delete("transactions").
 		PlaceholderFormat(squirrel.Dollar)
 
@@ -27,8 +27,8 @@ func (r *TransactionsRepoImpl) Delete(ctx context.Context, db utils.Executer) er
 	return err
 }
 
-func (r *EntriesRepoImpl) Delete(ctx context.Context, db utils.Executer) error {
-	filter := querybuilder.FromContext(ctx)
+func (r *EntriesRepoImpl) Delete(ctx context.Context, db util.Executer) error {
+	filter := querybuilder.Get(ctx)
 	query := squirrel.Delete("entries").
 		PlaceholderFormat(squirrel.Dollar)
 
