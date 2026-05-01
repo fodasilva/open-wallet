@@ -101,8 +101,8 @@ func (o *ListEntriesOptions) Run() error {
 // @Param filter query string false "Filter expression. \n- Allowed fields & ops:\n  - amount: eq, gt, gte, lt, lte\n  - category_id: eq, in\n  - created_at: eq, gt, gte, lt, lte\n  - id: eq, in\n  - period: eq, in, gte, lte\n  - reference_date: eq, gt, gte, lt, lte\n  - type: eq, in\n  - user_id: eq, in\n"
 // @Param order_by query string false "Sort field. \n- Allowed: reference_date, amount, id, created_at" example(reference_date:asc)
 // @Success 200 {object} util.PaginatedResponse[ListEntriesResponseData] "List of entries"
-// @Failure 401 {object} util.HTTPError "Unauthorized"
-// @Failure 500 {object} util.HTTPError "Internal server error"
+// @Failure 401 {object} httputil.HTTPError "Unauthorized"
+// @Failure 500 {object} httputil.HTTPError "Internal server error"
 // @Router /api/v1/transactions/entries [get]
 func (api *API) ListEntries(w http.ResponseWriter, r *http.Request) {
 	cmd := &ListEntriesOptions{

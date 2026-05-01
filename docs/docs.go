@@ -50,13 +50,13 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     }
                 }
@@ -126,13 +126,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     }
                 }
@@ -176,13 +176,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     }
                 }
@@ -223,19 +223,19 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     },
                     "404": {
                         "description": "Not found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     }
                 }
@@ -286,19 +286,19 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     },
                     "404": {
                         "description": "Not found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     }
                 }
@@ -369,13 +369,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     }
                 }
@@ -439,13 +439,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     }
                 }
@@ -489,19 +489,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     }
                 }
@@ -553,19 +553,19 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     },
                     "404": {
                         "description": "Not found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     }
                 }
@@ -616,19 +616,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     }
                 }
@@ -669,19 +669,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     }
                 }
@@ -727,19 +727,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     }
                 }
@@ -803,13 +803,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     }
                 }
@@ -859,13 +859,13 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     }
                 }
@@ -906,19 +906,19 @@ const docTemplate = `{
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     },
                     "404": {
                         "description": "Not found",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     }
                 }
@@ -969,19 +969,19 @@ const docTemplate = `{
                     "400": {
                         "description": "Bad request",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     },
                     "500": {
                         "description": "Internal server error",
                         "schema": {
-                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPError"
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
                     }
                 }
@@ -1003,28 +1003,6 @@ const docTemplate = `{
                 "Installment",
                 "Recurrence"
             ]
-        },
-        "github_com_felipe1496_open-wallet_internal_util.HTTPError": {
-            "type": "object",
-            "properties": {
-                "error": {
-                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util.HTTPErrorData"
-                },
-                "status": {
-                    "type": "integer"
-                }
-            }
-        },
-        "github_com_felipe1496_open-wallet_internal_util.HTTPErrorData": {
-            "type": "object",
-            "properties": {
-                "message": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
-                }
-            }
         },
         "github_com_felipe1496_open-wallet_internal_util.PaginatedResponse-internal_resources_categories_handlers_ListCategoriesResponseData": {
             "type": "object",
@@ -1171,6 +1149,28 @@ const docTemplate = `{
             "properties": {
                 "data": {
                     "$ref": "#/definitions/internal_resources_transactions_handlers.UpdateTransactionResponseData"
+                }
+            }
+        },
+        "github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError": {
+            "type": "object",
+            "properties": {
+                "error": {
+                    "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPErrorData"
+                },
+                "status": {
+                    "type": "integer"
+                }
+            }
+        },
+        "github_com_felipe1496_open-wallet_internal_util_httputil.HTTPErrorData": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
                 }
             }
         },

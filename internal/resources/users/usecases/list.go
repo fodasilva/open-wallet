@@ -5,14 +5,14 @@ import (
 	"net/http"
 
 	"github.com/felipe1496/open-wallet/internal/resources/users/repository"
-	"github.com/felipe1496/open-wallet/internal/util"
+	"github.com/felipe1496/open-wallet/internal/util/httputil"
 )
 
 func (uc *UsersUseCasesImpl) List(ctx context.Context) ([]repository.User, error) {
 	users, err := uc.repo.Select(ctx, uc.db)
 
 	if err != nil {
-		return nil, util.NewHTTPError(http.StatusInternalServerError, "failed to fetch users")
+		return nil, httputil.NewHTTPError(http.StatusInternalServerError, "failed to fetch users")
 	}
 
 	return users, nil

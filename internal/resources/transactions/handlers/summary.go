@@ -45,37 +45,37 @@ func (o *SummaryOptions) Complete(w http.ResponseWriter, r *http.Request) error 
 func (o *SummaryOptions) Validate() error {
 	gte := o.Builder.HasAndFieldOperator("period", "gte")
 	if len(gte) != 1 {
-		return util.NewHTTPError(http.StatusBadRequest, "exactly one 'period gte' filter is required")
+		return httputil.NewHTTPError(http.StatusBadRequest, "exactly one 'period gte' filter is required")
 	}
 	gteVal, ok := gte[0].Value.(string)
 	if !ok || len(gteVal) != 6 {
-		return util.NewHTTPError(http.StatusBadRequest, "period gte must be in YYYYMM format")
+		return httputil.NewHTTPError(http.StatusBadRequest, "period gte must be in YYYYMM format")
 	}
 	t1, err := time.Parse("200601", gteVal)
 	if err != nil {
-		return util.NewHTTPError(http.StatusBadRequest, "period gte is not a valid date (YYYYMM)")
+		return httputil.NewHTTPError(http.StatusBadRequest, "period gte is not a valid date (YYYYMM)")
 	}
 
 	lte := o.Builder.HasAndFieldOperator("period", "lte")
 	if len(lte) != 1 {
-		return util.NewHTTPError(http.StatusBadRequest, "exactly one 'period lte' filter is required")
+		return httputil.NewHTTPError(http.StatusBadRequest, "exactly one 'period lte' filter is required")
 	}
 	lteVal, ok := lte[0].Value.(string)
 	if !ok || len(lteVal) != 6 {
-		return util.NewHTTPError(http.StatusBadRequest, "period lte must be in YYYYMM format")
+		return httputil.NewHTTPError(http.StatusBadRequest, "period lte must be in YYYYMM format")
 	}
 	t2, err := time.Parse("200601", lteVal)
 	if err != nil {
-		return util.NewHTTPError(http.StatusBadRequest, "period lte is not a valid date (YYYYMM)")
+		return httputil.NewHTTPError(http.StatusBadRequest, "period lte is not a valid date (YYYYMM)")
 	}
 
 	if t1.After(t2) {
-		return util.NewHTTPError(http.StatusBadRequest, "period gte must be lower than or equal to period lte")
+		return httputil.NewHTTPError(http.StatusBadRequest, "period gte must be lower than or equal to period lte")
 	}
 
 	months := (t2.Year()-t1.Year())*12 + int(t2.Month()) - int(t1.Month()) + 1
 	if months > 12 {
-		return util.NewHTTPError(http.StatusBadRequest, "period range cannot exceed one year (12 months)")
+		return httputil.NewHTTPError(http.StatusBadRequest, "period range cannot exceed one year (12 months)")
 	}
 
 	return nil
@@ -125,8 +125,8 @@ func (o *SummaryOptions) Run() error {
 // @Param filter query string false "Filter expression. \n- Allowed fields & ops:\n  - period: eq, in, gte, lte\n  - total_balance: eq, gt, gte, lt, lte\n  - total_expense: eq, gt, gte, lt, lte\n  - total_income: eq, gt, gte, lt, lte\n"
 // @Param order_by query string false "Sort field. \n- Allowed: period, total_expense, total_income, total_balance" example(period:asc)
 // @Success 200 {object} util.ResponseData[SummaryResponseData] "Summary data"
-// @Failure 401 {object} util.HTTPError "Unauthorized"
-// @Failure 500 {object} util.HTTPError "Internal server error"
+// @Failure 401 {object} httputil.HTTPError "Unauthorized"
+// @Failure 500 {object} httputil.HTTPError "Internal server error"
 // @Router /api/v1/transactions/summary [get]
 func (api *API) Summary(w http.ResponseWriter, r *http.Request) {
 	cmd := &SummaryOptions{

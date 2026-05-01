@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/felipe1496/open-wallet/internal/services"
-	"github.com/felipe1496/open-wallet/internal/util"
 	"github.com/felipe1496/open-wallet/internal/util/httputil"
 )
 
@@ -37,7 +36,7 @@ func NewRateLimitMiddleware(cache services.CacheService, maxRequests int, window
 			}
 
 			if currentCount > maxRequests {
-				apiErr := util.NewHTTPError(http.StatusTooManyRequests, "You have exceeded the rate limit")
+				apiErr := httputil.NewHTTPError(http.StatusTooManyRequests, "You have exceeded the rate limit")
 				httputil.JSON(w, apiErr.StatusCode, apiErr)
 				return
 			}

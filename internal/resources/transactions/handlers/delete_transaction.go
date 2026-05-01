@@ -5,6 +5,7 @@ import (
 
 	"github.com/felipe1496/open-wallet/internal/resources/transactions/usecases"
 	"github.com/felipe1496/open-wallet/internal/util"
+	_ "github.com/felipe1496/open-wallet/internal/util/httputil"
 )
 
 type DeleteOptions struct {
@@ -48,9 +49,9 @@ func (o *DeleteOptions) Run() error {
 // @Produce json
 // @Param transaction_id path string true "transaction ID"
 // @Success 204 "Transaction deleted"
-// @Failure 401 {object} util.HTTPError "Unauthorized"
-// @Failure 404 {object} util.HTTPError "Not found"
-// @Failure 500 {object} util.HTTPError "Internal server error"
+// @Failure 401 {object} httputil.HTTPError "Unauthorized"
+// @Failure 404 {object} httputil.HTTPError "Not found"
+// @Failure 500 {object} httputil.HTTPError "Internal server error"
 // @Router /api/v1/transactions/{transaction_id} [delete]
 func (api *API) DeleteTransaction(w http.ResponseWriter, r *http.Request) {
 	cmd := &DeleteOptions{

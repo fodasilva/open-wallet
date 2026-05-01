@@ -28,18 +28,18 @@ func (o *UpdateOptions) Complete(w http.ResponseWriter, r *http.Request) error {
 	o.ID = r.PathValue("category_id")
 	o.UserID = util.GetString(r.Context(), util.ContextKeyUserID)
 
-	passedKeys, err := util.GetJSONKeys(r)
+	passedKeys, err := httputil.GetJSONKeys(r)
 	if err != nil {
-		return util.NewHTTPError(http.StatusBadRequest, err.Error())
+		return httputil.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	o.PassedKeys = passedKeys
 
 	if len(o.PassedKeys) == 0 {
-		return util.NewHTTPError(http.StatusBadRequest, "At least one field must be provided for update")
+		return httputil.NewHTTPError(http.StatusBadRequest, "At least one field must be provided for update")
 	}
 
 	if err := httputil.BindJSON(r, &o.Body); err != nil {
-		return util.NewHTTPError(http.StatusBadRequest, err.Error())
+		return httputil.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	return nil
@@ -48,20 +48,20 @@ func (o *UpdateOptions) Complete(w http.ResponseWriter, r *http.Request) error {
 func (o *UpdateOptions) Validate() error {
 	if slices.Contains(o.PassedKeys, "name") {
 		if o.Body.Name == nil {
-			return util.NewHTTPError(http.StatusBadRequest, "name cannot be null")
+			return httputil.NewHTTPError(http.StatusBadRequest, "name cannot be null")
 		}
 		if len(*o.Body.Name) == 0 {
-			return util.NewHTTPError(http.StatusBadRequest, "name cannot be empty")
+			return httputil.NewHTTPError(http.StatusBadRequest, "name cannot be empty")
 		}
 		o.Payload.Name = util.NewValue(*o.Body.Name)
 	}
 
 	if slices.Contains(o.PassedKeys, "color") {
 		if o.Body.Color == nil {
-			return util.NewHTTPError(http.StatusBadRequest, "color cannot be null")
+			return httputil.NewHTTPError(http.StatusBadRequest, "color cannot be null")
 		}
 		if len(*o.Body.Color) == 0 {
-			return util.NewHTTPError(http.StatusBadRequest, "color cannot be empty")
+			return httputil.NewHTTPError(http.StatusBadRequest, "color cannot be empty")
 		}
 		o.Payload.Color = util.NewValue(*o.Body.Color)
 	}
@@ -93,9 +93,9 @@ func (o *UpdateOptions) Run() error {
 // @Param category_id path string true "category ID"
 // @Param body body UpdateCategoryRequest true "Category payload"
 // @Success 200 {object} util.ResponseData[UpdateCategoryResponseData] "Category updated"
-// @Failure 401 {object} util.HTTPError "Unauthorized"
-// @Failure 404 {object} util.HTTPError "Not found"
-// @Failure 500 {object} util.HTTPError "Internal server error"
+// @Failure 401 {object} httputil.HTTPError "Unauthorized"
+// @Failure 404 {object} httputil.HTTPError "Not found"
+// @Failure 500 {object} httputil.HTTPError "Internal server error"
 // @Router /api/v1/categories/{category_id} [patch]
 func (api *API) Update(w http.ResponseWriter, r *http.Request) {
 	cmd := &UpdateOptions{

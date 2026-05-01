@@ -24,7 +24,7 @@ func (o *CreateOptions) Complete(w http.ResponseWriter, r *http.Request) error {
 	o.UserID = util.GetString(r.Context(), util.ContextKeyUserID)
 
 	if err := httputil.BindJSON(r, &o.Body); err != nil {
-		return util.NewHTTPError(http.StatusBadRequest, err.Error())
+		return httputil.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	return nil
@@ -32,10 +32,10 @@ func (o *CreateOptions) Complete(w http.ResponseWriter, r *http.Request) error {
 
 func (o *CreateOptions) Validate() error {
 	if len(o.Body.Name) == 0 {
-		return util.NewHTTPError(http.StatusBadRequest, "name is required")
+		return httputil.NewHTTPError(http.StatusBadRequest, "name is required")
 	}
 	if o.Body.Color == "" {
-		return util.NewHTTPError(http.StatusBadRequest, "color is required")
+		return httputil.NewHTTPError(http.StatusBadRequest, "color is required")
 	}
 	return nil
 }
@@ -68,8 +68,8 @@ func (o *CreateOptions) Run() error {
 // @Produce json
 // @Param body body CreateCategoryRequest true "Category payload"
 // @Success 201 {object} util.ResponseData[CreateCategoryResponseData] "Category created"
-// @Failure 401 {object} util.HTTPError "Unauthorized"
-// @Failure 500 {object} util.HTTPError "Internal server error"
+// @Failure 401 {object} httputil.HTTPError "Unauthorized"
+// @Failure 500 {object} httputil.HTTPError "Internal server error"
 // @Router /api/v1/categories [post]
 func (api *API) Create(w http.ResponseWriter, r *http.Request) {
 	cmd := &CreateOptions{

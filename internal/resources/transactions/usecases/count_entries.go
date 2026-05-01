@@ -6,7 +6,7 @@ import (
 
 	"go.opentelemetry.io/otel"
 
-	"github.com/felipe1496/open-wallet/internal/util"
+	"github.com/felipe1496/open-wallet/internal/util/httputil"
 )
 
 func (uc *TransactionsUseCasesImpl) CountEntries(ctx context.Context) (int, error) {
@@ -18,7 +18,7 @@ func (uc *TransactionsUseCasesImpl) CountEntries(ctx context.Context) (int, erro
 
 	if err != nil {
 		span.RecordError(err)
-		return 0, util.NewHTTPError(http.StatusInternalServerError, "failed to count entries")
+		return 0, httputil.NewHTTPError(http.StatusInternalServerError, "failed to count entries")
 	}
 
 	return count, nil

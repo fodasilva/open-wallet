@@ -7,14 +7,14 @@ import (
 	"github.com/felipe1496/open-wallet/internal/resources/users/repository"
 	usersUseCases "github.com/felipe1496/open-wallet/internal/resources/users/usecases"
 	"github.com/felipe1496/open-wallet/internal/services"
-	"github.com/felipe1496/open-wallet/internal/util"
+	"github.com/felipe1496/open-wallet/internal/util/httputil"
 )
 
 var (
-	GoogleAuthFailedErr       = util.NewHTTPError(http.StatusUnauthorized, "authentication with Google failed")
-	GoogleDintProvideEmailErr = util.NewHTTPError(http.StatusUnauthorized, "google did not provide an email")
-	JwtGenErr                 = util.NewHTTPError(http.StatusUnauthorized, "failed to generate JWT token")
-	GoogleEmailNotVerifiedErr = util.NewHTTPError(http.StatusUnauthorized, "Google email not verified")
+	GoogleAuthFailedErr       = httputil.NewHTTPError(http.StatusUnauthorized, "authentication with Google failed")
+	GoogleDintProvideEmailErr = httputil.NewHTTPError(http.StatusUnauthorized, "google did not provide an email")
+	JwtGenErr                 = httputil.NewHTTPError(http.StatusUnauthorized, "failed to generate JWT token")
+	GoogleEmailNotVerifiedErr = httputil.NewHTTPError(http.StatusUnauthorized, "Google email not verified")
 )
 
 type AuthUseCases interface {

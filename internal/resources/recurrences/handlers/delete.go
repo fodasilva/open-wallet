@@ -6,6 +6,7 @@ import (
 
 	"github.com/felipe1496/open-wallet/internal/resources/recurrences/usecases"
 	"github.com/felipe1496/open-wallet/internal/util"
+	"github.com/felipe1496/open-wallet/internal/util/httputil"
 )
 
 type DeleteOptions struct {
@@ -35,7 +36,7 @@ func (o *DeleteOptions) Complete(w http.ResponseWriter, r *http.Request) error {
 func (o *DeleteOptions) Validate() error {
 	allowedScopes := []string{"all", "until_current"}
 	if !slices.Contains(allowedScopes, o.Scope) {
-		return util.NewHTTPError(http.StatusBadRequest, "invalid scope. available: all, until_current")
+		return httputil.NewHTTPError(http.StatusBadRequest, "invalid scope. available: all, until_current")
 	}
 	return nil
 }
@@ -60,9 +61,9 @@ func (o *DeleteOptions) Run() error {
 // @Param id path string true "recurrence ID"
 // @Param scope query string false "Handling of linked transactions: 'all' (default) deletes the recurrence and all related transactions (past/future); 'until_current' preserves past history but removes future recurrences." Enums(all, until_current) default(all)
 // @Success 204 "Recurrence deleted"
-// @Failure 401 {object} util.HTTPError "Unauthorized"
-// @Failure 404 {object} util.HTTPError "Not found"
-// @Failure 500 {object} util.HTTPError "Internal server error"
+// @Failure 401 {object} httputil.HTTPError "Unauthorized"
+// @Failure 404 {object} httputil.HTTPError "Not found"
+// @Failure 500 {object} httputil.HTTPError "Internal server error"
 // @Router /api/v1/recurrences/{id} [delete]
 func (api *API) Delete(w http.ResponseWriter, r *http.Request) {
 	cmd := &DeleteOptions{

@@ -6,7 +6,7 @@ import (
 
 	"go.opentelemetry.io/otel"
 
-	"github.com/felipe1496/open-wallet/internal/util"
+	"github.com/felipe1496/open-wallet/internal/util/httputil"
 )
 
 func (uc *RecurrencesUseCasesImpl) Count(ctx context.Context) (int, error) {
@@ -17,7 +17,7 @@ func (uc *RecurrencesUseCasesImpl) Count(ctx context.Context) (int, error) {
 	count, err := uc.repo.Count(ctx, uc.db)
 	if err != nil {
 		span.RecordError(err)
-		return 0, util.NewHTTPError(http.StatusInternalServerError, "failed to count recurrences")
+		return 0, httputil.NewHTTPError(http.StatusInternalServerError, "failed to count recurrences")
 	}
 
 	return count, nil

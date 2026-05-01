@@ -1,11 +1,6 @@
 package util
 
 import (
-	"bytes"
-	"encoding/json"
-	"errors"
-	"io"
-	"net/http"
 	"net/url"
 	"reflect"
 )
@@ -34,37 +29,6 @@ func HasAtLeastOneField(v interface{}) bool {
 	}
 
 	return false
-}
-
-func GetApiErr(err error) *HTTPError {
-	var apiErr *HTTPError
-
-	if errors.As(err, &apiErr) {
-		return apiErr
-	} else {
-		return NewHTTPError(http.StatusInternalServerError, "an unexpected error occurred")
-	}
-}
-
-func GetJSONKeys(r *http.Request) ([]string, error) {
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	r.Body = io.NopCloser(bytes.NewBuffer(body))
-
-	var jsonData map[string]interface{}
-	if err := json.Unmarshal(body, &jsonData); err != nil {
-		return nil, err
-	}
-
-	keys := make([]string, 0, len(jsonData))
-	for key := range jsonData {
-		keys = append(keys, key)
-	}
-
-	return keys, nil
 }
 
 func IsValidURL(str string) bool {

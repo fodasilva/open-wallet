@@ -7,6 +7,7 @@ import (
 
 	"github.com/felipe1496/open-wallet/internal/resources/transactions/usecases"
 	"github.com/felipe1496/open-wallet/internal/util"
+	"github.com/felipe1496/open-wallet/internal/util/httputil"
 	"github.com/felipe1496/open-wallet/internal/util/querybuilder"
 )
 
@@ -14,11 +15,11 @@ func (uc *RecurrencesUseCasesImpl) DeleteByID(ctx context.Context, id string, us
 	filterCtx := querybuilder.WithBuilder(ctx, querybuilder.New().And("id", "eq", id).And("user_id", "eq", userID))
 	exists, err := uc.repo.Select(filterCtx, uc.db)
 	if err != nil {
-		return util.NewHTTPError(http.StatusInternalServerError, "failed to fetch recurrence")
+		return httputil.NewHTTPError(http.StatusInternalServerError, "failed to fetch recurrence")
 	}
 
 	if len(exists) == 0 {
-		return util.NewHTTPError(http.StatusNotFound, "recurrence not found")
+		return httputil.NewHTTPError(http.StatusNotFound, "recurrence not found")
 	}
 
 	rec := exists[0]
@@ -30,7 +31,7 @@ func (uc *RecurrencesUseCasesImpl) DeleteByID(ctx context.Context, id string, us
 	txs, err := uc.transactionsUseCase.ListEntries(txFilterCtx)
 
 	if err != nil {
-		return util.NewHTTPError(http.StatusInternalServerError, "failed to fetch linked transactions")
+		return httputil.NewHTTPError(http.StatusInternalServerError, "failed to fetch linked transactions")
 	}
 
 	if len(txs) > 0 {
@@ -39,7 +40,7 @@ func (uc *RecurrencesUseCasesImpl) DeleteByID(ctx context.Context, id string, us
 		case "all":
 			err = uc.transactionsUseCase.DeleteTransactionById(ctx, transactionID, rec.UserID)
 			if err != nil {
-				return util.NewHTTPError(http.StatusInternalServerError, "failed to delete linked transaction")
+				return httputil.NewHTTPError(http.StatusInternalServerError, "failed to delete linked transaction")
 			}
 		case "until_current":
 			currentPeriod := time.Now().Format("200601")
@@ -58,14 +59,14 @@ func (uc *RecurrencesUseCasesImpl) DeleteByID(ctx context.Context, id string, us
 				RecurrenceID: util.OptionalNullable[string]{Set: true, Value: nil},
 			})
 			if err != nil {
-				return util.NewHTTPError(http.StatusInternalServerError, "failed to update transactions entries")
+				return httputil.NewHTTPError(http.StatusInternalServerError, "failed to update transactions entries")
 			}
 		}
 	}
 
 	err = uc.repo.Delete(filterCtx, uc.db)
 	if err != nil {
-		return util.NewHTTPError(http.StatusInternalServerError, "failed to delete recurrence")
+		return httputil.NewHTTPError(http.StatusInternalServerError, "failed to delete recurrence")
 	}
 
 	return nil

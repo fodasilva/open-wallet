@@ -29,14 +29,14 @@ func (o *UpdateOptions) Complete(w http.ResponseWriter, r *http.Request) error {
 	o.ID = r.PathValue("id")
 	o.UserID = util.GetString(r.Context(), util.ContextKeyUserID)
 
-	keys, err := util.GetJSONKeys(r)
+	keys, err := httputil.GetJSONKeys(r)
 	if err != nil {
-		return util.NewHTTPError(http.StatusBadRequest, err.Error())
+		return httputil.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	o.PassedKeys = keys
 
 	if err := httputil.BindJSON(r, &o.Body); err != nil {
-		return util.NewHTTPError(http.StatusBadRequest, err.Error())
+		return httputil.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	return nil
@@ -44,7 +44,7 @@ func (o *UpdateOptions) Complete(w http.ResponseWriter, r *http.Request) error {
 
 func (o *UpdateOptions) Validate() error {
 	if len(o.PassedKeys) == 0 {
-		return util.NewHTTPError(http.StatusBadRequest, "At least one field must be provided for update")
+		return httputil.NewHTTPError(http.StatusBadRequest, "At least one field must be provided for update")
 	}
 
 	nonNullable := map[string]interface{}{
@@ -56,12 +56,12 @@ func (o *UpdateOptions) Validate() error {
 
 	for _, key := range o.PassedKeys {
 		if val, ok := nonNullable[key]; ok && (val == nil || reflect.ValueOf(val).IsNil()) {
-			return util.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("%s cannot be null", key))
+			return httputil.NewHTTPError(http.StatusBadRequest, fmt.Sprintf("%s cannot be null", key))
 		}
 	}
 
 	if slices.Contains(o.PassedKeys, "name") && o.Body.Name != nil && len(*o.Body.Name) == 0 {
-		return util.NewHTTPError(http.StatusBadRequest, "name cannot be empty")
+		return httputil.NewHTTPError(http.StatusBadRequest, "name cannot be empty")
 	}
 
 	return nil
@@ -101,9 +101,9 @@ func (o *UpdateOptions) Run() error {
 // @Param id path string true "recurrence ID"
 // @Param body body UpdateRecurrenceRequest true "Recurrence payload"
 // @Success 200 {object} util.ResponseData[UpdateRecurrenceResponseData] "Recurrence updated"
-// @Failure 400 {object} util.HTTPError "Bad request"
-// @Failure 401 {object} util.HTTPError "Unauthorized"
-// @Failure 500 {object} util.HTTPError "Internal server error"
+// @Failure 400 {object} httputil.HTTPError "Bad request"
+// @Failure 401 {object} httputil.HTTPError "Unauthorized"
+// @Failure 500 {object} httputil.HTTPError "Internal server error"
 // @Router /api/v1/recurrences/{id} [patch]
 func (api *API) Update(w http.ResponseWriter, r *http.Request) {
 	cmd := &UpdateOptions{

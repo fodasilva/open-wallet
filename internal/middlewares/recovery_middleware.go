@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"runtime/debug"
 
-	"github.com/felipe1496/open-wallet/internal/util"
 	"github.com/felipe1496/open-wallet/internal/util/httputil"
 )
 
@@ -15,7 +14,7 @@ func RecoveryMiddleware() func(http.Handler) http.Handler {
 			defer func() {
 				if err := recover(); err != nil {
 					log.Printf("panic recovered: %v\n%s", err, debug.Stack())
-					httputil.JSON(w, http.StatusInternalServerError, util.NewHTTPError(http.StatusInternalServerError, "Internal server error"))
+					httputil.JSON(w, http.StatusInternalServerError, httputil.NewHTTPError(http.StatusInternalServerError, "Internal server error"))
 				}
 			}()
 

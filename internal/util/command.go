@@ -21,19 +21,19 @@ type HandlerCommand interface {
 // RunCommand executes the command lifecycle and translates returned errors into HTTP responses.
 func RunCommand(w http.ResponseWriter, r *http.Request, cmd HandlerCommand) {
 	if err := cmd.Complete(w, r); err != nil {
-		apiErr := GetApiErr(err)
+		apiErr := httputil.GetApiErr(err)
 		httputil.JSON(w, apiErr.StatusCode, apiErr)
 		return
 	}
 
 	if err := cmd.Validate(); err != nil {
-		apiErr := GetApiErr(err)
+		apiErr := httputil.GetApiErr(err)
 		httputil.JSON(w, apiErr.StatusCode, apiErr)
 		return
 	}
 
 	if err := cmd.Run(); err != nil {
-		apiErr := GetApiErr(err)
+		apiErr := httputil.GetApiErr(err)
 		httputil.JSON(w, apiErr.StatusCode, apiErr)
 		return
 	}

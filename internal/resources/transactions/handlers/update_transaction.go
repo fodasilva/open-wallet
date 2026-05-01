@@ -27,18 +27,18 @@ func (o *UpdateTransactionOptions) Complete(w http.ResponseWriter, r *http.Reque
 	o.ID = r.PathValue("transaction_id")
 	o.UserID = util.GetString(r.Context(), util.ContextKeyUserID)
 
-	passedKeys, err := util.GetJSONKeys(r)
+	passedKeys, err := httputil.GetJSONKeys(r)
 	if err != nil {
-		return util.NewHTTPError(http.StatusBadRequest, err.Error())
+		return httputil.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	if len(passedKeys) == 0 {
-		return util.NewHTTPError(http.StatusBadRequest, "At least one field must be provided for update")
+		return httputil.NewHTTPError(http.StatusBadRequest, "At least one field must be provided for update")
 	}
 	o.PassedKeys = passedKeys
 
 	if err := httputil.BindJSON(r, &o.Body); err != nil {
-		return util.NewHTTPError(http.StatusBadRequest, err.Error())
+		return httputil.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	return nil
@@ -47,22 +47,22 @@ func (o *UpdateTransactionOptions) Complete(w http.ResponseWriter, r *http.Reque
 func (o *UpdateTransactionOptions) Validate() error {
 	if slices.Contains(o.PassedKeys, "name") {
 		if o.Body.Name == nil {
-			return util.NewHTTPError(http.StatusBadRequest, "name cannot be null")
+			return httputil.NewHTTPError(http.StatusBadRequest, "name cannot be null")
 		}
 		if len(*o.Body.Name) == 0 {
-			return util.NewHTTPError(http.StatusBadRequest, "name cannot be empty")
+			return httputil.NewHTTPError(http.StatusBadRequest, "name cannot be empty")
 		}
 	}
 	if slices.Contains(o.PassedKeys, "entries") {
 		if o.Body.Entries == nil {
-			return util.NewHTTPError(http.StatusBadRequest, "entries cannot be null")
+			return httputil.NewHTTPError(http.StatusBadRequest, "entries cannot be null")
 		}
 		if len(*o.Body.Entries) == 0 {
-			return util.NewHTTPError(http.StatusBadRequest, "entries cannot be empty")
+			return httputil.NewHTTPError(http.StatusBadRequest, "entries cannot be empty")
 		}
 		for _, e := range *o.Body.Entries {
 			if e.ReferenceDate == "" {
-				return util.NewHTTPError(http.StatusBadRequest, "reference_date is required for all entries")
+				return httputil.NewHTTPError(http.StatusBadRequest, "reference_date is required for all entries")
 			}
 		}
 	}
@@ -120,9 +120,9 @@ func (o *UpdateTransactionOptions) Run() error {
 // @Param transaction_id path string true "transaction ID"
 // @Param body body UpdateTransactionRequest true "Installment payload"
 // @Success 200 {object} util.ResponseData[UpdateTransactionResponseData] "Installment updated"
-// @Failure 400 {object} util.HTTPError "Bad request"
-// @Failure 401 {object} util.HTTPError "Unauthorized"
-// @Failure 500 {object} util.HTTPError "Internal server error"
+// @Failure 400 {object} httputil.HTTPError "Bad request"
+// @Failure 401 {object} httputil.HTTPError "Unauthorized"
+// @Failure 500 {object} httputil.HTTPError "Internal server error"
 // @Router /api/v1/transactions/{transaction_id} [patch]
 func (api *API) UpdateTransaction(w http.ResponseWriter, r *http.Request) {
 	cmd := &UpdateTransactionOptions{

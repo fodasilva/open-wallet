@@ -9,6 +9,7 @@ import (
 
 	transactionRepo "github.com/felipe1496/open-wallet/internal/resources/transactions/repository"
 	"github.com/felipe1496/open-wallet/internal/util"
+	"github.com/felipe1496/open-wallet/internal/util/httputil"
 	"github.com/felipe1496/open-wallet/internal/util/querybuilder"
 )
 
@@ -23,7 +24,7 @@ func (uc *TransactionsUseCasesImpl) CreateTransaction(ctx context.Context, paylo
 
 	tx, err := uc.db.Begin()
 	if err != nil {
-		return transactionRepo.Transaction{}, util.NewHTTPError(http.StatusInternalServerError, "failed to begin transaction")
+		return transactionRepo.Transaction{}, httputil.NewHTTPError(http.StatusInternalServerError, "failed to begin transaction")
 	}
 
 	transactionID := ulid.Make().String()
@@ -39,7 +40,7 @@ func (uc *TransactionsUseCasesImpl) CreateTransaction(ctx context.Context, paylo
 
 	if err != nil {
 		_ = tx.Rollback()
-		return transactionRepo.Transaction{}, util.NewHTTPError(http.StatusInternalServerError, "failed to create transaction")
+		return transactionRepo.Transaction{}, httputil.NewHTTPError(http.StatusInternalServerError, "failed to create transaction")
 	}
 
 	if err := uc.persistEntries(ctx, tx, transactionID, payload.Entries, payload.Type); err != nil {
@@ -48,7 +49,7 @@ func (uc *TransactionsUseCasesImpl) CreateTransaction(ctx context.Context, paylo
 	}
 
 	if err := tx.Commit(); err != nil {
-		return transactionRepo.Transaction{}, util.NewHTTPError(http.StatusInternalServerError, "failed to commit transaction")
+		return transactionRepo.Transaction{}, httputil.NewHTTPError(http.StatusInternalServerError, "failed to commit transaction")
 	}
 
 	return uc.fetchCreatedTransaction(ctx, transactionID)
@@ -64,11 +65,11 @@ func (uc *TransactionsUseCasesImpl) validateCategory(ctx context.Context, userID
 		And("user_id", "eq", userID))
 	exists, err := uc.categoriesUseCase.List(filterCtx)
 	if err != nil {
-		return util.NewHTTPError(http.StatusInternalServerError, "failed to check if category exists")
+		return httputil.NewHTTPError(http.StatusInternalServerError, "failed to check if category exists")
 	}
 
 	if len(exists) == 0 {
-		return util.NewHTTPError(http.StatusNotFound, "category not found")
+		return httputil.NewHTTPError(http.StatusNotFound, "category not found")
 	}
 
 	return nil
@@ -99,7 +100,7 @@ func (uc *TransactionsUseCasesImpl) persistEntries(ctx context.Context, tx *sql.
 		})
 
 		if err != nil {
-			return util.NewHTTPError(http.StatusInternalServerError, "failed to create entry")
+			return httputil.NewHTTPError(http.StatusInternalServerError, "failed to create entry")
 		}
 	}
 	return nil
@@ -109,7 +110,7 @@ func (uc *TransactionsUseCasesImpl) fetchCreatedTransaction(ctx context.Context,
 	filterCtx := querybuilder.WithBuilder(ctx, querybuilder.New().And("id", "eq", id))
 	created, err := uc.transactionsRepo.Select(filterCtx, uc.db)
 	if err != nil || len(created) == 0 {
-		return transactionRepo.Transaction{}, util.NewHTTPError(http.StatusInternalServerError, "failed to fetch created transaction")
+		return transactionRepo.Transaction{}, httputil.NewHTTPError(http.StatusInternalServerError, "failed to fetch created transaction")
 	}
 	return created[0], nil
 }
