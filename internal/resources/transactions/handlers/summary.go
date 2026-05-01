@@ -4,13 +4,13 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 
 	"github.com/felipe1496/open-wallet/internal/resources/transactions/usecases"
-	"github.com/felipe1496/open-wallet/internal/utils"
-	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
+	"github.com/felipe1496/open-wallet/internal/util"
+	"github.com/felipe1496/open-wallet/internal/util/httputil"
+	"github.com/felipe1496/open-wallet/internal/util/querybuilder"
 )
 
 // @gen_swagger_filter
@@ -25,17 +25,19 @@ var SummaryFilterConfig = querybuilder.ParseConfig{
 }
 
 type SummaryOptions struct {
-	Ctx      *gin.Context
+	W        http.ResponseWriter
+	R        *http.Request
 	UseCases usecases.TransactionsUseCases
 
 	UserID  string
 	Builder *querybuilder.Builder
 }
 
-func (o *SummaryOptions) Complete(ctx *gin.Context) error {
-	o.Ctx = ctx
-	o.UserID = ctx.GetString("user_id")
-	o.Builder = ctx.MustGet("query_builder").(*querybuilder.Builder).And("user_id", "eq", o.UserID)
+func (o *SummaryOptions) Complete(w http.ResponseWriter, r *http.Request) error {
+	o.W = w
+	o.R = r
+	o.UserID = util.GetString(r.Context(), util.ContextKeyUserID)
+	o.Builder = querybuilder.Get(r.Context()).And("user_id", "eq", o.UserID)
 
 	return nil
 }
@@ -43,37 +45,37 @@ func (o *SummaryOptions) Complete(ctx *gin.Context) error {
 func (o *SummaryOptions) Validate() error {
 	gte := o.Builder.HasAndFieldOperator("period", "gte")
 	if len(gte) != 1 {
-		return utils.NewHTTPError(http.StatusBadRequest, "exactly one 'period gte' filter is required")
+		return util.NewHTTPError(http.StatusBadRequest, "exactly one 'period gte' filter is required")
 	}
 	gteVal, ok := gte[0].Value.(string)
 	if !ok || len(gteVal) != 6 {
-		return utils.NewHTTPError(http.StatusBadRequest, "period gte must be in YYYYMM format")
+		return util.NewHTTPError(http.StatusBadRequest, "period gte must be in YYYYMM format")
 	}
 	t1, err := time.Parse("200601", gteVal)
 	if err != nil {
-		return utils.NewHTTPError(http.StatusBadRequest, "period gte is not a valid date (YYYYMM)")
+		return util.NewHTTPError(http.StatusBadRequest, "period gte is not a valid date (YYYYMM)")
 	}
 
 	lte := o.Builder.HasAndFieldOperator("period", "lte")
 	if len(lte) != 1 {
-		return utils.NewHTTPError(http.StatusBadRequest, "exactly one 'period lte' filter is required")
+		return util.NewHTTPError(http.StatusBadRequest, "exactly one 'period lte' filter is required")
 	}
 	lteVal, ok := lte[0].Value.(string)
 	if !ok || len(lteVal) != 6 {
-		return utils.NewHTTPError(http.StatusBadRequest, "period lte must be in YYYYMM format")
+		return util.NewHTTPError(http.StatusBadRequest, "period lte must be in YYYYMM format")
 	}
 	t2, err := time.Parse("200601", lteVal)
 	if err != nil {
-		return utils.NewHTTPError(http.StatusBadRequest, "period lte is not a valid date (YYYYMM)")
+		return util.NewHTTPError(http.StatusBadRequest, "period lte is not a valid date (YYYYMM)")
 	}
 
 	if t1.After(t2) {
-		return utils.NewHTTPError(http.StatusBadRequest, "period gte must be lower than or equal to period lte")
+		return util.NewHTTPError(http.StatusBadRequest, "period gte must be lower than or equal to period lte")
 	}
 
 	months := (t2.Year()-t1.Year())*12 + int(t2.Month()) - int(t1.Month()) + 1
 	if months > 12 {
-		return utils.NewHTTPError(http.StatusBadRequest, "period range cannot exceed one year (12 months)")
+		return util.NewHTTPError(http.StatusBadRequest, "period range cannot exceed one year (12 months)")
 	}
 
 	return nil
@@ -81,7 +83,7 @@ func (o *SummaryOptions) Validate() error {
 
 func (o *SummaryOptions) Run() error {
 	tracer := otel.Tracer("handler")
-	tCtx, span := tracer.Start(o.Ctx.Request.Context(), "TransactionsHandler.Summary")
+	tCtx, span := tracer.Start(o.R.Context(), "TransactionsHandler.Summary")
 	defer span.End()
 	span.SetAttributes(attribute.String("user.id", o.UserID))
 
@@ -103,7 +105,7 @@ func (o *SummaryOptions) Run() error {
 		}
 	}
 
-	o.Ctx.JSON(http.StatusOK, utils.ResponseData[SummaryResponseData]{
+	httputil.JSON(o.W, http.StatusOK, util.ResponseData[SummaryResponseData]{
 		Data: SummaryResponseData{
 			Summary: summary,
 		},
@@ -122,13 +124,13 @@ func (o *SummaryOptions) Run() error {
 // @Produce json
 // @Param filter query string false "Filter expression. \n- Allowed fields & ops:\n  - period: eq, in, gte, lte\n  - total_balance: eq, gt, gte, lt, lte\n  - total_expense: eq, gt, gte, lt, lte\n  - total_income: eq, gt, gte, lt, lte\n"
 // @Param order_by query string false "Sort field. \n- Allowed: period, total_expense, total_income, total_balance" example(period:asc)
-// @Success 200 {object} utils.ResponseData[SummaryResponseData] "Summary data"
-// @Failure 401 {object} utils.HTTPError "Unauthorized"
-// @Failure 500 {object} utils.HTTPError "Internal server error"
+// @Success 200 {object} util.ResponseData[SummaryResponseData] "Summary data"
+// @Failure 401 {object} util.HTTPError "Unauthorized"
+// @Failure 500 {object} util.HTTPError "Internal server error"
 // @Router /api/v1/transactions/summary [get]
-func (api *API) Summary(ctx *gin.Context) {
+func (api *API) Summary(w http.ResponseWriter, r *http.Request) {
 	cmd := &SummaryOptions{
 		UseCases: api.transactionsUseCases,
 	}
-	utils.RunCommand(ctx, cmd)
+	util.RunCommand(w, r, cmd)
 }

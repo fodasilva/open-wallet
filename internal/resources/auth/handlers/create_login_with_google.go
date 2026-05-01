@@ -3,37 +3,41 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
-
 	"github.com/felipe1496/open-wallet/internal/resources/auth/usecases"
 	"github.com/felipe1496/open-wallet/internal/services"
-	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/util"
+	"github.com/felipe1496/open-wallet/internal/util/httputil"
 )
 
 type CreateLoginWithGoogleOptions struct {
-	Ctx        *gin.Context
+	W          http.ResponseWriter
+	R          *http.Request
 	UseCases   usecases.AuthUseCases
 	JWTService services.JWTService
 
 	Body LoginGoogleRequest
 }
 
-func (o *CreateLoginWithGoogleOptions) Complete(ctx *gin.Context) error {
-	o.Ctx = ctx
+func (o *CreateLoginWithGoogleOptions) Complete(w http.ResponseWriter, r *http.Request) error {
+	o.W = w
+	o.R = r
 
-	if err := ctx.ShouldBindJSON(&o.Body); err != nil {
-		return utils.NewHTTPError(http.StatusBadRequest, "it was not possible to process the request body")
+	if err := httputil.BindJSON(r, &o.Body); err != nil {
+		return util.NewHTTPError(http.StatusBadRequest, "it was not possible to process the request body")
 	}
 
 	return nil
 }
 
 func (o *CreateLoginWithGoogleOptions) Validate() error {
+	if len(o.Body.Code) == 0 {
+		return util.NewHTTPError(http.StatusBadRequest, "code is required")
+	}
 	return nil
 }
 
 func (o *CreateLoginWithGoogleOptions) Run() error {
-	user, err := o.UseCases.LoginWithGoogle(o.Ctx, o.Body.Code)
+	user, err := o.UseCases.LoginWithGoogle(o.R.Context(), o.Body.Code)
 	if err != nil {
 		return err
 	}
@@ -43,7 +47,7 @@ func (o *CreateLoginWithGoogleOptions) Run() error {
 		return err
 	}
 
-	o.Ctx.JSON(http.StatusOK, utils.ResponseData[LoginGoogleResponseData]{
+	httputil.JSON(o.W, http.StatusOK, util.ResponseData[LoginGoogleResponseData]{
 		Data: LoginGoogleResponseData{
 			AccessToken: accessToken,
 			User:        MapUserResource(user),
@@ -61,13 +65,13 @@ func (o *CreateLoginWithGoogleOptions) Run() error {
 // @Produce json
 // @Param body body LoginGoogleRequest true "Login payload"
 // @Success 200 {object} utils.ResponseData[LoginGoogleResponseData] "User logged in"
-// @Failure 400 {object} utils.HTTPError "Bad request"
-// @Failure 401 {object} utils.HTTPError "Unauthorized"
+// @Failure 400 {object} util.HTTPError "Bad request"
+// @Failure 401 {object} util.HTTPError "Unauthorized"
 // @Router /api/v1/auth/login/google [post]
-func (api *API) CreateLoginWithGoogle(ctx *gin.Context) {
+func (api *API) CreateLoginWithGoogle(w http.ResponseWriter, r *http.Request) {
 	cmd := &CreateLoginWithGoogleOptions{
 		UseCases:   api.authUseCases,
 		JWTService: api.jwtService,
 	}
-	utils.RunCommand(ctx, cmd)
+	util.RunCommand(w, r, cmd)
 }

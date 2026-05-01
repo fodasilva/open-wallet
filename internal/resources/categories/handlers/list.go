@@ -3,11 +3,10 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
-
 	"github.com/felipe1496/open-wallet/internal/resources/categories/usecases"
-	"github.com/felipe1496/open-wallet/internal/utils"
-	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
+	"github.com/felipe1496/open-wallet/internal/util"
+	"github.com/felipe1496/open-wallet/internal/util/httputil"
+	"github.com/felipe1496/open-wallet/internal/util/querybuilder"
 )
 
 // @gen_swagger_filter
@@ -23,7 +22,8 @@ var CategoriesFilterConfig = querybuilder.ParseConfig{
 }
 
 type ListOptions struct {
-	Ctx      *gin.Context
+	W        http.ResponseWriter
+	R        *http.Request
 	UseCases usecases.CategoriesUseCases
 	UserID   string
 	Builder  *querybuilder.Builder
@@ -31,14 +31,15 @@ type ListOptions struct {
 	PerPage  int
 }
 
-func (o *ListOptions) Complete(ctx *gin.Context) error {
-	o.Ctx = ctx
-	o.UserID = ctx.GetString("user_id")
-	nameFilter := ctx.Query("name")
-	o.Builder = ctx.MustGet("query_builder").(*querybuilder.Builder).
+func (o *ListOptions) Complete(w http.ResponseWriter, r *http.Request) error {
+	o.W = w
+	o.R = r
+	o.UserID = util.GetString(r.Context(), util.ContextKeyUserID)
+	nameFilter := r.URL.Query().Get("name")
+	o.Builder = querybuilder.Get(r.Context()).
 		And("user_id", "eq", o.UserID)
-	o.Page = o.Ctx.GetInt("page")
-	o.PerPage = o.Ctx.GetInt("per_page")
+	o.Page = util.GetInt(r.Context(), util.ContextKeyPage)
+	o.PerPage = util.GetInt(r.Context(), util.ContextKeyPerPage)
 
 	if nameFilter != "" {
 		o.Builder.And("name", "like", nameFilter)
@@ -52,13 +53,13 @@ func (o *ListOptions) Validate() error {
 }
 
 func (o *ListOptions) Run() error {
-	reqCtx := querybuilder.WithBuilder(o.Ctx.Request.Context(), o.Builder)
+	reqCtx := querybuilder.WithBuilder(o.R.Context(), o.Builder)
 	categoriesList, err := o.UseCases.List(reqCtx)
 	if err != nil {
 		return err
 	}
 
-	countCtx := querybuilder.WithBuilder(o.Ctx.Request.Context(), querybuilder.ForCount(o.Builder))
+	countCtx := querybuilder.WithBuilder(o.R.Context(), querybuilder.ForCount(o.Builder))
 	count, err := o.UseCases.Count(countCtx)
 	if err != nil {
 		return err
@@ -69,7 +70,7 @@ func (o *ListOptions) Run() error {
 		categoriesResource[i] = MapCategoryResource(c)
 	}
 
-	o.Ctx.JSON(http.StatusOK, utils.PaginatedResponse[ListCategoriesResponseData]{
+	httputil.JSON(o.W, http.StatusOK, util.PaginatedResponse[ListCategoriesResponseData]{
 		Data: ListCategoriesResponseData{
 			Categories: categoriesResource,
 		},
@@ -91,13 +92,13 @@ func (o *ListOptions) Run() error {
 // @Param order_by query string false "Sort field. \n- Allowed: name, created_at, id" example(name:asc)
 // @Param filter query string false "Filter expression. \n- Allowed fields & ops:\n  - color: eq, in\n  - created_at: eq, gt, gte, lt, lte\n  - id: eq, in\n  - name: eq, like, in\n  - user_id: eq, in\n"
 // @Param name query string false "A category name to filter by"
-// @Success 200 {object} utils.PaginatedResponse[ListCategoriesResponseData] "List of categories"
-// @Failure 401 {object} utils.HTTPError "Unauthorized"
-// @Failure 500 {object} utils.HTTPError "Internal server error"
+// @Success 200 {object} util.PaginatedResponse[ListCategoriesResponseData] "List of categories"
+// @Failure 401 {object} util.HTTPError "Unauthorized"
+// @Failure 500 {object} util.HTTPError "Internal server error"
 // @Router /api/v1/categories [get]
-func (api *API) List(ctx *gin.Context) {
+func (api *API) List(w http.ResponseWriter, r *http.Request) {
 	cmd := &ListOptions{
 		UseCases: api.categoriesUseCases,
 	}
-	utils.RunCommand(ctx, cmd)
+	util.RunCommand(w, r, cmd)
 }

@@ -3,11 +3,10 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
-
 	"github.com/felipe1496/open-wallet/internal/resources/categories/usecases"
-	"github.com/felipe1496/open-wallet/internal/utils"
-	"github.com/felipe1496/open-wallet/internal/utils/querybuilder"
+	"github.com/felipe1496/open-wallet/internal/util"
+	"github.com/felipe1496/open-wallet/internal/util/httputil"
+	"github.com/felipe1496/open-wallet/internal/util/querybuilder"
 )
 
 // @gen_swagger_filter
@@ -24,7 +23,8 @@ var PeriodCategoriesFilterConfig = querybuilder.ParseConfig{
 }
 
 type ListAmountPerPeriodOptions struct {
-	Ctx      *gin.Context
+	W        http.ResponseWriter
+	R        *http.Request
 	UseCases usecases.CategoriesUseCases
 	UserID   string
 	Period   string
@@ -33,14 +33,15 @@ type ListAmountPerPeriodOptions struct {
 	PerPage  int
 }
 
-func (o *ListAmountPerPeriodOptions) Complete(ctx *gin.Context) error {
-	o.Ctx = ctx
-	o.UserID = ctx.GetString("user_id")
-	o.Period = ctx.Param("period")
-	o.Builder = ctx.MustGet("query_builder").(*querybuilder.Builder).
+func (o *ListAmountPerPeriodOptions) Complete(w http.ResponseWriter, r *http.Request) error {
+	o.W = w
+	o.R = r
+	o.UserID = util.GetString(r.Context(), util.ContextKeyUserID)
+	o.Period = r.PathValue("period")
+	o.Builder = querybuilder.Get(r.Context()).
 		And("user_id", "eq", o.UserID)
-	o.Page = o.Ctx.GetInt("page")
-	o.PerPage = o.Ctx.GetInt("per_page")
+	o.Page = util.GetInt(r.Context(), util.ContextKeyPage)
+	o.PerPage = util.GetInt(r.Context(), util.ContextKeyPerPage)
 
 	return nil
 }
@@ -50,13 +51,13 @@ func (o *ListAmountPerPeriodOptions) Validate() error {
 }
 
 func (o *ListAmountPerPeriodOptions) Run() error {
-	reqCtx := querybuilder.WithBuilder(o.Ctx.Request.Context(), o.Builder)
+	reqCtx := querybuilder.WithBuilder(o.R.Context(), o.Builder)
 	categories, err := o.UseCases.ListCategoryAmountPerPeriod(reqCtx, o.Period)
 	if err != nil {
 		return err
 	}
 
-	countCtx := querybuilder.WithBuilder(o.Ctx.Request.Context(), querybuilder.ForCount(o.Builder))
+	countCtx := querybuilder.WithBuilder(o.R.Context(), querybuilder.ForCount(o.Builder))
 	count, err := o.UseCases.CountCategoryAmountPerPeriod(countCtx, o.Period)
 	if err != nil {
 		return err
@@ -67,7 +68,7 @@ func (o *ListAmountPerPeriodOptions) Run() error {
 		categoriesResource[i] = MapCategoryAmountPerPeriodResource(c)
 	}
 
-	o.Ctx.JSON(http.StatusOK, utils.PaginatedResponse[ListCategoryAmountPerPeriodResponseData]{
+	httputil.JSON(o.W, http.StatusOK, util.PaginatedResponse[ListCategoryAmountPerPeriodResponseData]{
 		Data: ListCategoryAmountPerPeriodResponseData{
 			Categories: categoriesResource,
 		},
@@ -88,13 +89,13 @@ func (o *ListAmountPerPeriodOptions) Run() error {
 // @Param per_page query int false "Items per page" default(10)
 // @Param filter query string false "Filter expression. \n- Allowed fields & ops:\n  - color: eq, in\n  - id: eq, in\n  - name: eq, like, in\n  - period: eq, in\n  - total_amount: eq, gt, gte, lt, lte\n  - user_id: eq, in\n"
 // @Param order_by query string false "Sort field. \n- Allowed: name, total_amount, period, id" example(name:asc)
-// @Success 200 {object} utils.PaginatedResponse[ListCategoryAmountPerPeriodResponseData] "List of categories with amount per period"
-// @Failure 401 {object} utils.HTTPError "Unauthorized"
-// @Failure 500 {object} utils.HTTPError "Internal server error"
+// @Success 200 {object} util.PaginatedResponse[ListCategoryAmountPerPeriodResponseData] "List of categories with amount per period"
+// @Failure 401 {object} util.HTTPError "Unauthorized"
+// @Failure 500 {object} util.HTTPError "Internal server error"
 // @Router /api/v1/categories/{period} [get]
-func (api *API) ListCategoryAmountPerPeriod(ctx *gin.Context) {
+func (api *API) ListCategoryAmountPerPeriod(w http.ResponseWriter, r *http.Request) {
 	cmd := &ListAmountPerPeriodOptions{
 		UseCases: api.categoriesUseCases,
 	}
-	utils.RunCommand(ctx, cmd)
+	util.RunCommand(w, r, cmd)
 }

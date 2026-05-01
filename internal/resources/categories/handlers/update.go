@@ -4,15 +4,15 @@ import (
 	"net/http"
 	"slices"
 
-	"github.com/gin-gonic/gin"
-
 	"github.com/felipe1496/open-wallet/internal/resources/categories/repository"
 	"github.com/felipe1496/open-wallet/internal/resources/categories/usecases"
-	"github.com/felipe1496/open-wallet/internal/utils"
+	"github.com/felipe1496/open-wallet/internal/util"
+	"github.com/felipe1496/open-wallet/internal/util/httputil"
 )
 
 type UpdateOptions struct {
-	Ctx      *gin.Context
+	W        http.ResponseWriter
+	R        *http.Request
 	UseCases usecases.CategoriesUseCases
 
 	ID         string
@@ -22,23 +22,24 @@ type UpdateOptions struct {
 	Payload    repository.UpdateCategoryDTO
 }
 
-func (o *UpdateOptions) Complete(ctx *gin.Context) error {
-	o.Ctx = ctx
-	o.ID = ctx.Param("category_id")
-	o.UserID = ctx.GetString("user_id")
+func (o *UpdateOptions) Complete(w http.ResponseWriter, r *http.Request) error {
+	o.W = w
+	o.R = r
+	o.ID = r.PathValue("category_id")
+	o.UserID = util.GetString(r.Context(), util.ContextKeyUserID)
 
-	passedKeys, err := utils.GetJSONKeys(ctx)
+	passedKeys, err := util.GetJSONKeys(r)
 	if err != nil {
-		return utils.NewHTTPError(http.StatusBadRequest, err.Error())
+		return util.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 	o.PassedKeys = passedKeys
 
 	if len(o.PassedKeys) == 0 {
-		return utils.NewHTTPError(http.StatusBadRequest, "At least one field must be provided for update")
+		return util.NewHTTPError(http.StatusBadRequest, "At least one field must be provided for update")
 	}
 
-	if err := ctx.ShouldBindJSON(&o.Body); err != nil {
-		return utils.NewHTTPError(http.StatusBadRequest, err.Error())
+	if err := httputil.BindJSON(r, &o.Body); err != nil {
+		return util.NewHTTPError(http.StatusBadRequest, err.Error())
 	}
 
 	return nil
@@ -47,28 +48,34 @@ func (o *UpdateOptions) Complete(ctx *gin.Context) error {
 func (o *UpdateOptions) Validate() error {
 	if slices.Contains(o.PassedKeys, "name") {
 		if o.Body.Name == nil {
-			return utils.NewHTTPError(http.StatusBadRequest, "name cannot be null")
+			return util.NewHTTPError(http.StatusBadRequest, "name cannot be null")
 		}
-		o.Payload.Name = utils.NewValue(*o.Body.Name)
+		if len(*o.Body.Name) == 0 {
+			return util.NewHTTPError(http.StatusBadRequest, "name cannot be empty")
+		}
+		o.Payload.Name = util.NewValue(*o.Body.Name)
 	}
 
 	if slices.Contains(o.PassedKeys, "color") {
 		if o.Body.Color == nil {
-			return utils.NewHTTPError(http.StatusBadRequest, "color cannot be null")
+			return util.NewHTTPError(http.StatusBadRequest, "color cannot be null")
 		}
-		o.Payload.Color = utils.NewValue(*o.Body.Color)
+		if len(*o.Body.Color) == 0 {
+			return util.NewHTTPError(http.StatusBadRequest, "color cannot be empty")
+		}
+		o.Payload.Color = util.NewValue(*o.Body.Color)
 	}
 
 	return nil
 }
 
 func (o *UpdateOptions) Run() error {
-	category, err := o.UseCases.Update(o.Ctx.Request.Context(), o.ID, o.UserID, o.Payload)
+	category, err := o.UseCases.Update(o.R.Context(), o.ID, o.UserID, o.Payload)
 	if err != nil {
 		return err
 	}
 
-	o.Ctx.JSON(http.StatusOK, utils.ResponseData[UpdateCategoryResponseData]{
+	httputil.JSON(o.W, http.StatusOK, util.ResponseData[UpdateCategoryResponseData]{
 		Data: UpdateCategoryResponseData{
 			Category: MapCategoryResource(category),
 		},
@@ -85,14 +92,14 @@ func (o *UpdateOptions) Run() error {
 // @Produce json
 // @Param category_id path string true "category ID"
 // @Param body body UpdateCategoryRequest true "Category payload"
-// @Success 200 {object} utils.ResponseData[UpdateCategoryResponseData] "Category updated"
-// @Failure 401 {object} utils.HTTPError "Unauthorized"
-// @Failure 404 {object} utils.HTTPError "Not found"
-// @Failure 500 {object} utils.HTTPError "Internal server error"
+// @Success 200 {object} util.ResponseData[UpdateCategoryResponseData] "Category updated"
+// @Failure 401 {object} util.HTTPError "Unauthorized"
+// @Failure 404 {object} util.HTTPError "Not found"
+// @Failure 500 {object} util.HTTPError "Internal server error"
 // @Router /api/v1/categories/{category_id} [patch]
-func (api *API) Update(ctx *gin.Context) {
+func (api *API) Update(w http.ResponseWriter, r *http.Request) {
 	cmd := &UpdateOptions{
 		UseCases: api.categoriesUseCases,
 	}
-	utils.RunCommand(ctx, cmd)
+	util.RunCommand(w, r, cmd)
 }
