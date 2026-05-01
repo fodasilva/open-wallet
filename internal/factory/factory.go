@@ -22,6 +22,7 @@ type Factory struct {
 
 	googleService        services.GoogleService
 	jwtService           services.JWTService
+	cacheService         services.CacheService
 	usersUseCases        usersUseCases.UsersUseCases
 	authUseCases         authUseCases.AuthUseCases
 	categoriesUseCases   categoriesUseCases.CategoriesUseCases
@@ -45,6 +46,13 @@ func (f *Factory) JWTService() services.JWTService {
 		f.jwtService = services.NewJWTService(f.cfg)
 	}
 	return f.jwtService
+}
+
+func (f *Factory) CacheService() services.CacheService {
+	if f.cacheService == nil {
+		f.cacheService = services.NewCacheService(f.db)
+	}
+	return f.cacheService
 }
 
 func (f *Factory) UsersUseCases() usersUseCases.UsersUseCases {
