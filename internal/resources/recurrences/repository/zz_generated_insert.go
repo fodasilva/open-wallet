@@ -4,7 +4,9 @@ package repository
 
 import (
 	"context"
+
 	"github.com/Masterminds/squirrel"
+
 	"github.com/felipe1496/open-wallet/internal/util"
 )
 
