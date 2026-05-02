@@ -4,8 +4,8 @@ package repository
 
 import (
 	"context"
-
-	"github.com/Masterminds/squirrel"
+	"fmt"
+	"strings"
 
 	"github.com/felipe1496/open-wallet/internal/util"
 	"github.com/felipe1496/open-wallet/internal/util/querybuilder"
@@ -13,25 +13,22 @@ import (
 
 func (r *CategoriesRepoImpl) Update(ctx context.Context, db util.Executer, data UpdateCategoryDTO) error {
 	filter := querybuilder.Get(ctx)
-	query := squirrel.Update("categories").
-		PlaceholderFormat(squirrel.Dollar)
-
+	var sets []string
+	var values []interface{}
 	if data.Name.Set {
-		query = query.Set("name", data.Name.Value)
+		values = append(values, data.Name.Value)
+		sets = append(sets, fmt.Sprintf("name = $%d", len(values)))
 	}
 	if data.Color.Set {
-		query = query.Set("color", data.Color.Value)
+		values = append(values, data.Color.Value)
+		sets = append(sets, fmt.Sprintf("color = $%d", len(values)))
 	}
 
-	query = querybuilder.ToUpdateSquirrel(query, filter)
+	f := filter.ToSQL(len(values) + 1)
+	sql := "UPDATE categories SET " + strings.Join(sets, ", ") + " WHERE " + f.Where
+	values = append(values, f.Args...)
 
-	sql, args, err := query.ToSql()
-
-	if err != nil {
-		return err
-	}
-
-	_, err = db.ExecContext(ctx, sql, args...)
+	_, err := db.ExecContext(ctx, sql, values...)
 
 	return err
 }
