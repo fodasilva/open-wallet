@@ -3,7 +3,6 @@ package unit
 import (
 	"testing"
 
-	"github.com/Masterminds/squirrel"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -325,6 +324,36 @@ func TestQueryBuilder_ParseRequest(t *testing.T) {
 			orderBy: ":asc",
 			wantErr: true,
 		},
+		{
+			name:    "unclosed single quote",
+			filter:  "name eq 'John",
+			wantErr: true,
+		},
+		{
+			name:    "malformed list - unclosed paren",
+			filter:  "id in (1, 2",
+			wantErr: true,
+		},
+		{
+			name:    "malformed list - empty list",
+			filter:  "id in ()",
+			wantErr: true,
+		},
+		{
+			name:    "invalid value type",
+			filter:  "age eq not_a_number",
+			wantErr: true,
+		},
+		{
+			name:    "missing field separator",
+			filter:  "nameeq 'John'",
+			wantErr: true,
+		},
+		{
+			name:    "missing operator separator",
+			filter:  "name eq'John'",
+			wantErr: true,
+		},
 	}
 
 	permissiveConfig := &querybuilder.ParseConfig{
@@ -428,12 +457,14 @@ func TestQueryBuilder_ParseRequest_WithConfig(t *testing.T) {
 	}
 }
 
-func TestQueryBuilder_ToSquirrel(t *testing.T) {
+func TestQueryBuilder_ToSQL(t *testing.T) {
 	tests := []struct {
-		name     string
-		build    func() *querybuilder.Builder
-		wantSQL  string
-		wantArgs []interface{}
+		name      string
+		build     func() *querybuilder.Builder
+		wantWhere string
+		wantArgs  []any
+		wantOrder string
+		wantLimit string
 	}{
 		{
 			name: "basic select with where, order and limit",
@@ -443,8 +474,10 @@ func TestQueryBuilder_ToSquirrel(t *testing.T) {
 					OrderBy("id", "asc").
 					Limit(10)
 			},
-			wantSQL:  "SELECT * FROM users WHERE name = ? ORDER BY id ASC LIMIT 10",
-			wantArgs: []interface{}{"John"},
+			wantWhere: "1=1 AND name = $1",
+			wantArgs:  []any{"John"},
+			wantOrder: " ORDER BY id ASC",
+			wantLimit: " LIMIT 10",
 		},
 		{
 			name: "all operators SQL",
@@ -456,16 +489,16 @@ func TestQueryBuilder_ToSquirrel(t *testing.T) {
 					And("d", "lt", 4).
 					And("e", "lte", 5)
 			},
-			wantSQL:  "SELECT * FROM users WHERE a <> ? AND b > ? AND c >= ? AND d < ? AND e <= ?",
-			wantArgs: []interface{}{1, 2, 3, 4, 5},
+			wantWhere: "1=1 AND a != $1 AND b > $2 AND c >= $3 AND d < $4 AND e <= $5",
+			wantArgs:  []any{1, 2, 3, 4, 5},
 		},
 		{
 			name: "like operator with upper case",
 			build: func() *querybuilder.Builder {
 				return querybuilder.New().And("title", "like", "rock")
 			},
-			wantSQL:  "SELECT * FROM music WHERE upper(title) LIKE ?",
-			wantArgs: []interface{}{"%ROCK%"},
+			wantWhere: "1=1 AND upper(title) LIKE upper($1)",
+			wantArgs:  []any{"%rock%"},
 		},
 		{
 			name: "OR conditions",
@@ -476,45 +509,44 @@ func TestQueryBuilder_ToSquirrel(t *testing.T) {
 					Or("b", "eq", 2).
 					EndOr()
 			},
-			wantSQL:  "SELECT * FROM t WHERE (a = ? OR b = ?)",
-			wantArgs: []interface{}{1, 2},
+			wantWhere: "1=1 AND (a = $1 OR b = $2)",
+			wantArgs:  []any{1, 2},
 		},
 		{
 			name: "IN operator SQL",
 			build: func() *querybuilder.Builder {
 				return querybuilder.New().And("id", "in", []any{1, 2, 3})
 			},
-			wantSQL:  "SELECT * FROM users WHERE id IN (?,?,?)",
-			wantArgs: []interface{}{1, 2, 3},
+			wantWhere: "1=1 AND id IN ($1, $2, $3)",
+			wantArgs:  []any{1, 2, 3},
 		},
 		{
 			name: "IN operator with NULL SQL",
 			build: func() *querybuilder.Builder {
 				return querybuilder.New().And("id", "in", []any{1, nil})
 			},
-			wantSQL:  "SELECT * FROM users WHERE (id IN (?) OR id IS NULL)",
-			wantArgs: []interface{}{1},
+			wantWhere: "1=1 AND (id IN ($1) OR id IS NULL)",
+			wantArgs:  []any{1},
+		},
+		{
+			name: "nil builder safety",
+			build: func() *querybuilder.Builder {
+				return nil
+			},
+			wantWhere: "1=1",
+			wantArgs:  nil,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			b := tt.build()
-			// Extract table name from wantSQL for simulation
-			table := "users"
-			if tt.name == "like operator with upper case" {
-				table = "music"
-			} else if tt.name == "OR conditions" {
-				table = "t"
-			}
+			f := b.ToSQL(1)
 
-			query := squirrel.Select("*").From(table)
-			query = querybuilder.ToSquirrel(query, b)
-
-			sql, args, err := query.ToSql()
-			assert.NoError(t, err)
-			assert.Equal(t, tt.wantSQL, sql)
-			assert.Equal(t, tt.wantArgs, args)
+			assert.Equal(t, tt.wantWhere, f.Where)
+			assert.Equal(t, tt.wantArgs, f.Args)
+			assert.Equal(t, tt.wantOrder, f.OrderBy)
+			assert.Equal(t, tt.wantLimit, f.Limit)
 		})
 	}
 }

@@ -7,7 +7,6 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/Masterminds/squirrel"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -50,16 +49,10 @@ func RegisterQueryBuilderTestRoutes(r *http.ServeMux, resources *TestResources, 
 			builder := querybuilder.Get(r.Context())
 
 			// 1. Data Query
-			query := squirrel.Select("*").From("query_builder_tests").PlaceholderFormat(squirrel.Dollar)
-			query = querybuilder.ToSquirrel(query, builder)
+			f := builder.ToSQL(1)
+			sqlStr := "SELECT * FROM query_builder_tests WHERE " + f.Where + f.OrderBy + f.Limit + f.Offset
 
-			sqlStr, args, err := query.ToSql()
-			if err != nil {
-				httputil.JSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
-				return
-			}
-
-			rows, err := resources.DB.QueryContext(r.Context(), sqlStr, args...)
+			rows, err := resources.DB.QueryContext(r.Context(), sqlStr, f.Args...)
 			if err != nil {
 				httputil.JSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
 				return
@@ -79,17 +72,11 @@ func RegisterQueryBuilderTestRoutes(r *http.ServeMux, resources *TestResources, 
 
 			// 2. Count Query (respecting filters)
 			countBuilder := querybuilder.ForCount(builder)
-			countQuery := squirrel.Select("COUNT(*)").From("query_builder_tests").PlaceholderFormat(squirrel.Dollar)
-			countQuery = querybuilder.ToSquirrel(countQuery, countBuilder)
-
-			countSql, countArgs, err := countQuery.ToSql()
-			if err != nil {
-				httputil.JSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
-				return
-			}
+			cf := countBuilder.ToSQL(1)
+			countSql := "SELECT COUNT(*) FROM query_builder_tests WHERE " + cf.Where
 
 			var totalItems int
-			err = resources.DB.QueryRowContext(r.Context(), countSql, countArgs...).Scan(&totalItems)
+			err = resources.DB.QueryRowContext(r.Context(), countSql, cf.Args...).Scan(&totalItems)
 			if err != nil {
 				httputil.JSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
 				return
@@ -137,6 +124,7 @@ func TestQueryBuilderE2E(t *testing.T) {
 		{ID: "03", Name: stringPtr("Charlie"), Age: 35, IsActive: true},
 		{ID: "04", Name: stringPtr("David"), Age: 40, IsActive: false},
 		{ID: "05", Name: stringPtr("Eve"), Age: 25, IsActive: true},
+		{ID: "07", Name: stringPtr("O'Brien"), Age: 45, IsActive: true},
 	}
 	// Let's add real null for ID 06
 	_, err = db.Exec("INSERT INTO query_builder_tests (id, name, age, is_active) VALUES ($1, $2, $3, $4) ON CONFLICT (id) DO UPDATE SET name = EXCLUDED.name, age = EXCLUDED.age, is_active = EXCLUDED.is_active",
@@ -186,9 +174,9 @@ func TestQueryBuilderE2E(t *testing.T) {
 		{
 			name:        "Metadata: Filtered Count - is_active eq true",
 			queryParams: "filter=is_active eq true&per_page=10",
-			expectedIDs: []string{"01", "03", "05"},
+			expectedIDs: []string{"01", "03", "05", "07"},
 			verifyMetadata: func(t *testing.T, res util.PaginatedResponse[[]QueryBuilderTestData]) {
-				assert.Equal(t, 3, res.Query.TotalItems)
+				assert.Equal(t, 4, res.Query.TotalItems)
 				assert.Equal(t, 1, res.Query.TotalPages)
 				assert.Equal(t, false, res.Query.NextPage)
 			},
@@ -211,12 +199,12 @@ func TestQueryBuilderE2E(t *testing.T) {
 		{
 			name:        "Query by age gt",
 			queryParams: "filter=age gt 30",
-			expectedIDs: []string{"03", "04"},
+			expectedIDs: []string{"03", "04", "07"},
 		},
 		{
 			name:        "Query by is_active eq true",
 			queryParams: "filter=is_active eq true",
-			expectedIDs: []string{"01", "03", "05"},
+			expectedIDs: []string{"01", "03", "05", "07"},
 		},
 		{
 			name:        "Query LIKE case insensitive",
@@ -236,7 +224,7 @@ func TestQueryBuilderE2E(t *testing.T) {
 		{
 			name:        "Order by age desc",
 			queryParams: "order_by=age:desc,id:asc",
-			expectedIDs: []string{"04", "03", "02", "01", "05", "06"},
+			expectedIDs: []string{"07", "04", "03", "02", "01", "05", "06"},
 		},
 		{
 			name:        "Pagination page 2 per_page 2",
@@ -256,7 +244,7 @@ func TestQueryBuilderE2E(t *testing.T) {
 		{
 			name:        "Query with IN operator (booleans)",
 			queryParams: "filter=is_active in (true)",
-			expectedIDs: []string{"01", "03", "05"},
+			expectedIDs: []string{"01", "03", "05", "07"},
 		},
 		{
 			name:        "Query with IN operator (null)",
@@ -267,6 +255,16 @@ func TestQueryBuilderE2E(t *testing.T) {
 			name:        "Query with IN operator (only null)",
 			queryParams: "filter=name in (null)&order_by=id:asc",
 			expectedIDs: []string{"06"},
+		},
+		{
+			name:        "Query with escaped quote (O'Brien)",
+			queryParams: "filter=name eq 'O''Brien'",
+			expectedIDs: []string{"07"},
+		},
+		{
+			name:        "Query with complex AND/OR combination",
+			queryParams: "filter=(age eq 25 or age eq 30) and is_active eq true",
+			expectedIDs: []string{"01", "05"}, // Alice (25, true), Bob (30, false - skipped), Eve (25, true)
 		},
 		{
 			name:           "Disallowed field",
