@@ -14,6 +14,7 @@ import (
 	usersRepo "github.com/felipe1496/open-wallet/internal/resources/users/repository"
 	usersUseCases "github.com/felipe1496/open-wallet/internal/resources/users/usecases"
 	"github.com/felipe1496/open-wallet/internal/services"
+	"github.com/felipe1496/open-wallet/infra/rabbitmq"
 )
 
 type Factory struct {
@@ -28,6 +29,7 @@ type Factory struct {
 	categoriesUseCases   categoriesUseCases.CategoriesUseCases
 	transactionsUseCases transactionsUseCases.TransactionsUseCases
 	recurrencesUseCases  recurrencesUseCases.RecurrencesUseCases
+	brokerService        services.BrokerService
 }
 
 func NewFactory(db *sql.DB, cfg *infra.Config) *Factory {
@@ -99,4 +101,15 @@ func (f *Factory) RecurrencesUseCases() recurrencesUseCases.RecurrencesUseCases 
 		)
 	}
 	return f.recurrencesUseCases
+}
+
+func (f *Factory) BrokerService() (services.BrokerService, error) {
+	if f.brokerService == nil {
+		client, err := rabbitmq.NewClient(f.cfg.RabbitMQURL)
+		if err != nil {
+			return nil, err
+		}
+		f.brokerService = client
+	}
+	return f.brokerService, nil
 }

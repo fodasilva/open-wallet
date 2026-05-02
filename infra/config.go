@@ -24,6 +24,7 @@ type Config struct {
 	GoogleSecret     string
 	LoginRedirectURI string
 	JWTSecret        string
+	RabbitMQURL      string
 	RateLimits       RateLimits
 }
 
@@ -57,6 +58,7 @@ func Load() (*Config, error) {
 	l.loadDatabaseURL()
 	l.loadGoogleAuthConfig()
 	l.loadJWTConfig()
+	l.loadRabbitMQConfig()
 	l.loadRateLimitConfig()
 
 	if len(l.errs) > 0 {
@@ -145,6 +147,14 @@ func (l *loader) loadGoogleAuthConfig() {
 
 func (l *loader) loadJWTConfig() {
 	l.cfg.JWTSecret = l.getRequired("JWT_SECRET")
+}
+
+func (l *loader) loadRabbitMQConfig() {
+	val := os.Getenv("RABBITMQ_URL")
+	if val == "" {
+		l.errs = append(l.errs, "RABBITMQ_URL is required")
+	}
+	l.cfg.RabbitMQURL = val
 }
 
 func (l *loader) loadRateLimitConfig() {
