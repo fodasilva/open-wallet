@@ -1,23 +1,10 @@
-func (r *{{RepoName}}) {{MethodName}}(ctx context.Context, db util.Executer) ({{ReturnType}}, error) {
+func (r *{{RepoName}}) {{MethodName}}(ctx context.Context, db util.Executer) (int, error) {
 	filter := querybuilder.Get(ctx)
-	query := squirrel.Select("COUNT(*)").
-		From("{{TableName}}").
-		PlaceholderFormat(squirrel.Dollar)
+	f := filter.ToSQL(1)
 
-	query = querybuilder.ToSquirrel(query, filter)
-
-	sql, args, err := query.ToSql()
-
-	if err != nil {
-		return 0, err
-	}
+	sql := "SELECT COUNT(*) FROM {{TableName}} WHERE " + f.Where
 
 	var count int
-	err = db.QueryRowContext(ctx, sql, args...).Scan(&count)
-
-	if err != nil {
-		return 0, err
-	}
-
-	return count, nil
+	err := db.QueryRowContext(ctx, sql, f.Args...).Scan(&count)
+	return count, err
 }
