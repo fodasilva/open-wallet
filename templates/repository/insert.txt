@@ -1,15 +1,8 @@
 func (r *{{RepoName}}) {{MethodName}}(ctx context.Context, db util.Executer, data {{PayloadType}}) error {
-	query := squirrel.Insert("{{TableName}}").
-		PlaceholderFormat(squirrel.Dollar)
-
 {{InColsVals}}
 
-	sql, args, err := query.ToSql()
-	if err != nil {
-		return err
-	}
-
-	_, err = db.ExecContext(ctx, sql, args...)
+	sql := fmt.Sprintf("INSERT INTO {{TableName}} (%s) VALUES (%s)", strings.Join(columns, ", "), strings.Join(placeholders, ", "))
+	_, err := db.ExecContext(ctx, sql, values...)
 
 	return err
 }

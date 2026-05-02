@@ -1,17 +1,9 @@
 func (r *{{RepoName}}) {{MethodName}}(ctx context.Context, db util.Executer) error {
 	filter := querybuilder.Get(ctx)
-	query := squirrel.Delete("{{TableName}}").
-		PlaceholderFormat(squirrel.Dollar)
+	f := filter.ToSQL(1)
 
-	query = querybuilder.ToDeleteSquirrel(query, filter)
+	sql := "DELETE FROM {{TableName}} WHERE " + f.Where
 
-	sql, args, err := query.ToSql()
-
-	if err != nil {
-		return err
-	}
-
-	_, err = db.ExecContext(ctx, sql, args...)
-
+	_, err := db.ExecContext(ctx, sql, f.Args...)
 	return err
 }

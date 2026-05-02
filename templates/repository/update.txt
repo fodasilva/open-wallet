@@ -1,19 +1,12 @@
 func (r *{{RepoName}}) {{MethodName}}(ctx context.Context, db util.Executer, data {{PayloadType}}) error {
 	filter := querybuilder.Get(ctx)
-	query := squirrel.Update("{{TableName}}").
-		PlaceholderFormat(squirrel.Dollar)
-
 {{UpdateSets}}
 
-	query = querybuilder.ToUpdateSquirrel(query, filter)
+	f := filter.ToSQL(len(values) + 1)
+	sql := "UPDATE {{TableName}} SET " + strings.Join(sets, ", ") + " WHERE " + f.Where
+	values = append(values, f.Args...)
 
-	sql, args, err := query.ToSql()
-
-	if err != nil {
-		return err
-	}
-
-	_, err = db.ExecContext(ctx, sql, args...)
+	_, err := db.ExecContext(ctx, sql, values...)
 
 	return err
 }

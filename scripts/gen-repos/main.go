@@ -256,8 +256,10 @@ func generateFiles(repos []*RepoConfig) {
 		sb.WriteString(fmt.Sprintf("package %s\n\n", repos[0].Package))
 		sb.WriteString("import (\n")
 		sb.WriteString("\t\"context\"\n")
-		sb.WriteString("\n")
-		sb.WriteString("\t\"github.com/Masterminds/squirrel\"\n")
+		if name == "insert" || name == "update" {
+			sb.WriteString("\t\"fmt\"\n")
+			sb.WriteString("\t\"strings\"\n")
+		}
 		sb.WriteString("\n")
 		sb.WriteString("\t\"github.com/felipe1496/open-wallet/internal/util\"\n")
 		if name != "insert" {
@@ -290,28 +292,27 @@ func generateFiles(repos []*RepoConfig) {
 					cols = append(cols, f.Column)
 					scans = append(scans, "&item."+f.GoField)
 				}
-				tpl = strings.ReplaceAll(tpl, "{{Columns}}", `"`+strings.Join(cols, `", "`)+`"`)
+				tpl = strings.ReplaceAll(tpl, "{{Columns}}", strings.Join(cols, ", "))
 				tpl = strings.ReplaceAll(tpl, "{{ScanFields}}", strings.Join(scans, ",\n\t\t\t")+",")
 
 			case "Insert":
-				inColsVals := "var columns []string\n\tvar values []interface{}\n"
+				inColsVals := "var columns []string\n\tvar values []interface{}\n\tvar placeholders []string\n"
 				for _, f := range method.Fields {
 					if f.IsOptional {
-						inColsVals += fmt.Sprintf("\tif data.%s.Set { columns = append(columns, \"%s\"); values = append(values, data.%s.Value) }\n", f.GoField, f.Column, f.GoField)
+						inColsVals += fmt.Sprintf("\tif data.%s.Set { columns = append(columns, \"%s\"); values = append(values, data.%s.Value); placeholders = append(placeholders, fmt.Sprintf(\"$%%d\", len(values))) }\n", f.GoField, f.Column, f.GoField)
 					} else {
-						inColsVals += fmt.Sprintf("\tcolumns = append(columns, \"%s\"); values = append(values, data.%s)\n", f.Column, f.GoField)
+						inColsVals += fmt.Sprintf("\tcolumns = append(columns, \"%s\"); values = append(values, data.%s); placeholders = append(placeholders, fmt.Sprintf(\"$%%d\", len(values)))\n", f.Column, f.GoField)
 					}
 				}
-				inColsVals += "\tquery = query.Columns(columns...).Values(values...)"
 				tpl = strings.ReplaceAll(tpl, "{{InColsVals}}", inColsVals)
 
 			case "Update":
-				sets := ""
+				sets := "var sets []string\n\tvar values []interface{}\n"
 				for _, f := range method.Fields {
 					if f.IsOptional {
-						sets += fmt.Sprintf("\tif data.%s.Set { query = query.Set(\"%s\", data.%s.Value) }\n", f.GoField, f.Column, f.GoField)
+						sets += fmt.Sprintf("\tif data.%s.Set { values = append(values, data.%s.Value); sets = append(sets, fmt.Sprintf(\"%s = $%%d\", len(values))) }\n", f.GoField, f.GoField, f.Column)
 					} else {
-						sets += fmt.Sprintf("\tquery = query.Set(\"%s\", data.%s)\n", f.Column, f.GoField)
+						sets += fmt.Sprintf("\tvalues = append(values, data.%s); sets = append(sets, fmt.Sprintf(\"%s = $%%d\", len(values)))\n", f.GoField, f.Column)
 					}
 				}
 				tpl = strings.ReplaceAll(tpl, "{{UpdateSets}}", sets)
