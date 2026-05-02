@@ -4,8 +4,8 @@ package repository
 
 import (
 	"context"
-
-	"github.com/Masterminds/squirrel"
+	"fmt"
+	"strings"
 
 	"github.com/felipe1496/open-wallet/internal/util"
 	"github.com/felipe1496/open-wallet/internal/util/querybuilder"
@@ -13,31 +13,30 @@ import (
 
 func (r *UsersRepoImpl) Update(ctx context.Context, db util.Executer, data UpdateUserDTO) error {
 	filter := querybuilder.Get(ctx)
-	query := squirrel.Update("users").
-		PlaceholderFormat(squirrel.Dollar)
-
+	var sets []string
+	var values []interface{}
 	if data.Name.Set {
-		query = query.Set("name", data.Name.Value)
+		values = append(values, data.Name.Value)
+		sets = append(sets, fmt.Sprintf("name = $%d", len(values)))
 	}
 	if data.Email.Set {
-		query = query.Set("email", data.Email.Value)
+		values = append(values, data.Email.Value)
+		sets = append(sets, fmt.Sprintf("email = $%d", len(values)))
 	}
 	if data.AvatarURL.Set {
-		query = query.Set("avatar_url", data.AvatarURL.Value)
+		values = append(values, data.AvatarURL.Value)
+		sets = append(sets, fmt.Sprintf("avatar_url = $%d", len(values)))
 	}
 	if data.Username.Set {
-		query = query.Set("username", data.Username.Value)
+		values = append(values, data.Username.Value)
+		sets = append(sets, fmt.Sprintf("username = $%d", len(values)))
 	}
 
-	query = querybuilder.ToUpdateSquirrel(query, filter)
+	f := filter.ToSQL(len(values) + 1)
+	sql := "UPDATE users SET " + strings.Join(sets, ", ") + " WHERE " + f.Where
+	values = append(values, f.Args...)
 
-	sql, args, err := query.ToSql()
-
-	if err != nil {
-		return err
-	}
-
-	_, err = db.ExecContext(ctx, sql, args...)
+	_, err := db.ExecContext(ctx, sql, values...)
 
 	return err
 }

@@ -5,27 +5,17 @@ package repository
 import (
 	"context"
 
-	"github.com/Masterminds/squirrel"
-
 	"github.com/felipe1496/open-wallet/internal/util"
 	"github.com/felipe1496/open-wallet/internal/util/querybuilder"
 )
 
 func (r *UsersRepoImpl) Select(ctx context.Context, db util.Executer) ([]User, error) {
 	filter := querybuilder.Get(ctx)
-	query := squirrel.Select("id", "name", "email", "avatar_url", "created_at", "username").
-		From("users").
-		PlaceholderFormat(squirrel.Dollar)
+	f := filter.ToSQL(1)
 
-	query = querybuilder.ToSquirrel(query, filter)
+	sql := "SELECT id, name, email, avatar_url, created_at, username FROM users WHERE " + f.Where + f.OrderBy + f.Limit + f.Offset
 
-	sql, args, err := query.ToSql()
-
-	if err != nil {
-		return nil, err
-	}
-
-	rows, err := db.QueryContext(ctx, sql, args...)
+	rows, err := db.QueryContext(ctx, sql, f.Args...)
 
 	if err != nil {
 		return nil, err
@@ -44,6 +34,9 @@ func (r *UsersRepoImpl) Select(ctx context.Context, db util.Executer) ([]User, e
 			&item.CreatedAt,
 			&item.Username,
 		)
+		if err != nil {
+			return nil, err
+		}
 		results = append(results, item)
 	}
 

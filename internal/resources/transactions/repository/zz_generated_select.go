@@ -5,27 +5,17 @@ package repository
 import (
 	"context"
 
-	"github.com/Masterminds/squirrel"
-
 	"github.com/felipe1496/open-wallet/internal/util"
 	"github.com/felipe1496/open-wallet/internal/util/querybuilder"
 )
 
 func (r *TransactionsRepoImpl) Select(ctx context.Context, db util.Executer) ([]Transaction, error) {
 	filter := querybuilder.Get(ctx)
-	query := squirrel.Select("id", "user_id", "category", "name", "description", "created_at", "category_id", "recurrence_id").
-		From("transactions").
-		PlaceholderFormat(squirrel.Dollar)
+	f := filter.ToSQL(1)
 
-	query = querybuilder.ToSquirrel(query, filter)
+	sql := "SELECT id, user_id, category, name, description, created_at, category_id, recurrence_id FROM transactions WHERE " + f.Where + f.OrderBy + f.Limit + f.Offset
 
-	sql, args, err := query.ToSql()
-
-	if err != nil {
-		return nil, err
-	}
-
-	rows, err := db.QueryContext(ctx, sql, args...)
+	rows, err := db.QueryContext(ctx, sql, f.Args...)
 
 	if err != nil {
 		return nil, err
@@ -46,6 +36,9 @@ func (r *TransactionsRepoImpl) Select(ctx context.Context, db util.Executer) ([]
 			&item.CategoryID,
 			&item.RecurrenceID,
 		)
+		if err != nil {
+			return nil, err
+		}
 		results = append(results, item)
 	}
 
@@ -54,19 +47,11 @@ func (r *TransactionsRepoImpl) Select(ctx context.Context, db util.Executer) ([]
 
 func (r *EntriesRepoImpl) Select(ctx context.Context, db util.Executer) ([]ViewEntry, error) {
 	filter := querybuilder.Get(ctx)
-	query := squirrel.Select("id", "transaction_id", "name", "description", "amount", "period", "user_id", "category", "total_amount", "installment", "total_installments", "created_at", "reference_date", "category_id", "category_name", "category_color", "recurrence_id").
-		From("v_entries").
-		PlaceholderFormat(squirrel.Dollar)
+	f := filter.ToSQL(1)
 
-	query = querybuilder.ToSquirrel(query, filter)
+	sql := "SELECT id, transaction_id, name, description, amount, period, user_id, category, total_amount, installment, total_installments, created_at, reference_date, category_id, category_name, category_color, recurrence_id FROM v_entries WHERE " + f.Where + f.OrderBy + f.Limit + f.Offset
 
-	sql, args, err := query.ToSql()
-
-	if err != nil {
-		return nil, err
-	}
-
-	rows, err := db.QueryContext(ctx, sql, args...)
+	rows, err := db.QueryContext(ctx, sql, f.Args...)
 
 	if err != nil {
 		return nil, err
@@ -96,6 +81,9 @@ func (r *EntriesRepoImpl) Select(ctx context.Context, db util.Executer) ([]ViewE
 			&item.CategoryColor,
 			&item.RecurrenceID,
 		)
+		if err != nil {
+			return nil, err
+		}
 		results = append(results, item)
 	}
 
@@ -104,19 +92,11 @@ func (r *EntriesRepoImpl) Select(ctx context.Context, db util.Executer) ([]ViewE
 
 func (r *SummariesRepoImpl) Select(ctx context.Context, db util.Executer) ([]ViewSummary, error) {
 	filter := querybuilder.Get(ctx)
-	query := squirrel.Select("user_id", "period", "total_expense", "total_income", "total_balance").
-		From("v_summaries").
-		PlaceholderFormat(squirrel.Dollar)
+	f := filter.ToSQL(1)
 
-	query = querybuilder.ToSquirrel(query, filter)
+	sql := "SELECT user_id, period, total_expense, total_income, total_balance FROM v_summaries WHERE " + f.Where + f.OrderBy + f.Limit + f.Offset
 
-	sql, args, err := query.ToSql()
-
-	if err != nil {
-		return nil, err
-	}
-
-	rows, err := db.QueryContext(ctx, sql, args...)
+	rows, err := db.QueryContext(ctx, sql, f.Args...)
 
 	if err != nil {
 		return nil, err
@@ -134,6 +114,9 @@ func (r *SummariesRepoImpl) Select(ctx context.Context, db util.Executer) ([]Vie
 			&item.TotalIncome,
 			&item.TotalBalance,
 		)
+		if err != nil {
+			return nil, err
+		}
 		results = append(results, item)
 	}
 

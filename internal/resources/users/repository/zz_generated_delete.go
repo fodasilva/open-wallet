@@ -5,26 +5,16 @@ package repository
 import (
 	"context"
 
-	"github.com/Masterminds/squirrel"
-
 	"github.com/felipe1496/open-wallet/internal/util"
 	"github.com/felipe1496/open-wallet/internal/util/querybuilder"
 )
 
 func (r *UsersRepoImpl) Delete(ctx context.Context, db util.Executer) error {
 	filter := querybuilder.Get(ctx)
-	query := squirrel.Delete("users").
-		PlaceholderFormat(squirrel.Dollar)
+	f := filter.ToSQL(1)
 
-	query = querybuilder.ToDeleteSquirrel(query, filter)
+	sql := "DELETE FROM users WHERE " + f.Where
 
-	sql, args, err := query.ToSql()
-
-	if err != nil {
-		return err
-	}
-
-	_, err = db.ExecContext(ctx, sql, args...)
-
+	_, err := db.ExecContext(ctx, sql, f.Args...)
 	return err
 }

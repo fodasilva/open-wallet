@@ -4,8 +4,8 @@ package repository
 
 import (
 	"context"
-
-	"github.com/Masterminds/squirrel"
+	"fmt"
+	"strings"
 
 	"github.com/felipe1496/open-wallet/internal/util"
 	"github.com/felipe1496/open-wallet/internal/util/querybuilder"
@@ -13,31 +13,30 @@ import (
 
 func (r *TransactionsRepoImpl) Update(ctx context.Context, db util.Executer, data UpdateTransactionDTO) error {
 	filter := querybuilder.Get(ctx)
-	query := squirrel.Update("transactions").
-		PlaceholderFormat(squirrel.Dollar)
-
+	var sets []string
+	var values []interface{}
 	if data.Name.Set {
-		query = query.Set("name", data.Name.Value)
+		values = append(values, data.Name.Value)
+		sets = append(sets, fmt.Sprintf("name = $%d", len(values)))
 	}
 	if data.Note.Set {
-		query = query.Set("description", data.Note.Value)
+		values = append(values, data.Note.Value)
+		sets = append(sets, fmt.Sprintf("description = $%d", len(values)))
 	}
 	if data.CategoryID.Set {
-		query = query.Set("category_id", data.CategoryID.Value)
+		values = append(values, data.CategoryID.Value)
+		sets = append(sets, fmt.Sprintf("category_id = $%d", len(values)))
 	}
 	if data.RecurrenceID.Set {
-		query = query.Set("recurrence_id", data.RecurrenceID.Value)
+		values = append(values, data.RecurrenceID.Value)
+		sets = append(sets, fmt.Sprintf("recurrence_id = $%d", len(values)))
 	}
 
-	query = querybuilder.ToUpdateSquirrel(query, filter)
+	f := filter.ToSQL(len(values) + 1)
+	sql := "UPDATE transactions SET " + strings.Join(sets, ", ") + " WHERE " + f.Where
+	values = append(values, f.Args...)
 
-	sql, args, err := query.ToSql()
-
-	if err != nil {
-		return err
-	}
-
-	_, err = db.ExecContext(ctx, sql, args...)
+	_, err := db.ExecContext(ctx, sql, values...)
 
 	return err
 }

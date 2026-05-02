@@ -5,27 +5,17 @@ package repository
 import (
 	"context"
 
-	"github.com/Masterminds/squirrel"
-
 	"github.com/felipe1496/open-wallet/internal/util"
 	"github.com/felipe1496/open-wallet/internal/util/querybuilder"
 )
 
 func (r *RecurrencesRepoImpl) Select(ctx context.Context, db util.Executer) ([]Recurrence, error) {
 	filter := querybuilder.Get(ctx)
-	query := squirrel.Select("id", "user_id", "name", "note", "amount", "day_of_month", "category_id", "category_name", "category_color", "start_period", "end_period", "created_at").
-		From("v_recurrences").
-		PlaceholderFormat(squirrel.Dollar)
+	f := filter.ToSQL(1)
 
-	query = querybuilder.ToSquirrel(query, filter)
+	sql := "SELECT id, user_id, name, note, amount, day_of_month, category_id, category_name, category_color, start_period, end_period, created_at FROM v_recurrences WHERE " + f.Where + f.OrderBy + f.Limit + f.Offset
 
-	sql, args, err := query.ToSql()
-
-	if err != nil {
-		return nil, err
-	}
-
-	rows, err := db.QueryContext(ctx, sql, args...)
+	rows, err := db.QueryContext(ctx, sql, f.Args...)
 
 	if err != nil {
 		return nil, err
@@ -50,6 +40,9 @@ func (r *RecurrencesRepoImpl) Select(ctx context.Context, db util.Executer) ([]R
 			&item.EndPeriod,
 			&item.CreatedAt,
 		)
+		if err != nil {
+			return nil, err
+		}
 		results = append(results, item)
 	}
 

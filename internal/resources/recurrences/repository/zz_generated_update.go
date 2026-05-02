@@ -4,8 +4,8 @@ package repository
 
 import (
 	"context"
-
-	"github.com/Masterminds/squirrel"
+	"fmt"
+	"strings"
 
 	"github.com/felipe1496/open-wallet/internal/util"
 	"github.com/felipe1496/open-wallet/internal/util/querybuilder"
@@ -13,40 +13,42 @@ import (
 
 func (r *RecurrencesRepoImpl) Update(ctx context.Context, db util.Executer, data UpdateRecurrenceDTO) error {
 	filter := querybuilder.Get(ctx)
-	query := squirrel.Update("recurrences").
-		PlaceholderFormat(squirrel.Dollar)
-
+	var sets []string
+	var values []interface{}
 	if data.Name.Set {
-		query = query.Set("name", data.Name.Value)
+		values = append(values, data.Name.Value)
+		sets = append(sets, fmt.Sprintf("name = $%d", len(values)))
 	}
 	if data.Note.Set {
-		query = query.Set("note", data.Note.Value)
+		values = append(values, data.Note.Value)
+		sets = append(sets, fmt.Sprintf("note = $%d", len(values)))
 	}
 	if data.Amount.Set {
-		query = query.Set("amount", data.Amount.Value)
+		values = append(values, data.Amount.Value)
+		sets = append(sets, fmt.Sprintf("amount = $%d", len(values)))
 	}
 	if data.DayOfMonth.Set {
-		query = query.Set("day_of_month", data.DayOfMonth.Value)
+		values = append(values, data.DayOfMonth.Value)
+		sets = append(sets, fmt.Sprintf("day_of_month = $%d", len(values)))
 	}
 	if data.CategoryID.Set {
-		query = query.Set("category_id", data.CategoryID.Value)
+		values = append(values, data.CategoryID.Value)
+		sets = append(sets, fmt.Sprintf("category_id = $%d", len(values)))
 	}
 	if data.StartPeriod.Set {
-		query = query.Set("start_period", data.StartPeriod.Value)
+		values = append(values, data.StartPeriod.Value)
+		sets = append(sets, fmt.Sprintf("start_period = $%d", len(values)))
 	}
 	if data.EndPeriod.Set {
-		query = query.Set("end_period", data.EndPeriod.Value)
+		values = append(values, data.EndPeriod.Value)
+		sets = append(sets, fmt.Sprintf("end_period = $%d", len(values)))
 	}
 
-	query = querybuilder.ToUpdateSquirrel(query, filter)
+	f := filter.ToSQL(len(values) + 1)
+	sql := "UPDATE recurrences SET " + strings.Join(sets, ", ") + " WHERE " + f.Where
+	values = append(values, f.Args...)
 
-	sql, args, err := query.ToSql()
-
-	if err != nil {
-		return err
-	}
-
-	_, err = db.ExecContext(ctx, sql, args...)
+	_, err := db.ExecContext(ctx, sql, values...)
 
 	return err
 }

@@ -3,8 +3,6 @@ package repository
 import (
 	"context"
 
-	"github.com/Masterminds/squirrel"
-
 	"github.com/felipe1496/open-wallet/internal/util"
 	"github.com/felipe1496/open-wallet/internal/util/querybuilder"
 )
@@ -31,23 +29,13 @@ func NewCategoriesRepo() CategoriesRepo {
 
 func (r *CategoriesRepoImpl) CountCategoryAmountPerPeriod(ctx context.Context, db util.Executer, period string) (int, error) {
 	filter := querybuilder.Get(ctx)
-	countQuery := squirrel.
-		Select("COUNT(*)").
-		From("fn_category_amount_per_period(?)").
-		PlaceholderFormat(squirrel.Dollar)
+	f := filter.ToSQL(2) // Starts at $2 because period is $1
 
-	countQuery = querybuilder.ToSquirrel(countQuery, filter)
-
-	sql, args, err := countQuery.ToSql()
-
-	if err != nil {
-		return 0, err
-	}
-
-	args = append([]interface{}{period}, args...)
+	sql := "SELECT COUNT(*) FROM fn_category_amount_per_period($1) WHERE " + f.Where
+	args := append([]any{period}, f.Args...)
 
 	var count int
-	err = db.QueryRowContext(ctx, sql, args...).Scan(&count)
+	err := db.QueryRowContext(ctx, sql, args...).Scan(&count)
 	if err != nil {
 		return 0, err
 	}
@@ -57,20 +45,10 @@ func (r *CategoriesRepoImpl) CountCategoryAmountPerPeriod(ctx context.Context, d
 
 func (r *CategoriesRepoImpl) ListCategoryAmountPerPeriod(ctx context.Context, db util.Executer, period string) ([]CategoryAmountPerPeriod, error) {
 	filter := querybuilder.Get(ctx)
-	query := squirrel.
-		Select("id", "user_id", "name", "color", "period", "total_amount").
-		From("fn_category_amount_per_period(?)").
-		PlaceholderFormat(squirrel.Dollar)
+	f := filter.ToSQL(2) // Starts at $2 because period is $1
 
-	query = querybuilder.ToSquirrel(query, filter)
-
-	sql, args, err := query.ToSql()
-
-	if err != nil {
-		return nil, err
-	}
-
-	args = append([]interface{}{period}, args...)
+	sql := "SELECT id, user_id, name, color, period, total_amount FROM fn_category_amount_per_period($1) WHERE " + f.Where + f.OrderBy + f.Limit + f.Offset
+	args := append([]any{period}, f.Args...)
 
 	rows, err := db.QueryContext(ctx, sql, args...)
 

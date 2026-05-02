@@ -5,32 +5,17 @@ package repository
 import (
 	"context"
 
-	"github.com/Masterminds/squirrel"
-
 	"github.com/felipe1496/open-wallet/internal/util"
 	"github.com/felipe1496/open-wallet/internal/util/querybuilder"
 )
 
 func (r *RecurrencesRepoImpl) Count(ctx context.Context, db util.Executer) (int, error) {
 	filter := querybuilder.Get(ctx)
-	query := squirrel.Select("COUNT(*)").
-		From("v_recurrences").
-		PlaceholderFormat(squirrel.Dollar)
+	f := filter.ToSQL(1)
 
-	query = querybuilder.ToSquirrel(query, filter)
-
-	sql, args, err := query.ToSql()
-
-	if err != nil {
-		return 0, err
-	}
+	sql := "SELECT COUNT(*) FROM v_recurrences WHERE " + f.Where
 
 	var count int
-	err = db.QueryRowContext(ctx, sql, args...).Scan(&count)
-
-	if err != nil {
-		return 0, err
-	}
-
-	return count, nil
+	err := db.QueryRowContext(ctx, sql, f.Args...).Scan(&count)
+	return count, err
 }
