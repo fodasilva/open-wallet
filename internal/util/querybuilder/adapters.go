@@ -3,131 +3,142 @@ package querybuilder
 import (
 	"fmt"
 	"strings"
-
-	"github.com/Masterminds/squirrel"
 )
 
-func ToSquirrel(query squirrel.SelectBuilder, b *Builder) squirrel.SelectBuilder {
+type SQLFragments struct {
+	Where   string
+	Args    []any
+	OrderBy string
+	Limit   string
+	Offset  string
+}
+
+func (b *Builder) ToSQL(startIdx int) SQLFragments {
 	if b == nil {
-		return query
+		return SQLFragments{Where: "1=1"}
 	}
 
-	for _, andCondition := range b.AndConditions {
-		query = query.Where(conditionToSquirrel(andCondition))
-	}
+	where := "1=1"
+	args := []any{}
+	currentIdx := startIdx
 
-	for _, orGroup := range b.OrGroups {
-		orSqlizers := squirrel.Or{}
-		for _, condition := range orGroup {
-			orSqlizers = append(orSqlizers, conditionToSquirrel(condition))
+	// 1. AND Conditions
+	for _, cond := range b.AndConditions {
+		sql, condArgs := conditionToSQL(cond, &currentIdx)
+		if sql != "" {
+			where += " AND " + sql
+			args = append(args, condArgs...)
 		}
-
-		query = query.Where(orSqlizers)
 	}
 
+	// 2. OR Groups
+	for _, group := range b.OrGroups {
+		var orParts []string
+		for _, cond := range group {
+			sql, condArgs := conditionToSQL(cond, &currentIdx)
+			if sql != "" {
+				orParts = append(orParts, sql)
+				args = append(args, condArgs...)
+			}
+		}
+		if len(orParts) > 0 {
+			where += fmt.Sprintf(" AND (%s)", strings.Join(orParts, " OR "))
+		}
+	}
+
+	// 3. Order
+	orderBy := ""
+	if len(b.Orders) > 0 {
+		var parts []string
+		for _, o := range b.Orders {
+			dir := "ASC"
+			if strings.ToLower(o.Dir) == "desc" {
+				dir = "DESC"
+			}
+			parts = append(parts, fmt.Sprintf("%s %s", o.Field, dir))
+		}
+		orderBy = " ORDER BY " + strings.Join(parts, ", ")
+	}
+
+	// 4. Limit
+	limit := ""
 	if b.LimitValue != nil {
-		limit := *b.LimitValue
-		if limit < 0 {
-			limit = 0
+		l := *b.LimitValue
+		if l < 0 {
+			l = 0
 		}
-		query = query.Limit(uint64(limit))
+		limit = fmt.Sprintf(" LIMIT %d", l)
 	}
 
+	// 5. Offset
+	offset := ""
 	if b.OffsetValue != nil {
-		offset := *b.OffsetValue
-		if offset < 0 {
-			offset = 0
+		off := *b.OffsetValue
+		if off < 0 {
+			off = 0
 		}
-		query = query.Offset(uint64(offset))
+		offset = fmt.Sprintf(" OFFSET %d", off)
 	}
 
-	for _, order := range b.Orders {
-		if order.Dir == "asc" {
-			query = query.OrderBy(order.Field + " ASC")
-		} else {
-			query = query.OrderBy(order.Field + " DESC")
-		}
+	return SQLFragments{
+		Where:   where,
+		Args:    args,
+		OrderBy: orderBy,
+		Limit:   limit,
+		Offset:  offset,
 	}
-
-	return query
 }
 
-func ToDeleteSquirrel(query squirrel.DeleteBuilder, b *Builder) squirrel.DeleteBuilder {
-	if b == nil {
-		return query
-	}
-
-	for _, andCondition := range b.AndConditions {
-		query = query.Where(conditionToSquirrel(andCondition))
-	}
-
-	for _, orGroup := range b.OrGroups {
-		orSqlizers := squirrel.Or{}
-		for _, condition := range orGroup {
-			orSqlizers = append(orSqlizers, conditionToSquirrel(condition))
+func conditionToSQL(cond Condition, idx *int) (string, []any) {
+	switch cond.Operator {
+	case "eq":
+		if cond.Value == nil {
+			return fmt.Sprintf("%s IS NULL", cond.Field), nil
 		}
-		query = query.Where(orSqlizers)
-	}
+		sql := fmt.Sprintf("%s = $%d", cond.Field, *idx)
+		*idx++
+		return sql, []any{cond.Value}
 
-	if b.LimitValue != nil {
-		limit := *b.LimitValue
-		if limit < 0 {
-			limit = 0
+	case "ne":
+		if cond.Value == nil {
+			return fmt.Sprintf("%s IS NOT NULL", cond.Field), nil
 		}
-		query = query.Limit(uint64(limit))
-	}
+		sql := fmt.Sprintf("%s != $%d", cond.Field, *idx)
+		*idx++
+		return sql, []any{cond.Value}
 
-	for _, order := range b.Orders {
-		if order.Dir == "asc" {
-			query = query.OrderBy(order.Field + " ASC")
-		} else {
-			query = query.OrderBy(order.Field + " DESC")
-		}
-	}
+	case "lt":
+		sql := fmt.Sprintf("%s < $%d", cond.Field, *idx)
+		*idx++
+		return sql, []any{cond.Value}
 
-	return query
-}
+	case "lte":
+		sql := fmt.Sprintf("%s <= $%d", cond.Field, *idx)
+		*idx++
+		return sql, []any{cond.Value}
 
-func ToUpdateSquirrel(query squirrel.UpdateBuilder, b *Builder) squirrel.UpdateBuilder {
-	if b == nil {
-		return query
-	}
+	case "gt":
+		sql := fmt.Sprintf("%s > $%d", cond.Field, *idx)
+		*idx++
+		return sql, []any{cond.Value}
 
-	for _, andCondition := range b.AndConditions {
-		query = query.Where(conditionToSquirrel(andCondition))
-	}
+	case "gte":
+		sql := fmt.Sprintf("%s >= $%d", cond.Field, *idx)
+		*idx++
+		return sql, []any{cond.Value}
 
-	for _, orGroup := range b.OrGroups {
-		orSqlizers := squirrel.Or{}
-		for _, condition := range orGroup {
-			orSqlizers = append(orSqlizers, conditionToSquirrel(condition))
-		}
-		query = query.Where(orSqlizers)
-	}
+	case "like":
+		sql := fmt.Sprintf("upper(%s) LIKE upper($%d)", cond.Field, *idx)
+		val := fmt.Sprintf("%%%v%%", cond.Value)
+		*idx++
+		return sql, []any{val}
 
-	if b.LimitValue != nil {
-		limit := *b.LimitValue
-		if limit < 0 {
-			limit = 0
-		}
-		query = query.Limit(uint64(limit))
-	}
+	case "in":
+		if slice, ok := cond.Value.([]any); ok {
+			if len(slice) == 0 {
+				return "FALSE", nil
+			}
 
-	for _, order := range b.Orders {
-		if order.Dir == "asc" {
-			query = query.OrderBy(order.Field + " ASC")
-		} else {
-			query = query.OrderBy(order.Field + " DESC")
-		}
-	}
-
-	return query
-}
-
-func conditionToSquirrel(condition Condition) squirrel.Sqlizer {
-	switch condition.Operator {
-	case "eq", "in":
-		if slice, ok := condition.Value.([]any); ok {
 			var nonNulls []any
 			hasNull := false
 			for _, v := range slice {
@@ -138,30 +149,33 @@ func conditionToSquirrel(condition Condition) squirrel.Sqlizer {
 				}
 			}
 
-			if hasNull {
-				if len(nonNulls) == 0 {
-					return squirrel.Eq{condition.Field: nil}
+			var parts []string
+			var args []any
+
+			if len(nonNulls) > 0 {
+				placeholders := make([]string, len(nonNulls))
+				for i := range nonNulls {
+					placeholders[i] = fmt.Sprintf("$%d", *idx)
+					*idx++
 				}
-				return squirrel.Or{
-					squirrel.Eq{condition.Field: nonNulls},
-					squirrel.Eq{condition.Field: nil},
-				}
+				parts = append(parts, fmt.Sprintf("%s IN (%s)", cond.Field, strings.Join(placeholders, ", ")))
+				args = append(args, nonNulls...)
 			}
+
+			if hasNull {
+				parts = append(parts, fmt.Sprintf("%s IS NULL", cond.Field))
+			}
+
+			if len(parts) == 1 {
+				return parts[0], args
+			}
+			return "(" + strings.Join(parts, " OR ") + ")", args
 		}
-		return squirrel.Eq{condition.Field: condition.Value}
-	case "ne":
-		return squirrel.NotEq{condition.Field: condition.Value}
-	case "lt":
-		return squirrel.Lt{condition.Field: condition.Value}
-	case "lte":
-		return squirrel.LtOrEq{condition.Field: condition.Value}
-	case "gt":
-		return squirrel.Gt{condition.Field: condition.Value}
-	case "gte":
-		return squirrel.GtOrEq{condition.Field: condition.Value}
-	case "like":
-		return squirrel.Like{fmt.Sprintf("upper(%s)", condition.Field): strings.ToUpper(fmt.Sprintf("%%%s%%", condition.Value))}
-	default:
-		return nil
+		// If not a slice, treat as eq
+		sql := fmt.Sprintf("%s = $%d", cond.Field, *idx)
+		*idx++
+		return sql, []any{cond.Value}
 	}
+
+	return "", nil
 }
