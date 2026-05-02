@@ -13,12 +13,12 @@ The `querybuilder.Builder` serves as a **Living Object** that travels through th
 
 -   **Middleware**: Receives the raw web parameters and performs initial parsing and basic validation.
 -   **Usecase**: Can augment the builder with mandatory business rules (e.g., `builder.And("user_id", "eq", session.UID)` to enforce ownership) without knowing about web concerns.
--   **Repository**: Finalizes the process by converting the rich state in the builder into a SQL query using `ToSquirrel`.
+-   **Repository**: Finalizes the process by converting the rich state in the builder into raw SQL fragments using `ToSQL`.
 
 This approach provides:
 -   **State Composition**: You can compose filters at different levels of the application without overwriting or losing previous constraints.
 -   **Zero Boilerplate**: No need to define or maintain custom filter types for each domain.
--   **Layer Isolation**: The repository doesn't need to know about the filter string syntax, and the middleware doesn't need to know about Squirrel or SQL.
+-   **Layer Isolation**: The repository doesn't need to know about the filter string syntax, and the middleware doesn't need to know about SQL.
 
 ---
 
@@ -143,16 +143,22 @@ builder.InitOr().
     EndOr()
 ```
 
-### 4. Converting to Squirrel (SQL)
+### 4. Converting to SQL (Fragments)
 
-The builder integrates seamlessly with `Masterminds/squirrel`.
+The builder generates raw SQL fragments that can be easily concatenated into your queries.
 
 ```go
-query := squirrel.Select("*").From("users")
-query = querybuilder.ToSquirrel(query, builder)
+// 1 is the starting index for Postgres placeholders ($1, $2, etc.)
+f := builder.ToSQL(1) 
 
-sql, args, err := query.ToSql()
+// Use the fragments in your query
+sql := "SELECT * FROM users WHERE " + f.Where + f.OrderBy + f.Limit + f.Offset
+
+// Execute with f.Args
+rows, err := db.Query(ctx, sql, f.Args...)
 ```
+
+The `Where` fragment always starts with `1=1` (e.g., `1=1 AND name = $1`), ensuring valid SQL even if no filters are applied.
 
 ### 5. Repository Integration
 
@@ -161,7 +167,7 @@ Repository methods generated with the `@gen_repo` tag automatically receive and 
 ```go
 // @method: Select | fields: id, name, status
 func (r *Repo) Select(db utils.Executer, filter *querybuilder.Builder) ([]Item, error) {
-    // ... generated code will use querybuilder.ToSquirrel ...
+    // ... generated code will use filter.ToSQL ...
 }
 ```
 
