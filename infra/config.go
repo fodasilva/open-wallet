@@ -24,6 +24,7 @@ type Config struct {
 	GoogleSecret     string
 	LoginRedirectURI string
 	JWTSecret        string
+	RequestTimeout   int
 	RateLimits       RateLimits
 }
 
@@ -57,6 +58,7 @@ func Load() (*Config, error) {
 	l.loadDatabaseURL()
 	l.loadGoogleAuthConfig()
 	l.loadJWTConfig()
+	l.loadRequestTimeout()
 	l.loadRateLimitConfig()
 
 	if len(l.errs) > 0 {
@@ -145,6 +147,21 @@ func (l *loader) loadGoogleAuthConfig() {
 
 func (l *loader) loadJWTConfig() {
 	l.cfg.JWTSecret = l.getRequired("JWT_SECRET")
+}
+
+func (l *loader) loadRequestTimeout() {
+	val := os.Getenv("REQUEST_TIMEOUT_MS")
+	if val == "" {
+		l.cfg.RequestTimeout = 15000 // default 15s
+		return
+	}
+	intVal, err := strconv.Atoi(val)
+	if err != nil {
+		l.errs = append(l.errs, "REQUEST_TIMEOUT_MS must be a number")
+		l.cfg.RequestTimeout = 15000
+		return
+	}
+	l.cfg.RequestTimeout = intVal
 }
 
 func (l *loader) loadRateLimitConfig() {

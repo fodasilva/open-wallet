@@ -12,6 +12,7 @@ var StatusMessages = map[int]string{
 	404: "not found",
 	429: "too many requests",
 	500: "internal server error",
+	503: "service unavailable",
 }
 
 type HTTPErrorData struct {
