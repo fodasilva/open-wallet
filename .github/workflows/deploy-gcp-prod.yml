@@ -78,4 +78,5 @@ jobs:
             --set-env-vars LOGIN_REDIRECT_URI="${{ vars.LOGIN_REDIRECT_URI }}" \
             --set-env-vars GCP_PROJECT_ID="${{ secrets.GCP_PROJECT_ID }}" \
             --set-env-vars ENVIRONMENT="prod" \
-            --set-env-vars RATE_LIMIT_DB_URL="${{ secrets.RATE_LIMIT_DB_URL }}"
+            --set-env-vars RATE_LIMIT_DB_URL="${{ secrets.RATE_LIMIT_DB_URL }}" \
+            --set-env-vars REQUEST_TIMEOUT_MS="${{ vars.REQUEST_TIMEOUT_MS }}"

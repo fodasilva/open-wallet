@@ -50,6 +50,7 @@ func main() {
 
 	handler := httputil.Chain(
 		mux.ServeHTTP,
+		middlewares.TimeoutMiddleware(time.Duration(cfg.RequestTimeout)*time.Millisecond),
 		middlewares.RecoveryMiddleware(),
 		middlewares.DelayMiddleware(cfg),
 		middlewares.CorsMiddleware(cfg),
