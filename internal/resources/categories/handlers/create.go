@@ -70,6 +70,7 @@ func (o *CreateOptions) Run() error {
 // @Success 201 {object} util.ResponseData[CreateCategoryResponseData] "Category created"
 // @Failure 401 {object} httputil.HTTPError "Unauthorized"
 // @Failure 500 {object} httputil.HTTPError "Internal server error"
+// @Failure 503 {string} string "Service Unavailable"
 // @Router /api/v1/categories [post]
 func (api *API) Create(w http.ResponseWriter, r *http.Request) {
 	cmd := &CreateOptions{

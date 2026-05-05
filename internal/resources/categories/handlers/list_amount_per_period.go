@@ -92,6 +92,7 @@ func (o *ListAmountPerPeriodOptions) Run() error {
 // @Success 200 {object} util.PaginatedResponse[ListCategoryAmountPerPeriodResponseData] "List of categories with amount per period"
 // @Failure 401 {object} httputil.HTTPError "Unauthorized"
 // @Failure 500 {object} httputil.HTTPError "Internal server error"
+// @Failure 503 {string} string "Service Unavailable"
 // @Router /api/v1/categories/{period} [get]
 func (api *API) ListCategoryAmountPerPeriod(w http.ResponseWriter, r *http.Request) {
 	cmd := &ListAmountPerPeriodOptions{

@@ -123,6 +123,7 @@ func (o *UpdateTransactionOptions) Run() error {
 // @Failure 400 {object} httputil.HTTPError "Bad request"
 // @Failure 401 {object} httputil.HTTPError "Unauthorized"
 // @Failure 500 {object} httputil.HTTPError "Internal server error"
+// @Failure 503 {string} string "Service Unavailable"
 // @Router /api/v1/transactions/{transaction_id} [patch]
 func (api *API) UpdateTransaction(w http.ResponseWriter, r *http.Request) {
 	cmd := &UpdateTransactionOptions{

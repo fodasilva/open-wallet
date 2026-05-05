@@ -103,6 +103,7 @@ func (o *ListEntriesOptions) Run() error {
 // @Success 200 {object} util.PaginatedResponse[ListEntriesResponseData] "List of entries"
 // @Failure 401 {object} httputil.HTTPError "Unauthorized"
 // @Failure 500 {object} httputil.HTTPError "Internal server error"
+// @Failure 503 {string} string "Service Unavailable"
 // @Router /api/v1/transactions/entries [get]
 func (api *API) ListEntries(w http.ResponseWriter, r *http.Request) {
 	cmd := &ListEntriesOptions{

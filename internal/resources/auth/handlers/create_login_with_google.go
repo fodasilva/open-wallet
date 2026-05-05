@@ -67,6 +67,8 @@ func (o *CreateLoginWithGoogleOptions) Run() error {
 // @Success 200 {object} util.ResponseData[LoginGoogleResponseData] "User logged in"
 // @Failure 400 {object} httputil.HTTPError "Bad request"
 // @Failure 401 {object} httputil.HTTPError "Unauthorized"
+// @Failure 500 {object} httputil.HTTPError "Internal server error"
+// @Failure 503 {string} string "Service Unavailable"
 // @Router /api/v1/auth/login/google [post]
 func (api *API) CreateLoginWithGoogle(w http.ResponseWriter, r *http.Request) {
 	cmd := &CreateLoginWithGoogleOptions{
