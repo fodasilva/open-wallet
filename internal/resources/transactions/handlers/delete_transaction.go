@@ -52,6 +52,7 @@ func (o *DeleteOptions) Run() error {
 // @Failure 401 {object} httputil.HTTPError "Unauthorized"
 // @Failure 404 {object} httputil.HTTPError "Not found"
 // @Failure 500 {object} httputil.HTTPError "Internal server error"
+// @Failure 503 {string} string "Service Unavailable"
 // @Router /api/v1/transactions/{transaction_id} [delete]
 func (api *API) DeleteTransaction(w http.ResponseWriter, r *http.Request) {
 	cmd := &DeleteOptions{

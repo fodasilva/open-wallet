@@ -58,6 +58,18 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             }
@@ -134,6 +146,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             },
@@ -183,6 +201,12 @@ const docTemplate = `{
                         "description": "Internal server error",
                         "schema": {
                             "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -236,6 +260,12 @@ const docTemplate = `{
                         "description": "Internal server error",
                         "schema": {
                             "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -299,6 +329,12 @@ const docTemplate = `{
                         "description": "Internal server error",
                         "schema": {
                             "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -377,6 +413,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             }
@@ -447,6 +489,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             },
@@ -502,6 +550,12 @@ const docTemplate = `{
                         "description": "Internal server error",
                         "schema": {
                             "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -567,6 +621,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             },
@@ -630,6 +690,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             }
@@ -682,6 +748,12 @@ const docTemplate = `{
                         "description": "Internal server error",
                         "schema": {
                             "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -740,6 +812,12 @@ const docTemplate = `{
                         "description": "Internal server error",
                         "schema": {
                             "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -811,6 +889,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             }
@@ -867,6 +951,12 @@ const docTemplate = `{
                         "schema": {
                             "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
                         }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "type": "string"
+                        }
                     }
                 }
             }
@@ -919,6 +1009,12 @@ const docTemplate = `{
                         "description": "Internal server error",
                         "schema": {
                             "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }
@@ -982,6 +1078,12 @@ const docTemplate = `{
                         "description": "Internal server error",
                         "schema": {
                             "$ref": "#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError"
+                        }
+                    },
+                    "503": {
+                        "description": "Service Unavailable",
+                        "schema": {
+                            "type": "string"
                         }
                     }
                 }

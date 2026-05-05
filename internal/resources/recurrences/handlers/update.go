@@ -104,6 +104,7 @@ func (o *UpdateOptions) Run() error {
 // @Failure 400 {object} httputil.HTTPError "Bad request"
 // @Failure 401 {object} httputil.HTTPError "Unauthorized"
 // @Failure 500 {object} httputil.HTTPError "Internal server error"
+// @Failure 503 {string} string "Service Unavailable"
 // @Router /api/v1/recurrences/{id} [patch]
 func (api *API) Update(w http.ResponseWriter, r *http.Request) {
 	cmd := &UpdateOptions{

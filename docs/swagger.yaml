@@ -605,6 +605,14 @@ paths:
           description: Unauthorized
           schema:
             $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError'
+        "503":
+          description: Service Unavailable
+          schema:
+            type: string
       summary: Login with Google
       tags:
       - auth
@@ -655,6 +663,10 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError'
+        "503":
+          description: Service Unavailable
+          schema:
+            type: string
       security:
       - BearerAuth: []
       summary: List categories
@@ -687,6 +699,10 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError'
+        "503":
+          description: Service Unavailable
+          schema:
+            type: string
       security:
       - BearerAuth: []
       summary: Create a category
@@ -721,6 +737,10 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError'
+        "503":
+          description: Service Unavailable
+          schema:
+            type: string
       security:
       - BearerAuth: []
       summary: Delete Category By ID
@@ -762,6 +782,10 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError'
+        "503":
+          description: Service Unavailable
+          schema:
+            type: string
       security:
       - BearerAuth: []
       summary: Update Category By ID
@@ -815,6 +839,10 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError'
+        "503":
+          description: Service Unavailable
+          schema:
+            type: string
       security:
       - BearerAuth: []
       summary: List categories with amount per period
@@ -863,6 +891,10 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError'
+        "503":
+          description: Service Unavailable
+          schema:
+            type: string
       security:
       - BearerAuth: []
       summary: List recurrences
@@ -899,6 +931,10 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError'
+        "503":
+          description: Service Unavailable
+          schema:
+            type: string
       security:
       - BearerAuth: []
       summary: Create a recurrence
@@ -943,6 +979,10 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError'
+        "503":
+          description: Service Unavailable
+          schema:
+            type: string
       security:
       - BearerAuth: []
       summary: Delete Recurrence By ID
@@ -984,6 +1024,10 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError'
+        "503":
+          description: Service Unavailable
+          schema:
+            type: string
       security:
       - BearerAuth: []
       summary: Update a recurrence
@@ -1019,6 +1063,10 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError'
+        "503":
+          description: Service Unavailable
+          schema:
+            type: string
       security:
       - BearerAuth: []
       summary: Prepare recurrences for a period
@@ -1056,6 +1104,10 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError'
+        "503":
+          description: Service Unavailable
+          schema:
+            type: string
       security:
       - BearerAuth: []
       summary: Create a transaction
@@ -1090,6 +1142,10 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError'
+        "503":
+          description: Service Unavailable
+          schema:
+            type: string
       security:
       - BearerAuth: []
       summary: Delete Transaction By ID
@@ -1131,6 +1187,10 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError'
+        "503":
+          description: Service Unavailable
+          schema:
+            type: string
       security:
       - BearerAuth: []
       summary: Update a transaction
@@ -1181,6 +1241,10 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError'
+        "503":
+          description: Service Unavailable
+          schema:
+            type: string
       security:
       - BearerAuth: []
       summary: List entries
@@ -1223,6 +1287,10 @@ paths:
           description: Internal server error
           schema:
             $ref: '#/definitions/github_com_felipe1496_open-wallet_internal_util_httputil.HTTPError'
+        "503":
+          description: Service Unavailable
+          schema:
+            type: string
       security:
       - BearerAuth: []
       summary: Get financial summary grouped by month

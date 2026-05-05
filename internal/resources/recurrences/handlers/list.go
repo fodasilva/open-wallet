@@ -101,6 +101,7 @@ func (o *ListOptions) Run() error {
 // @Success 200 {object} util.PaginatedResponse[ListRecurrencesResponseData] "List of recurrences"
 // @Failure 401 {object} httputil.HTTPError "Unauthorized"
 // @Failure 500 {object} httputil.HTTPError "Internal server error"
+// @Failure 503 {string} string "Service Unavailable"
 // @Router /api/v1/recurrences [get]
 func (api *API) List(w http.ResponseWriter, r *http.Request) {
 	cmd := &ListOptions{

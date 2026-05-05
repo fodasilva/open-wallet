@@ -86,6 +86,7 @@ func (o *CreateOptions) Run() error {
 // @Failure 400 {object} httputil.HTTPError "Bad request"
 // @Failure 401 {object} httputil.HTTPError "Unauthorized"
 // @Failure 500 {object} httputil.HTTPError "Internal server error"
+// @Failure 503 {string} string "Service Unavailable"
 // @Router /api/v1/recurrences [post]
 func (api *API) Create(w http.ResponseWriter, r *http.Request) {
 	cmd := &CreateOptions{
