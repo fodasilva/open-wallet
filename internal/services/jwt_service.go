@@ -1,6 +1,7 @@
 package services
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -53,6 +54,9 @@ func (s *JWTServiceImpl) ValidateToken(tokenString string) (string, error) {
 	})
 
 	if err != nil {
+		if errors.Is(err, jwt.ErrTokenExpired) {
+			return "", httputil.NewHTTPError(http.StatusUnauthorized, "token expired")
+		}
 		return "", httputil.NewHTTPError(http.StatusInternalServerError, "failed to parse JWT token")
 	}
 
